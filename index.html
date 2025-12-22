@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>שאלון הכנה לישיבת התייעלות | קוראל שירותי ים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-dark: #1a365d;
+      --primary-teal: #0891b2;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --error: #dc2626;
+      --success: #059669;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--gray-700);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #root {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gray-200);
+      z-index: 1000;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary-teal));
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Header */
+    .header {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .logo-img {
+      height: 48px;
+      width: auto;
+    }
+
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .logo-placeholder {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-teal));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    /* Main Container */
+    .survey-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 2rem;
+    }
+
+    /* Step Container */
+    .step-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-12px);
+      }
+    }
+
+    .step-exiting {
+      animation: fadeOut 0.3s ease-in forwards;
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .welcome-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.125rem;
+      color: var(--gray-500);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Completion Screen */
+    .completion-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .completion-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--success), #10b981);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .completion-icon svg {
+      width: 40px;
+      height: 40px;
+      color: var(--white);
+    }
+
+    .completion-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .completion-subtitle {
+      font-size: 1.125rem;
+      color: var(--gray-500);
+    }
+
+    /* Step Header */
+    .step-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .step-indicator {
+      font-size: 0.875rem;
+      color: var(--gray-400);
+      margin-bottom: 0.5rem;
+    }
+
+    .step-title {
+      font-size: 1.375rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-description {
+      font-size: 0.9375rem;
+      color: var(--gray-500);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-label.required::after {
+      content: ' *';
+      color: var(--error);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--gray-700);
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary-teal);
+      box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+    }
+
+    .form-input.error,
+    .form-select.error {
+      border-color: var(--error);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--gray-400);
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 1rem center;
+      background-size: 20px;
+      padding-left: 2.5rem;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .char-count {
+      text-align: left;
+      font-size: 0.8125rem;
+      color: var(--gray-400);
+      margin-top: 0.25rem;
+    }
+
+    .char-count.warning {
+      color: var(--error);
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 0.875rem;
+      margin-top: 0.375rem;
+    }
+
+    /* Radio Options */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      background: var(--white);
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .radio-option:hover {
+      border-color: var(--gray-300);
+    }
+
+    .radio-option.selected {
+      border-color: var(--primary-teal);
+      background: rgba(8, 145, 178, 0.04);
+    }
+
+    .radio-option input {
+      display: none;
+    }
+
+    .radio-circle {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--gray-300);
+      border-radius: 50%;
+      margin-left: 0.875rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .radio-option.selected .radio-circle {
+      border-color: var(--primary-teal);
+      background: var(--primary-teal);
+    }
+
+    .radio-circle::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--white);
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.2s ease;
+    }
+
+    .radio-option.selected .radio-circle::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .radio-label {
+      font-size: 1rem;
+      color: var(--gray-700);
+    }
+
+    /* Checkbox Cards */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    .checkbox-card {
+      display: flex;
+      align-items: flex-start;
+      padding: 1rem 1.25rem;
+      background: var(--white);
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-card:hover {
+      border-color: var(--gray-300);
+    }
+
+    .checkbox-card.selected {
+      border-color: var(--primary-teal);
+      background: rgba(8, 145, 178, 0.04);
+    }
+
+    .checkbox-card input {
+      display: none;
+    }
+
+    .checkbox-box {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--gray-300);
+      border-radius: 6px;
+      margin-left: 0.875rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-card.selected .checkbox-box {
+      border-color: var(--primary-teal);
+      background: var(--primary-teal);
+    }
+
+    .checkbox-box svg {
+      width: 14px;
+      height: 14px;
+      color: var(--white);
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-card.selected .checkbox-box svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .checkbox-label {
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      line-height: 1.4;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: auto;
+      padding-top: 2rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-teal));
+      color: var(--white);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--gray-200);
+    }
+
+    .btn-start {
+      padding: 1.125rem 3rem;
+      font-size: 1.125rem;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Question Card */
+    .question-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .question-title {
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.375rem;
+    }
+
+    .question-hint {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (min-width: 640px) {
+      .survey-container {
+        padding: 2rem 1.5rem 3rem;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .step-title {
+        font-size: 1.5rem;
+      }
+
+      .button-group {
+        max-width: 400px;
+        align-self: center;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+    // Supabase Configuration
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+    // Survey Data
+    const DEPARTMENTS = [
+      'תפעול / סוכנות',
+      'חכירות',
+      'כספים',
+      'הנהלת חשבונות',
+      'פרויקטים',
+      'אחר'
+    ];
+
+    const SENIORITY_OPTIONS = [
+      'פחות משנה',
+      '1-3 שנים',
+      '3-7 שנים',
+      'מעל 7 שנים'
+    ];
+
+    const EMAILS_PER_DAY = [
+      'עד 20',
+      '20-50',
+      '50-100',
+      'מעל 100'
+    ];
+
+    const EMAILS_REQUIRING_ACTION = [
+      'כמעט אף אחד',
+      'מיעוט (עד 25%)',
+      'בערך חצי',
+      'רוב המיילים (מעל 50%)'
+    ];
+
+    const HOURS_OUTSIDE_WORK = [
+      'לא עובד מחוץ לשעות',
+      '1-3 שעות',
+      '3-6 שעות',
+      'מעל 6 שעות'
+    ];
+
+    const TIME_SEARCHING_INFO = [
+      'עד 15 דקות',
+      '15-30 דקות',
+      '30-60 דקות',
+      'מעל שעה'
+    ];
+
+    const REPETITIVE_TASKS = [
+      'העתקת נתונים ממייל לאקסל או לתוכנה אחרת',
+      'חיפוש סטטוס (של אנייה, משלוח, פרויקט, תשלום)',
+      'מענה על שאלות שחוזרות על עצמן',
+      'הכנת דוח ידני',
+      'עדכון אותו מידע בכמה מקומות',
+      'בדיקה ידנית של התאמות (חשבוניות, מסמכים)',
+      'תזכורות ומעקב ידני אחרי משימות'
+    ];
+
+    const TOTAL_STEPS = 6;
+
+    // Components
+    function ProgressBar({ step, totalSteps }) {
+      const progress = step === 0 ? 0 : (step / totalSteps) * 100;
+      return (
+        <div className="progress-container">
+          <div className="progress-bar" style={{ width: `${progress}%` }} />
+        </div>
+      );
+    }
+
+    function Header() {
+      return (
+        <header className="header">
+          <div className="logo-container">
+            {/* Replace logo-placeholder with actual logo: <img src="coral-logo.png" alt="קוראל" className="logo-img" /> */}
+            <div className="logo-placeholder">ק</div>
+            <span className="logo-text">קוראל שירותי ים</span>
+          </div>
+        </header>
+      );
+    }
+
+    function WelcomeScreen({ onStart }) {
+      return (
+        <div className="welcome-screen">
+          <h1 className="welcome-title">שאלון הכנה לישיבת התייעלות</h1>
+          <p className="welcome-subtitle">השאלון לוקח כ-3 דקות</p>
+          <button className="btn btn-primary btn-start" onClick={onStart}>
+            התחלה
+          </button>
+        </div>
+      );
+    }
+
+    function CompletionScreen({ name }) {
+      return (
+        <div className="completion-screen">
+          <div className="completion-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 className="completion-title">התשובות נשמרו</h2>
+          <p className="completion-subtitle">תודה {name}. נתראה בישיבה.</p>
+        </div>
+      );
+    }
+
+    function RadioGroup({ options, value, onChange, name }) {
+      return (
+        <div className="radio-group">
+          {options.map((option, index) => (
+            <label
+              key={index}
+              className={`radio-option ${value === option ? 'selected' : ''}`}
+            >
+              <input
+                type="radio"
+                name={name}
+                value={option}
+                checked={value === option}
+                onChange={() => onChange(option)}
+              />
+              <span className="radio-circle" />
+              <span className="radio-label">{option}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    function CheckboxGroup({ options, values, onChange }) {
+      const handleToggle = (option) => {
+        if (values.includes(option)) {
+          onChange(values.filter(v => v !== option));
+        } else {
+          onChange([...values, option]);
+        }
+      };
+
+      return (
+        <div className="checkbox-group">
+          {options.map((option, index) => (
+            <label
+              key={index}
+              className={`checkbox-card ${values.includes(option) ? 'selected' : ''}`}
+            >
+              <input
+                type="checkbox"
+                checked={values.includes(option)}
+                onChange={() => handleToggle(option)}
+              />
+              <span className="checkbox-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="checkbox-label">{option}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    function Step1PersonalInfo({ data, onChange, errors }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 1 מתוך 6</div>
+            <h2 className="step-title">פרטים אישיים</h2>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label required">שם מלא</label>
+            <input
+              type="text"
+              className={`form-input ${errors.name ? 'error' : ''}`}
+              value={data.name}
+              onChange={(e) => onChange('name', e.target.value)}
+              placeholder="הזן את שמך המלא"
+            />
+            {errors.name && <div className="error-message">{errors.name}</div>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">מחלקה</label>
+            <select
+              className="form-select"
+              value={data.department}
+              onChange={(e) => onChange('department', e.target.value)}
+            >
+              <option value="">בחר מחלקה</option>
+              {DEPARTMENTS.map((dept, index) => (
+                <option key={index} value={dept}>{dept}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">תפקיד</label>
+            <input
+              type="text"
+              className="form-input"
+              value={data.role}
+              onChange={(e) => onChange('role', e.target.value)}
+              placeholder="מה התפקיד שלך?"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">ותק בחברה</label>
+            <RadioGroup
+              options={SENIORITY_OPTIONS}
+              value={data.seniority}
+              onChange={(value) => onChange('seniority', value)}
+              name="seniority"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function Step2Emails({ data, onChange }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 2 מתוך 6</div>
+            <h2 className="step-title">עומס מיילים</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה מיילים אתה מקבל ביום עבודה ממוצע?</h3>
+            <RadioGroup
+              options={EMAILS_PER_DAY}
+              value={data.emails_per_day}
+              onChange={(value) => onChange('emails_per_day', value)}
+              name="emails_per_day"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה מהמיילים דורשים ממך להעתיק או להקליד מידע למקום אחר?</h3>
+            <p className="question-hint">למשל: להעביר נתונים מהמייל לאקסל, לתוכנה פנימית, לטופס</p>
+            <RadioGroup
+              options={EMAILS_REQUIRING_ACTION}
+              value={data.emails_requiring_action}
+              onChange={(value) => onChange('emails_requiring_action', value)}
+              name="emails_requiring_action"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function Step3WorkHours({ data, onChange }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 3 מתוך 6</div>
+            <h2 className="step-title">שעות עבודה</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה שעות בשבוע אתה עובד מחוץ לשעות המשרד?</h3>
+            <p className="question-hint">כולל מענה למיילים בערב, בסופ״ש</p>
+            <RadioGroup
+              options={HOURS_OUTSIDE_WORK}
+              value={data.hours_outside_work}
+              onChange={(value) => onChange('hours_outside_work', value)}
+              name="hours_outside_work"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה זמן ביום אתה מבלה בחיפוש מידע?</h3>
+            <p className="question-hint">חיפוש במיילים ישנים, בתיקיות, בקבצים, בתוכנות</p>
+            <RadioGroup
+              options={TIME_SEARCHING_INFO}
+              value={data.time_searching_info}
+              onChange={(value) => onChange('time_searching_info', value)}
+              name="time_searching_info"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function Step4RepetitiveTasks({ data, onChange }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 4 מתוך 6</div>
+            <h2 className="step-title">פעולות חוזרות</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">אילו פעולות אתה מבצע יותר מפעם אחת ביום?</h3>
+            <p className="question-hint">ניתן לבחור כמה אפשרויות</p>
+            <CheckboxGroup
+              options={REPETITIVE_TASKS}
+              values={data.repetitive_tasks}
+              onChange={(values) => onChange('repetitive_tasks', values)}
+            />
+          </div>
+        </>
+      );
+    }
+
+    function Step5PainPoint({ data, onChange }) {
+      const maxChars = 200;
+      const charCount = data.main_pain_point.length;
+
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 5 מתוך 6</div>
+            <h2 className="step-title">נקודת כאב</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מה התהליך הכי מתסכל או גוזל זמן בעבודה שלך?</h3>
+            <textarea
+              className="form-textarea"
+              value={data.main_pain_point}
+              onChange={(e) => {
+                if (e.target.value.length <= maxChars) {
+                  onChange('main_pain_point', e.target.value);
+                }
+              }}
+              placeholder="תאר בקצרה..."
+              rows="4"
+            />
+            <div className={`char-count ${charCount > maxChars - 20 ? 'warning' : ''}`}>
+              {charCount}/{maxChars}
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    function Step6AdditionalNotes({ data, onChange }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב 6 מתוך 6</div>
+            <h2 className="step-title">הערות</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">משהו נוסף?</h3>
+            <p className="question-hint">אופציונלי</p>
+            <textarea
+              className="form-textarea"
+              value={data.additional_notes}
+              onChange={(e) => onChange('additional_notes', e.target.value)}
+              placeholder="הערות, הצעות, או כל דבר אחר שחשוב לך לציין..."
+              rows="4"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function NavigationButtons({ step, onPrev, onNext, isSubmitting, isLastStep }) {
+      return (
+        <div className="button-group">
+          {step > 1 && (
+            <button
+              className="btn btn-secondary"
+              onClick={onPrev}
+              disabled={isSubmitting}
+            >
+              הקודם
+            </button>
+          )}
+          <button
+            className="btn btn-primary"
+            onClick={onNext}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="spinner" />
+            ) : isLastStep ? (
+              'שליחה'
+            ) : (
+              'הבא'
+            )}
+          </button>
+        </div>
+      );
+    }
+
+    // Main Survey Component
+    function Survey() {
+      const [step, setStep] = useState(0);
+      const [isTransitioning, setIsTransitioning] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [isCompleted, setIsCompleted] = useState(false);
+      const [errors, setErrors] = useState({});
+
+      const [formData, setFormData] = useState({
+        name: '',
+        department: '',
+        role: '',
+        seniority: '',
+        emails_per_day: '',
+        emails_requiring_action: '',
+        hours_outside_work: '',
+        time_searching_info: '',
+        repetitive_tasks: [],
+        main_pain_point: '',
+        additional_notes: ''
+      });
+
+      const updateField = useCallback((field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+          setErrors(prev => ({ ...prev, [field]: null }));
+        }
+      }, [errors]);
+
+      const validateStep = (stepNum) => {
+        const newErrors = {};
+
+        if (stepNum === 1) {
+          if (!formData.name.trim()) {
+            newErrors.name = 'שדה חובה';
+          }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+      };
+
+      const goToStep = (newStep, direction = 'next') => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setStep(newStep);
+          setIsTransitioning(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 300);
+      };
+
+      const handleNext = async () => {
+        if (!validateStep(step)) return;
+
+        if (step === TOTAL_STEPS) {
+          await submitForm();
+        } else {
+          goToStep(step + 1);
+        }
+      };
+
+      const handlePrev = () => {
+        if (step > 1) {
+          goToStep(step - 1, 'prev');
+        }
+      };
+
+      const submitForm = async () => {
+        setIsSubmitting(true);
+
+        try {
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+              name: formData.name,
+              department: formData.department || null,
+              role: formData.role || null,
+              seniority: formData.seniority || null,
+              emails_per_day: formData.emails_per_day || null,
+              emails_requiring_action: formData.emails_requiring_action || null,
+              hours_outside_work: formData.hours_outside_work || null,
+              time_searching_info: formData.time_searching_info || null,
+              repetitive_tasks: formData.repetitive_tasks.length > 0 ? formData.repetitive_tasks : null,
+              main_pain_point: formData.main_pain_point || null,
+              additional_notes: formData.additional_notes || null
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to submit');
+          }
+
+          setIsCompleted(true);
+        } catch (error) {
+          console.error('Submit error:', error);
+          alert('אירעה שגיאה בשמירת הנתונים. נסה שוב.');
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+
+      const renderStep = () => {
+        if (isCompleted) {
+          return <CompletionScreen name={formData.name.split(' ')[0]} />;
+        }
+
+        switch (step) {
+          case 0:
+            return <WelcomeScreen onStart={() => goToStep(1)} />;
+          case 1:
+            return <Step1PersonalInfo data={formData} onChange={updateField} errors={errors} />;
+          case 2:
+            return <Step2Emails data={formData} onChange={updateField} />;
+          case 3:
+            return <Step3WorkHours data={formData} onChange={updateField} />;
+          case 4:
+            return <Step4RepetitiveTasks data={formData} onChange={updateField} />;
+          case 5:
+            return <Step5PainPoint data={formData} onChange={updateField} />;
+          case 6:
+            return <Step6AdditionalNotes data={formData} onChange={updateField} />;
+          default:
+            return null;
+        }
+      };
+
+      return (
+        <>
+          <ProgressBar step={step} totalSteps={TOTAL_STEPS} />
+          <Header />
+          <main className="survey-container">
+            <div className={`step-container ${isTransitioning ? 'step-exiting' : ''}`}>
+              {renderStep()}
+              {step > 0 && !isCompleted && (
+                <NavigationButtons
+                  step={step}
+                  onPrev={handlePrev}
+                  onNext={handleNext}
+                  isSubmitting={isSubmitting}
+                  isLastStep={step === TOTAL_STEPS}
+                />
+              )}
+            </div>
+          </main>
+        </>
+      );
+    }
+
+    // Render
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<Survey />);
+  </script>
+</body>
+</html>
