@@ -626,6 +626,7 @@
     // Supabase Configuration
     const SUPABASE_URL = 'YOUR_SUPABASE_URL';
     const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const isSupabaseConfigured = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
 
     // Constants
     const DEPARTMENTS = [
@@ -1272,6 +1273,13 @@
 
       const submitForm = async () => {
         setIsSubmitting(true);
+
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured) {
+          alert('שגיאת הגדרות: יש להגדיר את פרטי Supabase בקוד.\n\nלמפתחים: יש לעדכן SUPABASE_URL ו-SUPABASE_ANON_KEY');
+          setIsSubmitting(false);
+          return;
+        }
 
         try {
           const submitData = {

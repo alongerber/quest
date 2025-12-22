@@ -638,8 +638,13 @@
     const ADMIN_PASSWORD = 'coral2024';
     const ITEMS_PER_PAGE = 10;
 
-    // Initialize Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Check if Supabase is configured
+    const isSupabaseConfigured = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
+
+    // Initialize Supabase only if configured
+    const supabase = isSupabaseConfigured
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
 
     // Chart colors
     const CHART_COLORS = [
@@ -1309,6 +1314,25 @@
       );
     }
 
+    // Config Error Component
+    function ConfigError() {
+      return (
+        <div className="login-screen">
+          <div className="login-card">
+            <h1 className="login-title" style={{color: '#dc2626'}}>שגיאת הגדרות</h1>
+            <p className="login-subtitle">יש להגדיר את פרטי Supabase בקוד</p>
+            <div style={{background: '#f1f5f9', padding: '1rem', borderRadius: '8px', textAlign: 'left', direction: 'ltr', fontSize: '0.875rem', fontFamily: 'monospace'}}>
+              <p>const SUPABASE_URL = '<span style={{color: '#dc2626'}}>your-url</span>';</p>
+              <p>const SUPABASE_ANON_KEY = '<span style={{color: '#dc2626'}}>your-key</span>';</p>
+            </div>
+            <p style={{marginTop: '1rem', fontSize: '0.875rem', color: '#64748b'}}>
+              ניתן להשיג את הפרטים מ-Supabase Dashboard → Settings → API
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     // App Component
     function App() {
       const [isAuthenticated, setIsAuthenticated] = useState(
@@ -1319,6 +1343,11 @@
         localStorage.removeItem('admin_authenticated');
         setIsAuthenticated(false);
       };
+
+      // Show config error if Supabase not configured
+      if (!isSupabaseConfigured) {
+        return <ConfigError />;
+      }
 
       if (!isAuthenticated) {
         return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
