@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דשבורד תשובות השאלון | קוראל שירותי ים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-dark: #1a365d;
+      --primary-teal: #0891b2;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --error: #dc2626;
+      --success: #059669;
+      --warning: #f59e0b;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-100);
+      min-height: 100vh;
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+
+    /* Login Screen */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-teal) 100%);
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      color: var(--gray-500);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: var(--primary-teal);
+    }
+
+    .login-input.error {
+      border-color: var(--error);
+    }
+
+    .login-error {
+      color: var(--error);
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-teal));
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      min-height: 100vh;
+    }
+
+    .dashboard-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .last-updated {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .btn {
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-teal);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: #0e7490;
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-logout {
+      background: transparent;
+      color: var(--gray-500);
+    }
+
+    .btn-logout:hover {
+      color: var(--error);
+    }
+
+    /* Main Content */
+    .dashboard-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .summary-card-label {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .summary-card-secondary {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+    }
+
+    /* Table Section */
+    .table-section {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .table-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .table-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .table-filters {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-input {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-family: inherit;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      min-width: 200px;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: var(--primary-teal);
+    }
+
+    .filter-select {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-family: inherit;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      background: var(--white);
+      min-width: 150px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.875rem;
+      text-align: right;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .data-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-600);
+      font-size: 0.875rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .data-table th:hover {
+      background: var(--gray-100);
+    }
+
+    .data-table tbody tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--gray-50);
+    }
+
+    .data-table td {
+      font-size: 0.9375rem;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .pagination-btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--gray-100);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn.active {
+      background: var(--primary-teal);
+      color: var(--white);
+      border-color: var(--primary-teal);
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    /* Pain Points Section */
+    .insights-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .insights-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+
+    .insights-filter {
+      margin-bottom: 1rem;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .insight-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border-right: 4px solid var(--warning);
+    }
+
+    .insight-card.automation {
+      border-right-color: var(--success);
+    }
+
+    .insight-content {
+      font-size: 0.9375rem;
+      color: var(--gray-700);
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .insight-meta {
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 10;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--gray-100);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--gray-600);
+    }
+
+    .modal-close:hover {
+      background: var(--gray-200);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-teal);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .modal-field {
+      display: flex;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-field-label {
+      font-weight: 500;
+      color: var(--gray-600);
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+
+    .modal-field-value {
+      color: var(--gray-700);
+    }
+
+    .modal-field-value.highlight {
+      background: var(--gray-100);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 0.25rem;
+      display: block;
+      width: 100%;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      color: var(--gray-500);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--primary-teal);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.75rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray-500);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .modal-field {
+        flex-direction: column;
+      }
+
+      .modal-field-label {
+        margin-bottom: 0.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // Configuration
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const ADMIN_PASSWORD = 'coral2024';
+    const ITEMS_PER_PAGE = 10;
+
+    // Initialize Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Chart colors
+    const CHART_COLORS = [
+      '#0891b2', '#1a365d', '#059669', '#f59e0b', '#8b5cf6',
+      '#ec4899', '#ef4444', '#14b8a6', '#6366f1', '#84cc16'
+    ];
+
+    // Helper functions
+    const formatDate = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('he-IL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    const formatShortDate = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+    };
+
+    const isToday = (dateStr) => {
+      const date = new Date(dateStr);
+      const today = new Date();
+      return date.toDateString() === today.toDateString();
+    };
+
+    const isThisWeek = (dateStr) => {
+      const date = new Date(dateStr);
+      const today = new Date();
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return date >= weekAgo;
+    };
+
+    // Login Component
+    function LoginScreen({ onLogin }) {
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (password === ADMIN_PASSWORD) {
+          localStorage.setItem('admin_authenticated', 'true');
+          onLogin();
+        } else {
+          setError('סיסמה שגויה');
+        }
+      };
+
+      return (
+        <div className="login-screen">
+          <form className="login-card" onSubmit={handleSubmit}>
+            <h1 className="login-title">דשבורד אדמין</h1>
+            <p className="login-subtitle">קוראל שירותי ים</p>
+            {error && <div className="login-error">{error}</div>}
+            <input
+              type="password"
+              className={`login-input ${error ? 'error' : ''}`}
+              placeholder="הזן סיסמה"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
+              autoFocus
+            />
+            <button type="submit" className="login-btn">כניסה</button>
+          </form>
+        </div>
+      );
+    }
+
+    // Summary Card Component
+    function SummaryCard({ label, value, secondary }) {
+      return (
+        <div className="summary-card">
+          <div className="summary-card-label">{label}</div>
+          <div className="summary-card-value">{value}</div>
+          {secondary && <div className="summary-card-secondary">{secondary}</div>}
+        </div>
+      );
+    }
+
+    // Chart Component
+    function ChartCard({ title, children }) {
+      return (
+        <div className="chart-card">
+          <h3 className="chart-title">{title}</h3>
+          <div className="chart-container">{children}</div>
+        </div>
+      );
+    }
+
+    // Donut Chart
+    function DonutChart({ data, labels }) {
+      const canvasRef = useRef(null);
+      const chartRef = useRef(null);
+
+      useEffect(() => {
+        if (chartRef.current) chartRef.current.destroy();
+
+        const ctx = canvasRef.current.getContext('2d');
+        chartRef.current = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: CHART_COLORS.slice(0, labels.length),
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                rtl: true,
+                labels: { font: { family: 'Heebo' }, padding: 15 }
+              }
+            }
+          }
+        });
+
+        return () => { if (chartRef.current) chartRef.current.destroy(); };
+      }, [data, labels]);
+
+      return <canvas ref={canvasRef}></canvas>;
+    }
+
+    // Bar Chart
+    function BarChart({ data, labels, horizontal = false }) {
+      const canvasRef = useRef(null);
+      const chartRef = useRef(null);
+
+      useEffect(() => {
+        if (chartRef.current) chartRef.current.destroy();
+
+        const ctx = canvasRef.current.getContext('2d');
+        chartRef.current = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: CHART_COLORS[0],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: horizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: {
+                grid: { display: !horizontal },
+                ticks: { font: { family: 'Heebo' } }
+              },
+              y: {
+                grid: { display: horizontal },
+                ticks: { font: { family: 'Heebo' } }
+              }
+            }
+          }
+        });
+
+        return () => { if (chartRef.current) chartRef.current.destroy(); };
+      }, [data, labels, horizontal]);
+
+      return <canvas ref={canvasRef}></canvas>;
+    }
+
+    // Response Modal
+    function ResponseModal({ response, onClose }) {
+      if (!response) return null;
+
+      const sections = [
+        {
+          title: 'פרטים אישיים',
+          fields: [
+            { label: 'שם', value: response.name },
+            { label: 'מחלקה', value: response.department || response.department_other || '-' },
+            { label: 'תפקיד', value: response.role || '-' },
+            { label: 'ותק', value: response.seniority || '-' },
+            { label: 'תאריך מילוי', value: formatDate(response.created_at) }
+          ]
+        },
+        {
+          title: 'פעילויות',
+          fields: [
+            { label: 'פעילויות נבחרות', value: response.activities?.join(', ') || '-' }
+          ]
+        },
+        {
+          title: 'מיילים',
+          fields: [
+            { label: 'מיילים ביום', value: response.emails_count || '-' },
+            { label: 'מיילים ישירים', value: response.emails_direct || '-' },
+            { label: 'דורשים פעולה', value: response.emails_action || '-' },
+            { label: 'דורשים העתקה', value: response.emails_copy || '-' },
+            { label: 'חיפוש במייל ישן', value: response.emails_search || '-' },
+            { label: 'מיילים נופלים', value: response.emails_missed || '-' }
+          ]
+        },
+        {
+          title: 'כלים',
+          fields: [
+            { label: 'כלים בשימוש', value: response.tools?.join(', ') || '-' },
+            { label: 'מערכת פנימית', value: response.internal_system_name || '-' },
+            { label: 'העתקות בין כלים', value: response.tools_copy_between || '-', highlight: true }
+          ]
+        },
+        {
+          title: 'זמן',
+          fields: [
+            { label: 'עבודה מחוץ לשעות', value: response.hours_outside || '-' },
+            { label: 'פעולה חוזרת', value: response.most_repeated_action || '-', highlight: true },
+            { label: 'מבזבז זמן', value: response.biggest_time_waste || '-', highlight: true }
+          ]
+        },
+        {
+          title: 'נקודות כאב ורעיונות',
+          fields: [
+            { label: 'הכי מתסכל', value: response.main_frustration || '-', highlight: true },
+            { label: 'רעיון לשיפור', value: response.improvement_idea || '-', highlight: true },
+            { label: 'אוטומציה רצויה', value: response.automation_wish || '-', highlight: true },
+            { label: 'הערות נוספות', value: response.additional_notes || '-', highlight: true }
+          ]
+        }
+      ];
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">תשובות: {response.name}</h2>
+              <button className="modal-close" onClick={onClose}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {sections.map((section, idx) => (
+                <div key={idx} className="modal-section">
+                  <h4 className="modal-section-title">{section.title}</h4>
+                  {section.fields.map((field, fidx) => (
+                    <div key={fidx} className="modal-field">
+                      <span className="modal-field-label">{field.label}:</span>
+                      {field.highlight ? (
+                        <span className="modal-field-value highlight">{field.value}</span>
+                      ) : (
+                        <span className="modal-field-value">{field.value}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Main Dashboard Component
+    function Dashboard({ onLogout }) {
+      const [responses, setResponses] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [lastUpdated, setLastUpdated] = useState(null);
+      const [searchTerm, setSearchTerm] = useState('');
+      const [departmentFilter, setDepartmentFilter] = useState('');
+      const [sortField, setSortField] = useState('created_at');
+      const [sortDir, setSortDir] = useState('desc');
+      const [currentPage, setCurrentPage] = useState(1);
+      const [selectedResponse, setSelectedResponse] = useState(null);
+      const [insightsDeptFilter, setInsightsDeptFilter] = useState('');
+
+      const fetchResponses = async () => {
+        setLoading(true);
+        try {
+          const { data, error } = await supabase
+            .from('survey_responses_v2')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          setResponses(data || []);
+          setLastUpdated(new Date());
+        } catch (err) {
+          console.error('Error fetching responses:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchResponses();
+      }, []);
+
+      // Stats
+      const stats = useMemo(() => {
+        const total = responses.length;
+        const today = responses.filter(r => isToday(r.created_at)).length;
+        const week = responses.filter(r => isThisWeek(r.created_at)).length;
+
+        const deptCounts = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          deptCounts[dept] = (deptCounts[dept] || 0) + 1;
+        });
+        const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0];
+
+        return { total, today, week, topDept: topDept ? topDept[0] : '-' };
+      }, [responses]);
+
+      // Chart data
+      const chartData = useMemo(() => {
+        // Department distribution
+        const deptCounts = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          deptCounts[dept] = (deptCounts[dept] || 0) + 1;
+        });
+        const departments = { labels: Object.keys(deptCounts), data: Object.values(deptCounts) };
+
+        // Seniority distribution
+        const senCounts = {};
+        responses.forEach(r => {
+          if (r.seniority) senCounts[r.seniority] = (senCounts[r.seniority] || 0) + 1;
+        });
+        const seniority = { labels: Object.keys(senCounts), data: Object.values(senCounts) };
+
+        // Emails per day
+        const emailCounts = {};
+        responses.forEach(r => {
+          if (r.emails_count) emailCounts[r.emails_count] = (emailCounts[r.emails_count] || 0) + 1;
+        });
+        const emails = { labels: Object.keys(emailCounts), data: Object.values(emailCounts) };
+
+        // Activities
+        const actCounts = {};
+        responses.forEach(r => {
+          (r.activities || []).forEach(a => {
+            actCounts[a] = (actCounts[a] || 0) + 1;
+          });
+        });
+        const sortedActs = Object.entries(actCounts).sort((a, b) => b[1] - a[1]);
+        const activities = { labels: sortedActs.map(a => a[0]), data: sortedActs.map(a => a[1]) };
+
+        // Hours outside
+        const hoursCounts = {};
+        responses.forEach(r => {
+          if (r.hours_outside) hoursCounts[r.hours_outside] = (hoursCounts[r.hours_outside] || 0) + 1;
+        });
+        const hours = { labels: Object.keys(hoursCounts), data: Object.values(hoursCounts) };
+
+        return { departments, seniority, emails, activities, hours };
+      }, [responses]);
+
+      // Filtered and sorted responses
+      const filteredResponses = useMemo(() => {
+        let result = [...responses];
+
+        if (searchTerm) {
+          const term = searchTerm.toLowerCase();
+          result = result.filter(r =>
+            r.name?.toLowerCase().includes(term) ||
+            r.department?.toLowerCase().includes(term) ||
+            r.role?.toLowerCase().includes(term)
+          );
+        }
+
+        if (departmentFilter) {
+          result = result.filter(r =>
+            r.department === departmentFilter || r.department_other === departmentFilter
+          );
+        }
+
+        result.sort((a, b) => {
+          const aVal = a[sortField] || '';
+          const bVal = b[sortField] || '';
+          const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+          return sortDir === 'asc' ? cmp : -cmp;
+        });
+
+        return result;
+      }, [responses, searchTerm, departmentFilter, sortField, sortDir]);
+
+      // Pagination
+      const totalPages = Math.ceil(filteredResponses.length / ITEMS_PER_PAGE);
+      const paginatedResponses = filteredResponses.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      );
+
+      // Departments list
+      const departments = useMemo(() => {
+        const depts = new Set();
+        responses.forEach(r => {
+          if (r.department) depts.add(r.department);
+          if (r.department_other) depts.add(r.department_other);
+        });
+        return Array.from(depts);
+      }, [responses]);
+
+      // Pain points and automation wishes
+      const insights = useMemo(() => {
+        let filtered = responses;
+        if (insightsDeptFilter) {
+          filtered = filtered.filter(r =>
+            r.department === insightsDeptFilter || r.department_other === insightsDeptFilter
+          );
+        }
+
+        const painPoints = filtered
+          .filter(r => r.main_frustration)
+          .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other || '-' }));
+
+        const automation = filtered
+          .filter(r => r.automation_wish)
+          .map(r => ({ text: r.automation_wish, name: r.name, dept: r.department || r.department_other || '-' }));
+
+        return { painPoints, automation };
+      }, [responses, insightsDeptFilter]);
+
+      // Export to CSV
+      const exportToCSV = () => {
+        const headers = [
+          'תאריך', 'שם', 'מחלקה', 'מחלקה אחר', 'תפקיד', 'ותק',
+          'פעילויות', 'מיילים ביום', 'מיילים ישירים', 'דורשים פעולה',
+          'דורשים העתקה', 'חיפוש במייל', 'מיילים נופלים',
+          'כלים', 'מערכת פנימית', 'העתקות בין כלים',
+          'עבודה מחוץ לשעות', 'פעולה חוזרת', 'מבזבז זמן',
+          'הכי מתסכל', 'רעיון לשיפור', 'אוטומציה רצויה', 'הערות'
+        ];
+
+        const rows = responses.map(r => [
+          formatDate(r.created_at),
+          r.name || '',
+          r.department || '',
+          r.department_other || '',
+          r.role || '',
+          r.seniority || '',
+          (r.activities || []).join('; '),
+          r.emails_count || '',
+          r.emails_direct || '',
+          r.emails_action || '',
+          r.emails_copy || '',
+          r.emails_search || '',
+          r.emails_missed || '',
+          (r.tools || []).join('; '),
+          r.internal_system_name || '',
+          r.tools_copy_between || '',
+          r.hours_outside || '',
+          r.most_repeated_action || '',
+          r.biggest_time_waste || '',
+          r.main_frustration || '',
+          r.improvement_idea || '',
+          r.automation_wish || '',
+          r.additional_notes || ''
+        ]);
+
+        const csvContent = '\uFEFF' + [headers, ...rows]
+          .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `survey_responses_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+      };
+
+      const handleSort = (field) => {
+        if (sortField === field) {
+          setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+          setSortField(field);
+          setSortDir('asc');
+        }
+      };
+
+      if (loading) {
+        return (
+          <div className="dashboard">
+            <div className="loading">
+              <span className="spinner"></span>
+              טוען נתונים...
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="dashboard">
+          <header className="dashboard-header">
+            <div className="header-content">
+              <h1 className="header-title">דשבורד תשובות השאלון | קוראל שירותי ים</h1>
+              <div className="header-actions">
+                {lastUpdated && (
+                  <span className="last-updated">
+                    עודכן: {lastUpdated.toLocaleTimeString('he-IL')}
+                  </span>
+                )}
+                <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
+                <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
+                <button className="btn btn-logout" onClick={onLogout}>התנתק</button>
+              </div>
+            </div>
+          </header>
+
+          <main className="dashboard-content">
+            {/* Summary Cards */}
+            <div className="summary-cards">
+              <SummaryCard label="סה״כ תשובות" value={stats.total} />
+              <SummaryCard label="תשובות היום" value={stats.today} />
+              <SummaryCard label="השבוע האחרון" value={stats.week} />
+              <SummaryCard label="מחלקה מובילה" value={stats.topDept} />
+            </div>
+
+            {/* Charts */}
+            {responses.length > 0 && (
+              <div className="charts-grid">
+                <ChartCard title="התפלגות לפי מחלקה">
+                  <DonutChart data={chartData.departments.data} labels={chartData.departments.labels} />
+                </ChartCard>
+                <ChartCard title="התפלגות לפי ותק">
+                  <BarChart data={chartData.seniority.data} labels={chartData.seniority.labels} horizontal />
+                </ChartCard>
+                <ChartCard title="עומס מיילים ביום">
+                  <BarChart data={chartData.emails.data} labels={chartData.emails.labels} />
+                </ChartCard>
+                <ChartCard title="פעילויות נפוצות">
+                  <BarChart data={chartData.activities.data} labels={chartData.activities.labels} horizontal />
+                </ChartCard>
+                <ChartCard title="שעות עבודה מחוץ למשרד">
+                  <DonutChart data={chartData.hours.data} labels={chartData.hours.labels} />
+                </ChartCard>
+              </div>
+            )}
+
+            {/* Responses Table */}
+            <div className="table-section">
+              <div className="table-header">
+                <h2 className="table-title">כל התשובות ({filteredResponses.length})</h2>
+                <div className="table-filters">
+                  <input
+                    type="text"
+                    className="filter-input"
+                    placeholder="חיפוש לפי שם, מחלקה או תפקיד..."
+                    value={searchTerm}
+                    onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                  />
+                  <select
+                    className="filter-select"
+                    value={departmentFilter}
+                    onChange={e => { setDepartmentFilter(e.target.value); setCurrentPage(1); }}
+                  >
+                    <option value="">כל המחלקות</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {filteredResponses.length === 0 ? (
+                <div className="empty-state">אין תשובות להצגה</div>
+              ) : (
+                <>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th onClick={() => handleSort('created_at')}>תאריך {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th onClick={() => handleSort('name')}>שם {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th onClick={() => handleSort('department')}>מחלקה {sortField === 'department' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedResponses.map(response => (
+                          <tr key={response.id} onClick={() => setSelectedResponse(response)}>
+                            <td>{formatShortDate(response.created_at)}</td>
+                            <td>{response.name}</td>
+                            <td>{response.department || response.department_other || '-'}</td>
+                            <td>{response.role || '-'}</td>
+                            <td>{response.emails_count || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        הקודם
+                      </button>
+                      <span className="pagination-info">עמוד {currentPage} מתוך {totalPages}</span>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        הבא
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Pain Points */}
+            {insights.painPoints.length > 0 && (
+              <div className="insights-section">
+                <h2 className="insights-title">מה הכי מתסכל את העובדים? ({insights.painPoints.length} תשובות)</h2>
+                <div className="insights-filter">
+                  <select
+                    className="filter-select"
+                    value={insightsDeptFilter}
+                    onChange={e => setInsightsDeptFilter(e.target.value)}
+                  >
+                    <option value="">כל המחלקות</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="insights-grid">
+                  {insights.painPoints.map((item, idx) => (
+                    <div key={idx} className="insight-card">
+                      <div className="insight-content">{item.text}</div>
+                      <div className="insight-meta">{item.name} | {item.dept}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Automation Wishes */}
+            {insights.automation.length > 0 && (
+              <div className="insights-section">
+                <h2 className="insights-title">מה העובדים היו רוצים שיקרה אוטומטית? ({insights.automation.length} תשובות)</h2>
+                <div className="insights-grid">
+                  {insights.automation.map((item, idx) => (
+                    <div key={idx} className="insight-card automation">
+                      <div className="insight-content">{item.text}</div>
+                      <div className="insight-meta">{item.name} | {item.dept}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Response Modal */}
+          {selectedResponse && (
+            <ResponseModal response={selectedResponse} onClose={() => setSelectedResponse(null)} />
+          )}
+        </div>
+      );
+    }
+
+    // App Component
+    function App() {
+      const [isAuthenticated, setIsAuthenticated] = useState(
+        localStorage.getItem('admin_authenticated') === 'true'
+      );
+
+      const handleLogout = () => {
+        localStorage.removeItem('admin_authenticated');
+        setIsAuthenticated(false);
+      };
+
+      if (!isAuthenticated) {
+        return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
+      }
+
+      return <Dashboard onLogout={handleLogout} />;
+    }
+
+    // Render
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
