@@ -579,6 +579,23 @@
       border-radius: 2px;
     }
 
+    .admin-link {
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    .admin-link a {
+      color: var(--gray-400);
+      font-size: 0.8125rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .admin-link a:hover {
+      color: var(--primary-teal);
+    }
+
     @media (min-width: 640px) {
       .survey-container {
         padding: 2rem 1.5rem 3rem;
@@ -1341,6 +1358,9 @@
               )}
             </div>
           </main>
+          <footer className="admin-link">
+            <a href="admin.html">כניסת מנהלים</a>
+          </footer>
         </>
       );
     }
