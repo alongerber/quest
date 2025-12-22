@@ -54,7 +54,6 @@
       flex-direction: column;
     }
 
-    /* Progress Bar */
     .progress-container {
       position: fixed;
       top: 0;
@@ -71,7 +70,6 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Header */
     .header {
       padding: 1.5rem 1rem;
       text-align: center;
@@ -84,17 +82,6 @@
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
-    }
-
-    .logo-img {
-      height: 48px;
-      width: auto;
-    }
-
-    .logo-text {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary-dark);
     }
 
     .logo-placeholder {
@@ -110,7 +97,12 @@
       font-size: 1.25rem;
     }
 
-    /* Main Container */
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
     .survey-container {
       flex: 1;
       display: flex;
@@ -121,7 +113,6 @@
       padding: 1.5rem 1rem 2rem;
     }
 
-    /* Step Container */
     .step-container {
       flex: 1;
       display: flex;
@@ -130,32 +121,19 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeOut {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-12px);
-      }
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-12px); }
     }
 
     .step-exiting {
       animation: fadeOut 0.3s ease-in forwards;
     }
 
-    /* Welcome Screen */
     .welcome-screen {
       flex: 1;
       display: flex;
@@ -180,7 +158,6 @@
       margin-bottom: 2.5rem;
     }
 
-    /* Completion Screen */
     .completion-screen {
       flex: 1;
       display: flex;
@@ -220,7 +197,6 @@
       color: var(--gray-500);
     }
 
-    /* Step Header */
     .step-header {
       margin-bottom: 1.5rem;
     }
@@ -243,7 +219,6 @@
       color: var(--gray-500);
     }
 
-    /* Form Elements */
     .form-group {
       margin-bottom: 1.25rem;
     }
@@ -286,7 +261,8 @@
     }
 
     .form-input.error,
-    .form-select.error {
+    .form-select.error,
+    .form-textarea.error {
       border-color: var(--error);
     }
 
@@ -325,7 +301,6 @@
       margin-top: 0.375rem;
     }
 
-    /* Radio Options */
     .radio-group {
       display: flex;
       flex-direction: column;
@@ -395,7 +370,6 @@
       color: var(--gray-700);
     }
 
-    /* Checkbox Cards */
     .checkbox-group {
       display: flex;
       flex-direction: column;
@@ -464,7 +438,25 @@
       line-height: 1.4;
     }
 
-    /* Buttons */
+    .checkbox-with-input {
+      width: 100%;
+    }
+
+    .checkbox-input {
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.9375rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .checkbox-input:focus {
+      outline: none;
+      border-color: var(--primary-teal);
+    }
+
     .button-group {
       display: flex;
       gap: 0.75rem;
@@ -521,7 +513,6 @@
       font-size: 1.125rem;
     }
 
-    /* Loading Spinner */
     .spinner {
       width: 20px;
       height: 20px;
@@ -532,12 +523,9 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
 
-    /* Question Card */
     .question-card {
       background: var(--white);
       border-radius: 16px;
@@ -559,7 +547,38 @@
       margin-bottom: 1rem;
     }
 
-    /* Responsive */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--gray-200);
+      margin: 1.5rem 0;
+    }
+
+    .activity-section {
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .activity-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-teal);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .activity-section-title::before {
+      content: '';
+      width: 4px;
+      height: 1.25rem;
+      background: var(--primary-teal);
+      border-radius: 2px;
+    }
+
     @media (min-width: 640px) {
       .survey-container {
         padding: 2rem 1.5rem 3rem;
@@ -585,13 +604,13 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useCallback } = React;
+    const { useState, useCallback, useMemo } = React;
 
     // Supabase Configuration
     const SUPABASE_URL = 'YOUR_SUPABASE_URL';
     const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-    // Survey Data
+    // Constants
     const DEPARTMENTS = [
       'תפעול / סוכנות',
       'חכירות',
@@ -608,49 +627,77 @@
       'מעל 7 שנים'
     ];
 
-    const EMAILS_PER_DAY = [
-      'עד 20',
-      '20-50',
-      '50-100',
-      'מעל 100'
+    const ACTIVITIES = [
+      { id: 'ships', label: 'טיפול באניות (תיאום הגעה, עזיבה, מסמכים)' },
+      { id: 'cargo', label: 'טיפול במטענים (מעקב, תיעוד, שחרור)' },
+      { id: 'external', label: 'תקשורת עם גורמי חוץ (ספקים, סוכנים, לקוחות, רשויות)' },
+      { id: 'documents', label: 'הכנת מסמכים ודוחות' },
+      { id: 'financial', label: 'עבודה עם נתונים כספיים (חשבוניות, תשלומים, התאמות)' },
+      { id: 'projects', label: 'ניהול פרויקטים או משימות לאורך זמן' },
+      { id: 'inquiries', label: 'מענה לפניות ובקשות שוטפות' },
+      { id: 'other', label: 'אחר' }
     ];
 
-    const EMAILS_REQUIRING_ACTION = [
-      'כמעט אף אחד',
-      'מיעוט (עד 25%)',
-      'בערך חצי',
-      'רוב המיילים (מעל 50%)'
+    const TOOLS = [
+      { id: 'outlook', label: 'Outlook' },
+      { id: 'excel', label: 'Excel' },
+      { id: 'word', label: 'Word' },
+      { id: 'whatsapp', label: 'WhatsApp' },
+      { id: 'internal_system', label: 'מערכת פנימית' },
+      { id: 'accounting', label: 'תוכנת הנה"ח' },
+      { id: 'websites', label: 'אתרי אינטרנט (לבדיקת סטטוס וכו\')' },
+      { id: 'other', label: 'אחר' }
     ];
 
-    const HOURS_OUTSIDE_WORK = [
-      'לא עובד מחוץ לשעות',
-      '1-3 שעות',
-      '3-6 שעות',
-      'מעל 6 שעות'
-    ];
+    const EMAILS_COUNT = ['עד 20', '20-50', '50-100', 'מעל 100'];
+    const EMAILS_DIRECT = ['רוב', 'כחצי', 'מיעוט'];
+    const EMAILS_ACTION = ['עד 10', '10-30', '30-50', 'מעל 50'];
+    const EMAILS_COPY = ['כמעט אף אחד', 'מיעוט', 'כחצי', 'רוב'];
+    const EMAILS_SEARCH = ['כמעט אף פעם', '1-3 פעמים', '4-10 פעמים', 'מעל 10 פעמים'];
+    const EMAILS_MISSED = ['לא קורה', 'לפעמים', 'קורה הרבה'];
+    const HOURS_OUTSIDE = ['לא עובד מעבר לשעות', '1-3 שעות', '3-6 שעות', 'מעל 6 שעות'];
 
-    const TIME_SEARCHING_INFO = [
-      'עד 15 דקות',
-      '15-30 דקות',
-      '30-60 דקות',
-      'מעל שעה'
-    ];
-
-    const REPETITIVE_TASKS = [
-      'העתקת נתונים ממייל לאקסל או לתוכנה אחרת',
-      'חיפוש סטטוס (של אנייה, משלוח, פרויקט, תשלום)',
-      'מענה על שאלות שחוזרות על עצמן',
-      'הכנת דוח ידני',
-      'עדכון אותו מידע בכמה מקומות',
-      'בדיקה ידנית של התאמות (חשבוניות, מסמכים)',
-      'תזכורות ומעקב ידני אחרי משימות'
-    ];
-
-    const TOTAL_STEPS = 6;
+    // Dynamic questions per activity
+    const ACTIVITY_QUESTIONS = {
+      ships: [
+        { id: 'ships_per_week', type: 'radio', title: 'כמה אניות אתה מטפל בהן בשבוע ממוצע?', options: ['1-3', '4-7', '8-15', 'מעל 15'] },
+        { id: 'ships_info_source', type: 'radio', title: 'מאיפה מגיע המידע על האניות?', options: ['מייל', 'מערכת ייעודית', 'טלפון', 'שילוב של כולם'] },
+        { id: 'ships_systems_update', type: 'radio', title: 'כמה מערכות צריך לעדכן כשאנייה מגיעה/עוזבת?', options: ['1-2', '3-4', '5 ומעלה'] }
+      ],
+      cargo: [
+        { id: 'cargo_per_week', type: 'radio', title: 'כמה משלוחים אתה מטפל בהם בשבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'cargo_tracking', type: 'radio', title: 'האם מעקב המטענים נעשה ידנית או דרך מערכת?', options: ['ידנית לחלוטין', 'בעיקר ידנית', 'בעיקר במערכת', 'במערכת לחלוטין'] },
+        { id: 'cargo_status_questions', type: 'radio', title: 'כמה פעמים שואלים אותך "איפה המשלוח?" ביום?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+      ],
+      external: [
+        { id: 'external_contacts', type: 'radio', title: 'עם כמה גורמי חוץ אתה בקשר קבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'external_channel', type: 'radio', title: 'מה ערוץ התקשורת העיקרי?', options: ['מייל', 'טלפון', 'WhatsApp', 'שילוב של כולם'] },
+        { id: 'external_relay', type: 'radio', title: 'כמה פעמים ביום אתה מעביר מידע מגורם אחד לאחר?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+      ],
+      documents: [
+        { id: 'documents_types', type: 'text', title: 'אילו סוגי מסמכים אתה מכין?', placeholder: 'לדוגמה: דוחות שבועיים, חשבוניות, אישורי משלוח...' },
+        { id: 'documents_time', type: 'radio', title: 'כמה זמן לוקח להכין מסמך ממוצע?', options: ['עד 15 דקות', '15-30 דקות', '30-60 דקות', 'מעל שעה'] },
+        { id: 'documents_sources', type: 'radio', title: 'האם המידע למסמך מגיע ממקום אחד או כמה מקורות?', options: ['מקור אחד', '2-3 מקורות', '4 מקורות ומעלה'] }
+      ],
+      financial: [
+        { id: 'financial_volume', type: 'radio', title: 'כמה חשבוניות/תשלומים עוברים דרכך בשבוע?', options: ['עד 20', '20-50', '50-100', 'מעל 100'] },
+        { id: 'financial_reconciliation', type: 'radio', title: 'האם יש התאמות ידניות בין מערכות שונות?', options: ['אין', 'לפעמים', 'הרבה'] },
+        { id: 'financial_time_consuming', type: 'text', title: 'מה הכי גוזל זמן בעבודה הכספית?', placeholder: 'תאר בקצרה...' }
+      ],
+      projects: [
+        { id: 'projects_active', type: 'radio', title: 'כמה פרויקטים פעילים יש לך כרגע?', options: ['1-2', '3-5', '5-10', 'מעל 10'] },
+        { id: 'projects_tracking', type: 'text', title: 'איך אתה עוקב אחרי סטטוס ומשימות?', placeholder: 'לדוגמה: אקסל, רשימות, זיכרון...' },
+        { id: 'projects_people', type: 'radio', title: 'כמה אנשים מעורבים בפרויקט ממוצע?', options: ['1-3', '4-7', '8-15', 'מעל 15'] }
+      ],
+      inquiries: [
+        { id: 'inquiries_per_day', type: 'radio', title: 'כמה פניות אתה מטפל ביום ממוצע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'inquiries_recurring', type: 'text', title: 'האם יש שאלות שחוזרות על עצמן? אילו?', placeholder: 'תאר את השאלות הנפוצות...' },
+        { id: 'inquiries_time', type: 'radio', title: 'כמה זמן לוקח לענות על פנייה ממוצעת?', options: ['עד 5 דקות', '5-15 דקות', '15-30 דקות', 'מעל 30 דקות'] }
+      ]
+    };
 
     // Components
-    function ProgressBar({ step, totalSteps }) {
-      const progress = step === 0 ? 0 : (step / totalSteps) * 100;
+    function ProgressBar({ progress }) {
       return (
         <div className="progress-container">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
@@ -662,7 +709,6 @@
       return (
         <header className="header">
           <div className="logo-container">
-            {/* Replace logo-placeholder with actual logo: <img src="coral-logo.png" alt="קוראל" className="logo-img" /> */}
             <div className="logo-placeholder">ק</div>
             <span className="logo-text">קוראל שירותי ים</span>
           </div>
@@ -670,14 +716,64 @@
       );
     }
 
+    function RadioGroup({ options, value, onChange, name }) {
+      return (
+        <div className="radio-group">
+          {options.map((option, index) => (
+            <label key={index} className={`radio-option ${value === option ? 'selected' : ''}`}>
+              <input type="radio" name={name} value={option} checked={value === option} onChange={() => onChange(option)} />
+              <span className="radio-circle" />
+              <span className="radio-label">{option}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    function CheckboxGroup({ options, values, onChange, otherValue, onOtherChange, showOtherInput }) {
+      const handleToggle = (optionId) => {
+        if (values.includes(optionId)) {
+          onChange(values.filter(v => v !== optionId));
+        } else {
+          onChange([...values, optionId]);
+        }
+      };
+
+      return (
+        <div className="checkbox-group">
+          {options.map((option) => (
+            <label key={option.id} className={`checkbox-card ${values.includes(option.id) ? 'selected' : ''}`}>
+              <input type="checkbox" checked={values.includes(option.id)} onChange={() => handleToggle(option.id)} />
+              <span className="checkbox-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <div className="checkbox-with-input">
+                <span className="checkbox-label">{option.label}</span>
+                {showOtherInput && option.id === 'other' && values.includes('other') && (
+                  <input
+                    type="text"
+                    className="checkbox-input"
+                    value={otherValue || ''}
+                    onChange={(e) => onOtherChange(e.target.value)}
+                    placeholder="פרט..."
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                )}
+              </div>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
     function WelcomeScreen({ onStart }) {
       return (
         <div className="welcome-screen">
           <h1 className="welcome-title">שאלון הכנה לישיבת התייעלות</h1>
-          <p className="welcome-subtitle">השאלון לוקח כ-3 דקות</p>
-          <button className="btn btn-primary btn-start" onClick={onStart}>
-            התחלה
-          </button>
+          <p className="welcome-subtitle">השאלון לוקח כ-5 דקות</p>
+          <button className="btn btn-primary btn-start" onClick={onStart}>התחלה</button>
         </div>
       );
     }
@@ -696,67 +792,11 @@
       );
     }
 
-    function RadioGroup({ options, value, onChange, name }) {
-      return (
-        <div className="radio-group">
-          {options.map((option, index) => (
-            <label
-              key={index}
-              className={`radio-option ${value === option ? 'selected' : ''}`}
-            >
-              <input
-                type="radio"
-                name={name}
-                value={option}
-                checked={value === option}
-                onChange={() => onChange(option)}
-              />
-              <span className="radio-circle" />
-              <span className="radio-label">{option}</span>
-            </label>
-          ))}
-        </div>
-      );
-    }
-
-    function CheckboxGroup({ options, values, onChange }) {
-      const handleToggle = (option) => {
-        if (values.includes(option)) {
-          onChange(values.filter(v => v !== option));
-        } else {
-          onChange([...values, option]);
-        }
-      };
-
-      return (
-        <div className="checkbox-group">
-          {options.map((option, index) => (
-            <label
-              key={index}
-              className={`checkbox-card ${values.includes(option) ? 'selected' : ''}`}
-            >
-              <input
-                type="checkbox"
-                checked={values.includes(option)}
-                onChange={() => handleToggle(option)}
-              />
-              <span className="checkbox-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="checkbox-label">{option}</span>
-            </label>
-          ))}
-        </div>
-      );
-    }
-
-    function Step1PersonalInfo({ data, onChange, errors }) {
+    function StepPersonalInfo({ data, onChange, errors, stepNum, totalSteps }) {
       return (
         <>
           <div className="step-header">
-            <div className="step-indicator">שלב 1 מתוך 6</div>
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
             <h2 className="step-title">פרטים אישיים</h2>
           </div>
 
@@ -786,6 +826,20 @@
             </select>
           </div>
 
+          {data.department === 'אחר' && (
+            <div className="form-group">
+              <label className="form-label required">פרט את המחלקה</label>
+              <input
+                type="text"
+                className={`form-input ${errors.department_other ? 'error' : ''}`}
+                value={data.department_other || ''}
+                onChange={(e) => onChange('department_other', e.target.value)}
+                placeholder="שם המחלקה"
+              />
+              {errors.department_other && <div className="error-message">{errors.department_other}</div>}
+            </div>
+          )}
+
           <div className="form-group">
             <label className="form-label">תפקיד</label>
             <input
@@ -810,140 +864,263 @@
       );
     }
 
-    function Step2Emails({ data, onChange }) {
+    function StepActivities({ data, onChange, stepNum, totalSteps }) {
       return (
         <>
           <div className="step-header">
-            <div className="step-indicator">שלב 2 מתוך 6</div>
-            <h2 className="step-title">עומס מיילים</h2>
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">מה אתה עושה בפועל?</h2>
+            <p className="step-description">סמן את הפעילויות שאתה מבצע במסגרת עבודתך</p>
+          </div>
+
+          <CheckboxGroup
+            options={ACTIVITIES}
+            values={data.activities}
+            onChange={(values) => onChange('activities', values)}
+            otherValue={data.activities_other}
+            onOtherChange={(value) => onChange('activities_other', value)}
+            showOtherInput={true}
+          />
+        </>
+      );
+    }
+
+    function StepDynamicQuestions({ data, onChange, stepNum, totalSteps }) {
+      const relevantActivities = data.activities.filter(a => a !== 'other' && ACTIVITY_QUESTIONS[a]);
+
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">שאלות על הפעילויות שלך</h2>
+          </div>
+
+          {relevantActivities.map((activityId) => {
+            const activity = ACTIVITIES.find(a => a.id === activityId);
+            const questions = ACTIVITY_QUESTIONS[activityId];
+
+            return (
+              <div key={activityId} className="activity-section">
+                <div className="activity-section-title">{activity.label.split('(')[0].trim()}</div>
+                {questions.map((question) => (
+                  <div key={question.id} className="question-card">
+                    <h3 className="question-title">{question.title}</h3>
+                    {question.type === 'radio' ? (
+                      <RadioGroup
+                        options={question.options}
+                        value={data[question.id] || ''}
+                        onChange={(value) => onChange(question.id, value)}
+                        name={question.id}
+                      />
+                    ) : (
+                      <textarea
+                        className="form-textarea"
+                        value={data[question.id] || ''}
+                        onChange={(e) => onChange(question.id, e.target.value)}
+                        placeholder={question.placeholder}
+                        rows="3"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </>
+      );
+    }
+
+    function StepEmails({ data, onChange, stepNum, totalSteps }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">מיילים</h2>
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">כמה מיילים אתה מקבל ביום עבודה ממוצע?</h3>
-            <RadioGroup
-              options={EMAILS_PER_DAY}
-              value={data.emails_per_day}
-              onChange={(value) => onChange('emails_per_day', value)}
-              name="emails_per_day"
-            />
+            <h3 className="question-title">כמה מיילים חדשים נכנסים אליך ביום עבודה ממוצע?</h3>
+            <RadioGroup options={EMAILS_COUNT} value={data.emails_count} onChange={(v) => onChange('emails_count', v)} name="emails_count" />
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">כמה מהמיילים דורשים ממך להעתיק או להקליד מידע למקום אחר?</h3>
+            <h3 className="question-title">כמה מהמיילים מיועדים ישירות אליך (לא CC)?</h3>
+            <RadioGroup options={EMAILS_DIRECT} value={data.emails_direct} onChange={(v) => onChange('emails_direct', v)} name="emails_direct" />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה מיילים ביום דורשים ממך פעולה (לא רק קריאה)?</h3>
+            <RadioGroup options={EMAILS_ACTION} value={data.emails_action} onChange={(v) => onChange('emails_action', v)} name="emails_action" />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה מיילים דורשים להעתיק מידע למקום אחר?</h3>
             <p className="question-hint">למשל: להעביר נתונים מהמייל לאקסל, לתוכנה פנימית, לטופס</p>
-            <RadioGroup
-              options={EMAILS_REQUIRING_ACTION}
-              value={data.emails_requiring_action}
-              onChange={(value) => onChange('emails_requiring_action', value)}
-              name="emails_requiring_action"
-            />
+            <RadioGroup options={EMAILS_COPY} value={data.emails_copy} onChange={(v) => onChange('emails_copy', v)} name="emails_copy" />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה פעמים ביום אתה מחפש מידע במייל ישן?</h3>
+            <RadioGroup options={EMAILS_SEARCH} value={data.emails_search} onChange={(v) => onChange('emails_search', v)} name="emails_search" />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">האם קורה שמיילים נופלים בין הכיסאות?</h3>
+            <RadioGroup options={EMAILS_MISSED} value={data.emails_missed} onChange={(v) => onChange('emails_missed', v)} name="emails_missed" />
           </div>
         </>
       );
     }
 
-    function Step3WorkHours({ data, onChange }) {
+    function StepTools({ data, onChange, stepNum, totalSteps }) {
       return (
         <>
           <div className="step-header">
-            <div className="step-indicator">שלב 3 מתוך 6</div>
-            <h2 className="step-title">שעות עבודה</h2>
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">כלים ותוכנות</h2>
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">כמה שעות בשבוע אתה עובד מחוץ לשעות המשרד?</h3>
-            <p className="question-hint">כולל מענה למיילים בערב, בסופ״ש</p>
-            <RadioGroup
-              options={HOURS_OUTSIDE_WORK}
-              value={data.hours_outside_work}
-              onChange={(value) => onChange('hours_outside_work', value)}
-              name="hours_outside_work"
-            />
-          </div>
-
-          <div className="question-card">
-            <h3 className="question-title">כמה זמן ביום אתה מבלה בחיפוש מידע?</h3>
-            <p className="question-hint">חיפוש במיילים ישנים, בתיקיות, בקבצים, בתוכנות</p>
-            <RadioGroup
-              options={TIME_SEARCHING_INFO}
-              value={data.time_searching_info}
-              onChange={(value) => onChange('time_searching_info', value)}
-              name="time_searching_info"
-            />
-          </div>
-        </>
-      );
-    }
-
-    function Step4RepetitiveTasks({ data, onChange }) {
-      return (
-        <>
-          <div className="step-header">
-            <div className="step-indicator">שלב 4 מתוך 6</div>
-            <h2 className="step-title">פעולות חוזרות</h2>
-          </div>
-
-          <div className="question-card">
-            <h3 className="question-title">אילו פעולות אתה מבצע יותר מפעם אחת ביום?</h3>
+            <h3 className="question-title">באילו כלים אתה משתמש?</h3>
             <p className="question-hint">ניתן לבחור כמה אפשרויות</p>
             <CheckboxGroup
-              options={REPETITIVE_TASKS}
-              values={data.repetitive_tasks}
-              onChange={(values) => onChange('repetitive_tasks', values)}
+              options={TOOLS}
+              values={data.tools}
+              onChange={(values) => onChange('tools', values)}
+              otherValue={data.tools_other}
+              onOtherChange={(value) => onChange('tools_other', value)}
+              showOtherInput={true}
             />
           </div>
-        </>
-      );
-    }
 
-    function Step5PainPoint({ data, onChange }) {
-      const maxChars = 200;
-      const charCount = data.main_pain_point.length;
-
-      return (
-        <>
-          <div className="step-header">
-            <div className="step-indicator">שלב 5 מתוך 6</div>
-            <h2 className="step-title">נקודת כאב</h2>
-          </div>
+          {data.tools.includes('internal_system') && (
+            <div className="question-card">
+              <h3 className="question-title">איזו מערכת פנימית?</h3>
+              <input
+                type="text"
+                className="form-input"
+                value={data.internal_system_name || ''}
+                onChange={(e) => onChange('internal_system_name', e.target.value)}
+                placeholder="שם המערכת"
+              />
+            </div>
+          )}
 
           <div className="question-card">
-            <h3 className="question-title">מה התהליך הכי מתסכל או גוזל זמן בעבודה שלך?</h3>
+            <h3 className="question-title">האם אתה מעתיק מידע בין כלים שונים?</h3>
+            <p className="question-hint">תאר אילו העתקות אתה עושה באופן קבוע</p>
             <textarea
               className="form-textarea"
-              value={data.main_pain_point}
-              onChange={(e) => {
-                if (e.target.value.length <= maxChars) {
-                  onChange('main_pain_point', e.target.value);
-                }
-              }}
-              placeholder="תאר בקצרה..."
-              rows="4"
+              value={data.tools_copy_between || ''}
+              onChange={(e) => onChange('tools_copy_between', e.target.value)}
+              placeholder="לדוגמה: מעתיק נתונים ממייל לאקסל, מאקסל למערכת..."
+              rows="3"
             />
-            <div className={`char-count ${charCount > maxChars - 20 ? 'warning' : ''}`}>
-              {charCount}/{maxChars}
-            </div>
           </div>
         </>
       );
     }
 
-    function Step6AdditionalNotes({ data, onChange }) {
+    function StepTime({ data, onChange, stepNum, totalSteps }) {
       return (
         <>
           <div className="step-header">
-            <div className="step-indicator">שלב 6 מתוך 6</div>
-            <h2 className="step-title">הערות</h2>
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">זמן וחזרתיות</h2>
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">משהו נוסף?</h3>
+            <h3 className="question-title">כמה שעות בשבוע אתה עובד מעבר לשעות המשרד?</h3>
+            <p className="question-hint">כולל מענה למיילים בערב, בסופ״ש</p>
+            <RadioGroup options={HOURS_OUTSIDE} value={data.hours_outside} onChange={(v) => onChange('hours_outside', v)} name="hours_outside" />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מה הפעולה שאתה חוזר עליה הכי הרבה פעמים ביום?</h3>
+            <textarea
+              className="form-textarea"
+              value={data.most_repeated_action || ''}
+              onChange={(e) => onChange('most_repeated_action', e.target.value)}
+              placeholder="תאר את הפעולה..."
+              rows="3"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מה הדבר שהכי מבזבז לך זמן?</h3>
+            <textarea
+              className="form-textarea"
+              value={data.biggest_time_waste || ''}
+              onChange={(e) => onChange('biggest_time_waste', e.target.value)}
+              placeholder="תאר..."
+              rows="3"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function StepPainPoints({ data, onChange, errors, stepNum, totalSteps }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">נקודות כאב ורעיונות</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מה הדבר הכי מתסכל בעבודה שלך?</h3>
+            <textarea
+              className={`form-textarea ${errors.main_frustration ? 'error' : ''}`}
+              value={data.main_frustration || ''}
+              onChange={(e) => onChange('main_frustration', e.target.value)}
+              placeholder="תאר..."
+              rows="4"
+            />
+            {errors.main_frustration && <div className="error-message">{errors.main_frustration}</div>}
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">האם יש משהו שאתה בטוח שאפשר לעשות אותו יותר מהר/טוב?</h3>
+            <textarea
+              className="form-textarea"
+              value={data.improvement_idea || ''}
+              onChange={(e) => onChange('improvement_idea', e.target.value)}
+              placeholder="תאר את הרעיון שלך..."
+              rows="3"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מה היית רוצה שיקרה "אוטומטית" בלי שתצטרך לטפל?</h3>
+            <textarea
+              className="form-textarea"
+              value={data.automation_wish || ''}
+              onChange={(e) => onChange('automation_wish', e.target.value)}
+              placeholder="תאר..."
+              rows="3"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function StepFinal({ data, onChange, stepNum, totalSteps }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">סיום</h2>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">משהו נוסף שחשוב לך להוסיף?</h3>
             <p className="question-hint">אופציונלי</p>
             <textarea
               className="form-textarea"
-              value={data.additional_notes}
+              value={data.additional_notes || ''}
               onChange={(e) => onChange('additional_notes', e.target.value)}
-              placeholder="הערות, הצעות, או כל דבר אחר שחשוב לך לציין..."
+              placeholder="הערות, הצעות, או כל דבר אחר..."
               rows="4"
             />
           </div>
@@ -951,30 +1128,14 @@
       );
     }
 
-    function NavigationButtons({ step, onPrev, onNext, isSubmitting, isLastStep }) {
+    function NavigationButtons({ onPrev, onNext, isSubmitting, isLastStep, showPrev }) {
       return (
         <div className="button-group">
-          {step > 1 && (
-            <button
-              className="btn btn-secondary"
-              onClick={onPrev}
-              disabled={isSubmitting}
-            >
-              הקודם
-            </button>
+          {showPrev && (
+            <button className="btn btn-secondary" onClick={onPrev} disabled={isSubmitting}>הקודם</button>
           )}
-          <button
-            className="btn btn-primary"
-            onClick={onNext}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <span className="spinner" />
-            ) : isLastStep ? (
-              'שליחה'
-            ) : (
-              'הבא'
-            )}
+          <button className="btn btn-primary" onClick={onNext} disabled={isSubmitting}>
+            {isSubmitting ? <span className="spinner" /> : isLastStep ? 'שליחה' : 'הבא'}
           </button>
         </div>
       );
@@ -991,14 +1152,27 @@
       const [formData, setFormData] = useState({
         name: '',
         department: '',
+        department_other: '',
         role: '',
         seniority: '',
-        emails_per_day: '',
-        emails_requiring_action: '',
-        hours_outside_work: '',
-        time_searching_info: '',
-        repetitive_tasks: [],
-        main_pain_point: '',
+        activities: [],
+        activities_other: '',
+        emails_count: '',
+        emails_direct: '',
+        emails_action: '',
+        emails_copy: '',
+        emails_search: '',
+        emails_missed: '',
+        tools: [],
+        tools_other: '',
+        internal_system_name: '',
+        tools_copy_between: '',
+        hours_outside: '',
+        most_repeated_action: '',
+        biggest_time_waste: '',
+        main_frustration: '',
+        improvement_idea: '',
+        automation_wish: '',
         additional_notes: ''
       });
 
@@ -1009,12 +1183,44 @@
         }
       }, [errors]);
 
-      const validateStep = (stepNum) => {
+      // Calculate steps based on activities
+      const hasDynamicQuestions = useMemo(() => {
+        return formData.activities.some(a => a !== 'other' && ACTIVITY_QUESTIONS[a]);
+      }, [formData.activities]);
+
+      const steps = useMemo(() => {
+        const baseSteps = ['welcome', 'personal', 'activities'];
+        if (hasDynamicQuestions) {
+          baseSteps.push('dynamic');
+        }
+        baseSteps.push('emails', 'tools', 'time', 'painpoints', 'final');
+        return baseSteps;
+      }, [hasDynamicQuestions]);
+
+      const totalSteps = steps.length - 1; // exclude welcome
+      const currentStepName = steps[step];
+      const currentStepNum = step; // step 0 is welcome, step 1 is first real step
+
+      const progress = useMemo(() => {
+        if (step === 0) return 0;
+        return (step / totalSteps) * 100;
+      }, [step, totalSteps]);
+
+      const validateStep = (stepName) => {
         const newErrors = {};
 
-        if (stepNum === 1) {
+        if (stepName === 'personal') {
           if (!formData.name.trim()) {
             newErrors.name = 'שדה חובה';
+          }
+          if (formData.department === 'אחר' && !formData.department_other?.trim()) {
+            newErrors.department_other = 'נא לפרט את המחלקה';
+          }
+        }
+
+        if (stepName === 'painpoints') {
+          if (!formData.main_frustration?.trim()) {
+            newErrors.main_frustration = 'שדה חובה';
           }
         }
 
@@ -1022,7 +1228,7 @@
         return Object.keys(newErrors).length === 0;
       };
 
-      const goToStep = (newStep, direction = 'next') => {
+      const goToStep = (newStep) => {
         setIsTransitioning(true);
         setTimeout(() => {
           setStep(newStep);
@@ -1032,9 +1238,9 @@
       };
 
       const handleNext = async () => {
-        if (!validateStep(step)) return;
+        if (!validateStep(currentStepName)) return;
 
-        if (step === TOTAL_STEPS) {
+        if (step === steps.length - 1) {
           await submitForm();
         } else {
           goToStep(step + 1);
@@ -1043,7 +1249,7 @@
 
       const handlePrev = () => {
         if (step > 1) {
-          goToStep(step - 1, 'prev');
+          goToStep(step - 1);
         }
       };
 
@@ -1051,7 +1257,18 @@
         setIsSubmitting(true);
 
         try {
-          const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
+          const submitData = {
+            ...formData,
+            activities: formData.activities.length > 0 ? formData.activities : null,
+            tools: formData.tools.length > 0 ? formData.tools : null
+          };
+
+          // Clean up empty strings
+          Object.keys(submitData).forEach(key => {
+            if (submitData[key] === '') submitData[key] = null;
+          });
+
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses_v2`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1059,19 +1276,7 @@
               'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
               'Prefer': 'return=minimal'
             },
-            body: JSON.stringify({
-              name: formData.name,
-              department: formData.department || null,
-              role: formData.role || null,
-              seniority: formData.seniority || null,
-              emails_per_day: formData.emails_per_day || null,
-              emails_requiring_action: formData.emails_requiring_action || null,
-              hours_outside_work: formData.hours_outside_work || null,
-              time_searching_info: formData.time_searching_info || null,
-              repetitive_tasks: formData.repetitive_tasks.length > 0 ? formData.repetitive_tasks : null,
-              main_pain_point: formData.main_pain_point || null,
-              additional_notes: formData.additional_notes || null
-            })
+            body: JSON.stringify(submitData)
           });
 
           if (!response.ok) {
@@ -1092,21 +1297,27 @@
           return <CompletionScreen name={formData.name.split(' ')[0]} />;
         }
 
-        switch (step) {
-          case 0:
+        const stepProps = { data: formData, onChange: updateField, errors, stepNum: step, totalSteps };
+
+        switch (currentStepName) {
+          case 'welcome':
             return <WelcomeScreen onStart={() => goToStep(1)} />;
-          case 1:
-            return <Step1PersonalInfo data={formData} onChange={updateField} errors={errors} />;
-          case 2:
-            return <Step2Emails data={formData} onChange={updateField} />;
-          case 3:
-            return <Step3WorkHours data={formData} onChange={updateField} />;
-          case 4:
-            return <Step4RepetitiveTasks data={formData} onChange={updateField} />;
-          case 5:
-            return <Step5PainPoint data={formData} onChange={updateField} />;
-          case 6:
-            return <Step6AdditionalNotes data={formData} onChange={updateField} />;
+          case 'personal':
+            return <StepPersonalInfo {...stepProps} />;
+          case 'activities':
+            return <StepActivities {...stepProps} />;
+          case 'dynamic':
+            return <StepDynamicQuestions {...stepProps} />;
+          case 'emails':
+            return <StepEmails {...stepProps} />;
+          case 'tools':
+            return <StepTools {...stepProps} />;
+          case 'time':
+            return <StepTime {...stepProps} />;
+          case 'painpoints':
+            return <StepPainPoints {...stepProps} />;
+          case 'final':
+            return <StepFinal {...stepProps} />;
           default:
             return null;
         }
@@ -1114,18 +1325,18 @@
 
       return (
         <>
-          <ProgressBar step={step} totalSteps={TOTAL_STEPS} />
+          <ProgressBar progress={progress} />
           <Header />
           <main className="survey-container">
             <div className={`step-container ${isTransitioning ? 'step-exiting' : ''}`}>
               {renderStep()}
               {step > 0 && !isCompleted && (
                 <NavigationButtons
-                  step={step}
                   onPrev={handlePrev}
                   onNext={handleNext}
                   isSubmitting={isSubmitting}
-                  isLastStep={step === TOTAL_STEPS}
+                  isLastStep={step === steps.length - 1}
+                  showPrev={step > 1}
                 />
               )}
             </div>
