@@ -1895,7 +1895,82 @@
 
     // AI Analysis Modal - ניתוח מתקדם
     function AIAnalysisModal({ responses, onClose }) {
+      const [aiResponse, setAiResponse] = useState(null);
+      const [aiLoading, setAiLoading] = useState(false);
+      const [aiError, setAiError] = useState(null);
+
       if (!responses || responses.length === 0) return null;
+
+      // Call real Claude AI
+      const callClaudeAI = async () => {
+        setAiLoading(true);
+        setAiError(null);
+        try {
+          // Prepare summary data for Claude
+          const deptDataForAI = {};
+          responses.forEach(r => {
+            const dept = r.department || r.department_other || 'לא צוין';
+            if (!deptDataForAI[dept]) deptDataForAI[dept] = { count: 0, hours: 0 };
+            deptDataForAI[dept].count++;
+            deptDataForAI[dept].hours += calculateWeeklyHours(r);
+          });
+
+          const deptBreakdown = Object.entries(deptDataForAI)
+            .map(([name, data]) => `- ${name}: ${data.count} עובדים, ${Math.round(data.hours)} שעות/שבוע`)
+            .join('\n');
+
+          const painPointsForAI = responses
+            .filter(r => r.main_frustration)
+            .slice(0, 5)
+            .map(r => `- ${r.name} (${r.department || 'לא צוין'}): "${r.main_frustration}"`)
+            .join('\n') || 'לא דווחו';
+
+          const toolsForAI = {};
+          responses.forEach(r => {
+            (r.tools || []).forEach(t => { toolsForAI[t] = (toolsForAI[t] || 0) + 1; });
+          });
+          const toolsList = Object.entries(toolsForAI)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8)
+            .map(([t, c]) => `${t} (${c})`)
+            .join(', ') || 'לא צוין';
+
+          const wishesForAI = responses
+            .filter(r => r.process_wish || r.automation_wish)
+            .slice(0, 5)
+            .map(r => `- "${r.process_wish || r.automation_wish}"`)
+            .join('\n') || 'לא צוין';
+
+          const summaryData = {
+            totalResponses: responses.length,
+            totalHours: Math.round(responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0)),
+            avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
+            deptBreakdown,
+            painPoints: painPointsForAI,
+            tools: toolsList,
+            wishes: wishesForAI
+          };
+
+          const res = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ responses, summaryData })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'שגיאה בשירות AI');
+          }
+
+          setAiResponse(data.analysis);
+        } catch (err) {
+          console.error('AI Error:', err);
+          setAiError(err.message || 'שגיאה בהתחברות ל-AI');
+        } finally {
+          setAiLoading(false);
+        }
+      };
 
       // Generate comprehensive analysis
       const analysis = useMemo(() => {
@@ -2070,6 +2145,63 @@
                   </div>
                 </div>
               )}
+
+              {/* Claude AI Analysis */}
+              <div className="modal-section">
+                <h4 className="modal-section-title" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                  ניתוח Claude AI
+                  <span style={{fontSize: '0.75rem', background: 'linear-gradient(135deg, #8b5cf6, #a855f7)', color: 'white', padding: '0.125rem 0.5rem', borderRadius: '10px'}}>חדש</span>
+                </h4>
+
+                {!aiResponse && !aiLoading && (
+                  <div style={{textAlign: 'center', padding: '1.5rem'}}>
+                    <p style={{color: 'var(--gray-600)', marginBottom: '1rem'}}>
+                      קבל ניתוח מעמיק מבוסס AI עם המלצות מותאמות אישית
+                    </p>
+                    <button
+                      onClick={callClaudeAI}
+                      style={{
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.875rem 2rem',
+                        borderRadius: '12px',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit'
+                      }}
+                    >
+                      הפעל ניתוח AI
+                    </button>
+                    {aiError && (
+                      <p style={{color: 'var(--error)', marginTop: '1rem', fontSize: '0.875rem'}}>{aiError}</p>
+                    )}
+                  </div>
+                )}
+
+                {aiLoading && (
+                  <div style={{textAlign: 'center', padding: '2rem'}}>
+                    <div className="spinner" style={{margin: '0 auto 1rem'}}></div>
+                    <p style={{color: 'var(--gray-600)'}}>Claude מנתח את הנתונים...</p>
+                  </div>
+                )}
+
+                {aiResponse && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: '1.8',
+                    fontSize: '0.9375rem',
+                    color: 'var(--gray-700)',
+                    borderRight: '4px solid #8b5cf6'
+                  }}>
+                    {aiResponse}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
