@@ -792,6 +792,226 @@
       font-size: 0.8125rem;
       font-weight: 600;
     }
+
+    /* Delete Button */
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .delete-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+    }
+
+    .delete-btn:hover {
+      background: #fecaca;
+    }
+
+    /* Full Data View Section */
+    .full-data-section {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .response-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .response-card-header {
+      background: var(--white);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .response-card-header:hover {
+      background: var(--gray-50);
+    }
+
+    .response-card-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .response-card-name {
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .response-card-meta {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .response-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .response-card-body {
+      padding: 1.25rem;
+      border-top: 1px solid var(--gray-200);
+      display: none;
+    }
+
+    .response-card.expanded .response-card-body {
+      display: block;
+    }
+
+    .response-data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .response-data-section {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .response-data-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-teal);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .response-data-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .response-data-label {
+      color: var(--gray-500);
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .response-data-value {
+      color: var(--gray-700);
+    }
+
+    .expand-icon {
+      transition: transform 0.2s;
+    }
+
+    .response-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Bottleneck Card */
+    .bottleneck-card {
+      background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+
+    .bottleneck-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bottleneck-content {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .bottleneck-stat {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      margin: 0 0.25rem;
+    }
+
+    /* Volume Multiplier Card */
+    .volume-card {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      border-radius: 12px;
+      padding: 1.25rem;
+      color: white;
+    }
+
+    .volume-title {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+
+    .volume-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .volume-desc {
+      font-size: 0.8125rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    /* Confirm Dialog */
+    .confirm-dialog {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .confirm-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .confirm-message {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -853,10 +1073,12 @@
     // Hebrew Labels Mapping
     const ACTIVITY_LABELS = {
       'ships': 'טיפול באניות',
-      'cargo': 'טיפול במטענים',
-      'external': 'תקשורת עם גורמי חוץ',
+      'cargo': 'מטענים / פקודות מסירה',
+      'manifest': 'הזנת מניפסטים',
+      'bol': 'שטרי מטען (B/L)',
+      'external': 'גורמי חוץ (יבואנים/משלחים)',
       'documents': 'הכנת מסמכים ודוחות',
-      'financial': 'עבודה עם נתונים כספיים',
+      'financial': 'נתונים כספיים',
       'projects': 'ניהול פרויקטים',
       'inquiries': 'מענה לפניות',
       'other': 'אחר'
@@ -864,9 +1086,12 @@
 
     const SOURCE_LABELS = {
       'email_body': 'מייל (גוף הטקסט)',
-      'pdf': 'קובץ PDF',
+      'email_attachment': 'מייל (קבצים מצורפים)',
+      'manifest_pdf': 'מניפסט PDF',
+      'tos_port': 'אתר הנמל (TOS)',
+      'edi_file': 'קובץ EDI',
       'excel': 'קובץ אקסל',
-      'port_system': 'מערכת הנמל',
+      'internal_system': 'מערכת פנימית',
       'whatsapp': 'וואטסאפ',
       'phone': 'טלפון',
       'other_source': 'אחר'
@@ -943,6 +1168,225 @@
       if (score >= 50) return { bg: '#fef9c3', color: '#854d0e' }; // Yellow
       return { bg: '#fee2e2', color: '#991b1b' }; // Red
     };
+
+    // Confirm Dialog Component
+    function ConfirmDialog({ title, message, onConfirm, onCancel, isDeleting }) {
+      return (
+        <div className="modal-overlay" onClick={onCancel}>
+          <div className="confirm-dialog" onClick={e => e.stopPropagation()}>
+            <h2 className="confirm-title">{title}</h2>
+            <p className="confirm-message">{message}</p>
+            <div className="confirm-actions">
+              <button className="btn btn-secondary" onClick={onCancel} disabled={isDeleting}>ביטול</button>
+              <button className="btn btn-danger" onClick={onConfirm} disabled={isDeleting}>
+                {isDeleting ? 'מוחק...' : 'אישור מחיקה'}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Full Response Card Component
+    function ResponseCard({ response, onDelete, onExpand, isExpanded }) {
+      const score = calculateAutomationScore(response);
+      const badgeColor = getScoreBadgeColor(score);
+      const weeklyHours = calculateWeeklyHours(response);
+
+      return (
+        <div className={`response-card ${isExpanded ? 'expanded' : ''}`}>
+          <div className="response-card-header" onClick={() => onExpand(response.id)}>
+            <div className="response-card-info">
+              <span className="response-card-name">{response.name}</span>
+              <span className="response-card-meta">
+                {response.department || response.department_other || '-'} | {response.role || '-'} | {formatShortDate(response.created_at)}
+              </span>
+              <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
+                ציון: {score}
+              </span>
+            </div>
+            <div className="response-card-actions">
+              <button
+                className="delete-btn"
+                onClick={(e) => { e.stopPropagation(); onDelete(response); }}
+              >
+                מחק
+              </button>
+              <span className="expand-icon">▼</span>
+            </div>
+          </div>
+          <div className="response-card-body">
+            <div className="response-data-grid">
+              <div className="response-data-section">
+                <h4 className="response-data-title">פרטים אישיים</h4>
+                <div className="response-data-item"><span className="response-data-label">שם:</span><span className="response-data-value">{response.name}</span></div>
+                <div className="response-data-item"><span className="response-data-label">מחלקה:</span><span className="response-data-value">{response.department || response.department_other || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">תפקיד:</span><span className="response-data-value">{response.role || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">ותק:</span><span className="response-data-value">{response.seniority || '-'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">ניתוח אוטומציה</h4>
+                <div className="response-data-item"><span className="response-data-label">ציון:</span><span className="response-data-value">{score}/100</span></div>
+                <div className="response-data-item"><span className="response-data-label">שעות שבועיות:</span><span className="response-data-value">{weeklyHours} שעות</span></div>
+                <div className="response-data-item"><span className="response-data-label">סוג תהליך:</span><span className="response-data-value">{response.process_type === 'rule_based' ? 'מבוסס חוקים' : response.process_type === 'mixed' ? 'מעורב' : 'שיקול דעת'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">תדירות:</span><span className="response-data-value">{response.process_frequency === 'daily' ? 'יומי' : response.process_frequency === 'weekly' ? 'שבועי' : 'חודשי'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">פעילויות</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.activities || []).map(a => ACTIVITY_LABELS[a] || a).join(', ') || '-'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">מקורות מידע</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.info_source || []).map(s => SOURCE_LABELS[s] || s).join(', ') || '-'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">מיילים</h4>
+                <div className="response-data-item"><span className="response-data-label">מיילים ביום:</span><span className="response-data-value">{response.emails_count || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">דורשים העתקה:</span><span className="response-data-value">{response.emails_copy || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">מיילים נופלים:</span><span className="response-data-value">{response.emails_missed || '-'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">כלים</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.tools || []).join(', ') || '-'}
+                  </span>
+                </div>
+                {response.tools_copy_between && (
+                  <div className="response-data-item" style={{marginTop: '0.5rem'}}>
+                    <span className="response-data-label">העתקות:</span>
+                    <span className="response-data-value">{response.tools_copy_between}</span>
+                  </div>
+                )}
+              </div>
+
+              {response.main_frustration && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">הכי מתסכל</h4>
+                  <div className="response-data-value">{response.main_frustration}</div>
+                </div>
+              )}
+
+              {response.automation_wish && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">משאלת אוטומציה</h4>
+                  <div className="response-data-value">{response.automation_wish}</div>
+                </div>
+              )}
+
+              {response.manual_steps && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">שלבים ידניים (צוואר בקבוק)</h4>
+                  <div className="response-data-value">{response.manual_steps}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Bottleneck Analysis Component
+    function BottleneckCard({ responses }) {
+      const analysis = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        // Find department with most manual work
+        const deptHours = {};
+        const deptUnits = {};
+        const deptVessels = {};
+
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          const hours = calculateWeeklyHours(r);
+          deptHours[dept] = (deptHours[dept] || 0) + hours;
+
+          // Count units based on responses
+          const cargoCount = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const bolCount = r.bol_per_week ? parseInt(r.bol_per_week.match(/\d+/)?.[0] || '0') : 0;
+          deptUnits[dept] = (deptUnits[dept] || 0) + Math.max(cargoCount, bolCount);
+
+          // Count vessels
+          const vesselCount = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          deptVessels[dept] = (deptVessels[dept] || 0) + vesselCount;
+        });
+
+        // Find highest hours department
+        const topDept = Object.entries(deptHours).sort((a, b) => b[1] - a[1])[0];
+        if (!topDept) return null;
+
+        return {
+          department: topDept[0],
+          hours: Math.round(topDept[1] * 10) / 10,
+          units: deptUnits[topDept[0]] || 0,
+          vessels: deptVessels[topDept[0]] || 0
+        };
+      }, [responses]);
+
+      if (!analysis) return null;
+
+      return (
+        <div className="bottleneck-card">
+          <h2 className="bottleneck-title">
+            צוואר הבקבוק המוביל ביחס לאנייה
+          </h2>
+          <div className="bottleneck-content">
+            מחלקת <span className="bottleneck-stat">{analysis.department}</span> משקיעה
+            <span className="bottleneck-stat">{analysis.hours} שעות/שבוע</span>
+            {analysis.units > 0 && (
+              <>בטיפול ב-<span className="bottleneck-stat">{analysis.units} פקודות מסירה</span></>
+            )}
+            {analysis.vessels > 0 && (
+              <> עבור <span className="bottleneck-stat">{analysis.vessels} אניות</span></>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Volume Multiplier Component
+    function VolumeMultiplierCard({ responses }) {
+      const multiplier = useMemo(() => {
+        let totalUnits = 0;
+        let totalVessels = 0;
+
+        responses.forEach(r => {
+          // Extract numeric values from responses
+          const importers = r.importers_per_vessel ? parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0') : 0;
+          const cargo = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const vessels = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+
+          totalUnits += Math.max(importers, cargo);
+          totalVessels += vessels;
+        });
+
+        if (totalVessels === 0) return null;
+        return Math.round((totalUnits / totalVessels) * 10) / 10;
+      }, [responses]);
+
+      if (!multiplier) return null;
+
+      return (
+        <div className="volume-card">
+          <div className="volume-title">Volume Multiplier</div>
+          <div className="volume-value">x{multiplier}</div>
+          <div className="volume-desc">יחידות עבודה לכל אנייה</div>
+        </div>
+      );
+    }
 
     // Login Component
     function LoginScreen({ onLogin }) {
@@ -1297,6 +1741,10 @@
       const [currentPage, setCurrentPage] = useState(1);
       const [selectedResponse, setSelectedResponse] = useState(null);
       const [insightsDeptFilter, setInsightsDeptFilter] = useState('');
+      const [deleteTarget, setDeleteTarget] = useState(null);
+      const [isDeleting, setIsDeleting] = useState(false);
+      const [expandedCards, setExpandedCards] = useState({});
+      const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
 
       const fetchResponses = async () => {
         setLoading(true);
@@ -1319,6 +1767,53 @@
       useEffect(() => {
         fetchResponses();
       }, []);
+
+      // Delete single response
+      const handleDeleteResponse = async () => {
+        if (!deleteTarget) return;
+        setIsDeleting(true);
+        try {
+          const { error } = await supabase
+            .from('survey_responses_v2')
+            .delete()
+            .eq('id', deleteTarget.id);
+
+          if (error) throw error;
+          setResponses(prev => prev.filter(r => r.id !== deleteTarget.id));
+          setDeleteTarget(null);
+        } catch (err) {
+          console.error('Error deleting response:', err);
+          alert('שגיאה במחיקה');
+        } finally {
+          setIsDeleting(false);
+        }
+      };
+
+      // Delete all responses
+      const handleResetAllData = async () => {
+        if (!deleteTarget?.resetAll) return;
+        setIsDeleting(true);
+        try {
+          const { error } = await supabase
+            .from('survey_responses_v2')
+            .delete()
+            .neq('id', 0); // Delete all rows
+
+          if (error) throw error;
+          setResponses([]);
+          setDeleteTarget(null);
+        } catch (err) {
+          console.error('Error resetting data:', err);
+          alert('שגיאה באיפוס הנתונים');
+        } finally {
+          setIsDeleting(false);
+        }
+      };
+
+      // Toggle card expansion
+      const toggleCardExpansion = (id) => {
+        setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+      };
 
       // Stats
       const stats = useMemo(() => {
@@ -1530,6 +2025,13 @@
                 )}
                 <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
                 <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => setDeleteTarget({ resetAll: true })}
+                  disabled={responses.length === 0}
+                >
+                  איפוס כל הנתונים
+                </button>
                 <button className="btn btn-logout" onClick={onLogout}>התנתק</button>
               </div>
             </div>
@@ -1545,7 +2047,11 @@
               <SummaryCard label="תשובות היום" value={stats.today} />
               <SummaryCard label="השבוע האחרון" value={stats.week} />
               <SummaryCard label="שעות שבועיות לאוטומציה" value={`${stats.totalWeeklyHours} שעות`} secondary={`ציון ממוצע: ${stats.avgScore}`} />
+              <VolumeMultiplierCard responses={responses} />
             </div>
+
+            {/* Bottleneck Analysis */}
+            {responses.length > 0 && <BottleneckCard responses={responses} />}
 
             {/* Charts */}
             {responses.length > 0 && (
@@ -1568,7 +2074,7 @@
               </div>
             )}
 
-            {/* Responses Table */}
+            {/* Responses Table / Full View */}
             <div className="table-section">
               <div className="table-header">
                 <h2 className="table-title">כל התשובות ({filteredResponses.length})</h2>
@@ -1590,12 +2096,57 @@
                       <option key={dept} value={dept}>{dept}</option>
                     ))}
                   </select>
+                  <button
+                    className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setViewMode('table')}
+                  >
+                    טבלה
+                  </button>
+                  <button
+                    className={`btn ${viewMode === 'cards' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setViewMode('cards')}
+                  >
+                    כרטיסים מפורטים
+                  </button>
                 </div>
               </div>
 
               {filteredResponses.length === 0 ? (
                 <div className="empty-state">אין תשובות להצגה</div>
+              ) : viewMode === 'cards' ? (
+                /* Cards View */
+                <div>
+                  {paginatedResponses.map(response => (
+                    <ResponseCard
+                      key={response.id}
+                      response={response}
+                      onDelete={setDeleteTarget}
+                      onExpand={toggleCardExpansion}
+                      isExpanded={expandedCards[response.id]}
+                    />
+                  ))}
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        הקודם
+                      </button>
+                      <span className="pagination-info">עמוד {currentPage} מתוך {totalPages}</span>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        הבא
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
+                /* Table View */
                 <>
                   <div className="table-wrapper">
                     <table className="data-table">
@@ -1607,6 +2158,7 @@
                           <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th>ציון אוטומציה</th>
                           <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th>פעולות</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1614,17 +2166,25 @@
                           const score = calculateAutomationScore(response);
                           const badgeColor = getScoreBadgeColor(score);
                           return (
-                            <tr key={response.id} onClick={() => setSelectedResponse(response)}>
-                              <td>{formatShortDate(response.created_at)}</td>
-                              <td>{response.name}</td>
-                              <td>{response.department || response.department_other || '-'}</td>
-                              <td>{response.role || '-'}</td>
-                              <td>
+                            <tr key={response.id}>
+                              <td onClick={() => setSelectedResponse(response)}>{formatShortDate(response.created_at)}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.name}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.department || response.department_other || '-'}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.role || '-'}</td>
+                              <td onClick={() => setSelectedResponse(response)}>
                                 <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
                                   {score}
                                 </span>
                               </td>
-                              <td>{response.emails_count || '-'}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.emails_count || '-'}</td>
+                              <td>
+                                <button
+                                  className="delete-btn"
+                                  onClick={() => setDeleteTarget(response)}
+                                >
+                                  מחק
+                                </button>
+                              </td>
                             </tr>
                           );
                         })}
@@ -1701,6 +2261,20 @@
           {/* Response Modal */}
           {selectedResponse && (
             <ResponseModal response={selectedResponse} onClose={() => setSelectedResponse(null)} />
+          )}
+
+          {/* Delete Confirmation Dialog */}
+          {deleteTarget && (
+            <ConfirmDialog
+              title={deleteTarget.resetAll ? 'איפוס כל הנתונים' : `מחיקת תשובה של ${deleteTarget.name}`}
+              message={deleteTarget.resetAll
+                ? 'האם אתה בטוח שברצונך למחוק את כל התשובות? פעולה זו בלתי הפיכה!'
+                : 'האם אתה בטוח שברצונך למחוק תשובה זו?'
+              }
+              onConfirm={deleteTarget.resetAll ? handleResetAllData : handleDeleteResponse}
+              onCancel={() => setDeleteTarget(null)}
+              isDeleting={isDeleting}
+            />
           )}
         </div>
       );

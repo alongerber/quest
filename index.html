@@ -630,12 +630,13 @@
 
     // Constants
     const DEPARTMENTS = [
-      'תפעול / סוכנות',
-      'חכירות',
-      'כספים',
-      'הנהלת חשבונות',
-      'פרויקטים',
-      'אחר'
+      { id: 'operations', label: 'תפעול / סוכנות', unit: 'vessel_calls', unitLabel: 'כניסות אניות' },
+      { id: 'chartering', label: 'חכירות', unit: 'fixtures', unitLabel: 'עסקאות חכירה (Fixtures)' },
+      { id: 'documentation', label: 'תיעוד / סוכנות', unit: 'bol', unitLabel: 'שטרי מטען / פקודות מסירה' },
+      { id: 'finance', label: 'כספים', unit: 'transactions', unitLabel: 'עסקאות' },
+      { id: 'accounting', label: 'הנהלת חשבונות', unit: 'invoices', unitLabel: 'חשבוניות' },
+      { id: 'projects', label: 'פרויקטים', unit: 'projects', unitLabel: 'פרויקטים' },
+      { id: 'other', label: 'אחר', unit: 'tasks', unitLabel: 'משימות' }
     ];
 
     const SENIORITY_OPTIONS = [
@@ -646,9 +647,11 @@
     ];
 
     const ACTIVITIES = [
-      { id: 'ships', label: 'טיפול באניות (תיאום הגעה, עזיבה, מסמכים)' },
-      { id: 'cargo', label: 'טיפול במטענים (מעקב, תיעוד, שחרור)' },
-      { id: 'external', label: 'תקשורת עם גורמי חוץ (ספקים, סוכנים, לקוחות, רשויות)' },
+      { id: 'ships', label: 'טיפול באניות (תיאום הגעה, עזיבה, מסמכים לנמל)' },
+      { id: 'cargo', label: 'טיפול במטענים (פקודות מסירה, שחרור, מעקב)' },
+      { id: 'manifest', label: 'הזנת נתוני מניפסט ותיעוד מטען' },
+      { id: 'bol', label: 'הפקת שטרי מטען (B/L) ופקודות מסירה (D/O)' },
+      { id: 'external', label: 'תקשורת עם גורמי חוץ (יבואנים, משלחים, סוכנים, רשויות)' },
       { id: 'documents', label: 'הכנת מסמכים ודוחות' },
       { id: 'financial', label: 'עבודה עם נתונים כספיים (חשבוניות, תשלומים, התאמות)' },
       { id: 'projects', label: 'ניהול פרויקטים או משימות לאורך זמן' },
@@ -678,9 +681,12 @@
     // Process Mapping Constants (for automation analysis)
     const INFO_SOURCES = [
       { id: 'email_body', label: 'מייל (גוף הטקסט)' },
-      { id: 'pdf', label: 'קובץ PDF' },
+      { id: 'email_attachment', label: 'מייל (קבצים מצורפים)' },
+      { id: 'manifest_pdf', label: 'מניפסט PDF' },
+      { id: 'tos_port', label: 'אתר הנמל (TOS)' },
+      { id: 'edi_file', label: 'קובץ EDI' },
       { id: 'excel', label: 'קובץ אקסל' },
-      { id: 'port_system', label: 'מערכת הנמל' },
+      { id: 'internal_system', label: 'מערכת פנימית' },
       { id: 'whatsapp', label: 'וואטסאפ' },
       { id: 'phone', label: 'טלפון' },
       { id: 'other_source', label: 'אחר' }
@@ -723,12 +729,24 @@
         { id: 'ships_systems_update', type: 'radio', title: 'כמה מערכות צריך לעדכן כשאנייה מגיעה/עוזבת?', options: ['1-2', '3-4', '5 ומעלה'] }
       ],
       cargo: [
-        { id: 'cargo_per_week', type: 'radio', title: 'כמה משלוחים אתה מטפל בהם בשבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'cargo_per_week', type: 'radio', title: 'כמה פקודות מסירה / תיקי לקוח אתה מטפל בהם בשבוע?', options: ['עד 10', '10-30', '30-50', '50-100', 'מעל 100'] },
+        { id: 'importers_per_vessel', type: 'radio', title: 'בממוצע, כמה יבואנים/גורמי קצה מטופלים תחת אנייה אחת בתיק שלך?', options: ['1-5', '5-15', '15-30', '30-50', 'מעל 50'] },
         { id: 'cargo_tracking', type: 'radio', title: 'האם מעקב המטענים נעשה ידנית או דרך מערכת?', options: ['ידנית לחלוטין', 'בעיקר ידנית', 'בעיקר במערכת', 'במערכת לחלוטין'] },
-        { id: 'cargo_status_questions', type: 'radio', title: 'כמה פעמים שואלים אותך "איפה המשלוח?" ביום?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+        { id: 'cargo_status_questions', type: 'radio', title: 'כמה פעמים שואלים אותך "איפה המטען?" ביום?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+      ],
+      manifest: [
+        { id: 'manifest_per_week', type: 'radio', title: 'כמה מניפסטים אתה מזין בשבוע ממוצע?', options: ['1-5', '5-15', '15-30', 'מעל 30'] },
+        { id: 'manifest_source', type: 'radio', title: 'מאיפה מגיע המניפסט?', options: ['PDF במייל', 'אתר הנמל (TOS)', 'קובץ EDI', 'שילוב של כולם'] },
+        { id: 'manifest_time', type: 'radio', title: 'כמה זמן לוקח להזין מניפסט אחד?', options: ['עד 15 דקות', '15-30 דקות', '30-60 דקות', 'מעל שעה'] },
+        { id: 'manifest_lines', type: 'radio', title: 'כמה שורות (פריטים) יש במניפסט ממוצע?', options: ['עד 20', '20-50', '50-100', 'מעל 100'] }
+      ],
+      bol: [
+        { id: 'bol_per_week', type: 'radio', title: 'כמה שטרי מטען / פקודות מסירה אתה מפיק בשבוע?', options: ['עד 20', '20-50', '50-100', 'מעל 100'] },
+        { id: 'bol_source', type: 'radio', title: 'מאיפה מגיע המידע לשטר המטען?', options: ['מניפסט', 'בקשת יבואן', 'מערכת פנימית', 'שילוב של כולם'] },
+        { id: 'bol_manual_typing', type: 'radio', title: 'כמה מהנתונים מוקלדים ידנית?', options: ['כמעט הכל', 'רוב', 'חצי', 'מיעוט'] }
       ],
       external: [
-        { id: 'external_contacts', type: 'radio', title: 'עם כמה גורמי חוץ אתה בקשר קבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'external_contacts', type: 'radio', title: 'עם כמה גורמי חוץ (יבואנים, משלחים, סוכנים) אתה בקשר קבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
         { id: 'external_channel', type: 'radio', title: 'מה ערוץ התקשורת העיקרי?', options: ['מייל', 'טלפון', 'WhatsApp', 'שילוב של כולם'] },
         { id: 'external_relay', type: 'radio', title: 'כמה פעמים ביום אתה מעביר מידע מגורם אחד לאחר?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
       ],
@@ -878,8 +896,8 @@
               onChange={(e) => onChange('department', e.target.value)}
             >
               <option value="">בחר מחלקה</option>
-              {DEPARTMENTS.map((dept, index) => (
-                <option key={index} value={dept}>{dept}</option>
+              {DEPARTMENTS.map((dept) => (
+                <option key={dept.id} value={dept.label}>{dept.label}</option>
               ))}
             </select>
           </div>
