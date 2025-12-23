@@ -744,6 +744,17 @@
         border-top: 2px solid var(--gray-300);
       }
 
+      /* System Insights Print Section */
+      .system-insights-print {
+        display: block !important;
+        page-break-inside: avoid;
+        padding: 1.5rem;
+        background: white;
+        border: 1px solid var(--gray-300);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+      }
+
       /* Analysis Engine Print Section */
       .ai-analysis-print {
         display: block !important;
@@ -780,6 +791,11 @@
 
     /* Analysis Engine Print Section - hidden on screen */
     .ai-analysis-print {
+      display: none;
+    }
+
+    /* System Insights Print Section - hidden on screen */
+    .system-insights-print {
       display: none;
     }
 
@@ -2219,6 +2235,139 @@
       );
     }
 
+    // System Insights Print Component - מופיע רק בהדפסה
+    function SystemInsightsPrint({ responses }) {
+      const analysis = useMemo(() => {
+        if (responses.length === 0) return null;
+        const n = responses.length;
+
+        // Department analysis
+        const deptData = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0 };
+          deptData[dept].count++;
+          deptData[dept].hours += calculateWeeklyHours(r);
+        });
+        const deptAnalysis = Object.entries(deptData)
+          .map(([name, data]) => ({ name, count: data.count, hours: Math.round(data.hours) }))
+          .sort((a, b) => b.hours - a.hours);
+
+        // Pain points by department (no names)
+        const painPointsByDept = {};
+        responses.filter(r => r.main_frustration).forEach(r => {
+          const dept = r.department || r.department_other || 'כללי';
+          if (!painPointsByDept[dept]) painPointsByDept[dept] = [];
+          painPointsByDept[dept].push(r.main_frustration);
+        });
+
+        // Recommendations
+        const recommendations = [];
+        const highCopyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
+        if (highCopyPaste > 0) {
+          recommendations.push({ title: 'אוטומציה של העתקת נתונים', action: 'לבחון כלי OCR וחילוץ נתונים אוטומטי' });
+        }
+        const highEmail = responses.filter(r => r.emails_count === 'מעל 100' || r.emails_count === '50-100').length;
+        if (highEmail > 0) {
+          recommendations.push({ title: 'ניהול עומס מיילים', action: 'להטמיע כללי סינון אוטומטיים וכלי סיכום' });
+        }
+        const multiSystem = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים').length;
+        if (multiSystem > 0) {
+          recommendations.push({ title: 'אינטגרציה בין מערכות', action: 'לבחון חיבורים אוטומטיים בין המערכות' });
+        }
+
+        // Tool usage
+        const toolUsage = {};
+        responses.forEach(r => {
+          (r.tools || []).forEach(tool => { toolUsage[tool] = (toolUsage[tool] || 0) + 1; });
+        });
+        const topTools = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        return { n, deptAnalysis, painPointsByDept, recommendations, topTools };
+      }, [responses]);
+
+      if (!analysis) return null;
+
+      return (
+        <div className="system-insights-print">
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', borderBottom: '2px solid #0891b2', paddingBottom: '0.5rem'}}>
+            תובנות מערכת
+          </h2>
+
+          {/* Recommendations */}
+          {analysis.recommendations.length > 0 && (
+            <div style={{marginBottom: '1.5rem'}}>
+              <h3 style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem', color: '#059669'}}>המלצות לפעולה</h3>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem'}}>
+                {analysis.recommendations.map((rec, idx) => (
+                  <div key={idx} style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '8px', borderRight: '3px solid #059669'}}>
+                    <div style={{fontWeight: '600', marginBottom: '0.25rem'}}>{rec.title}</div>
+                    <div style={{fontSize: '0.8125rem', color: '#166534'}}>{rec.action}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Department Analysis */}
+          <div style={{marginBottom: '1.5rem'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem'}}>פירוט לפי מחלקה</h3>
+            <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem'}}>
+              <thead>
+                <tr style={{background: '#f1f5f9'}}>
+                  <th style={{padding: '0.5rem', textAlign: 'right', borderBottom: '1px solid #e2e8f0'}}>מחלקה</th>
+                  <th style={{padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #e2e8f0'}}>עובדים</th>
+                  <th style={{padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #e2e8f0'}}>שעות עבודה חוזרת</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analysis.deptAnalysis.map((dept, idx) => (
+                  <tr key={idx}>
+                    <td style={{padding: '0.5rem', borderBottom: '1px solid #f1f5f9'}}>{dept.name}</td>
+                    <td style={{padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #f1f5f9'}}>{dept.count}</td>
+                    <td style={{padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #f1f5f9', fontWeight: '600', color: '#0891b2'}}>{dept.hours}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pain Points by Department */}
+          {Object.keys(analysis.painPointsByDept).length > 0 && (
+            <div style={{marginBottom: '1.5rem'}}>
+              <h3 style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.75rem'}}>נושאים שעלו לפי מחלקה</h3>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem'}}>
+                {Object.entries(analysis.painPointsByDept).slice(0, 4).map(([dept, points], idx) => (
+                  <div key={idx} style={{background: '#f8fafc', padding: '0.75rem', borderRadius: '8px', borderTop: '2px solid #0891b2'}}>
+                    <div style={{fontWeight: '600', marginBottom: '0.5rem', color: '#1a365d'}}>{dept}</div>
+                    {points.slice(0, 2).map((text, pIdx) => (
+                      <div key={pIdx} style={{fontSize: '0.8125rem', color: '#475569', marginBottom: '0.25rem'}}>
+                        • {text.length > 60 ? text.substring(0, 60) + '...' : text}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Top Tools */}
+          {analysis.topTools.length > 0 && (
+            <div>
+              <h3 style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem'}}>כלים בשימוש</h3>
+              <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+                {analysis.topTools.map(([tool, count], idx) => (
+                  <span key={idx} style={{background: '#e2e8f0', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8125rem'}}>
+                    {tool} ({count})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // Practical Tools Guide - מדריך כלים מעשי (קבוע - לא תלוי בנתונים)
     function PracticalToolsGuide() {
       // SVG Icons
@@ -2937,10 +3086,17 @@
           }))
           .sort((a, b) => b.hours - a.hours);
 
-        // Pain points
+        // Pain points - WITHOUT names
         const painPoints = responses
           .filter(r => r.main_frustration)
-          .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other }));
+          .map(r => ({ text: r.main_frustration, dept: r.department || r.department_other || 'כללי' }));
+
+        // Group pain points by theme
+        const painPointsByDept = {};
+        painPoints.forEach(p => {
+          if (!painPointsByDept[p.dept]) painPointsByDept[p.dept] = [];
+          painPointsByDept[p.dept].push(p.text);
+        });
 
         // Improvement wishes
         const wishes = responses
@@ -2956,26 +3112,42 @@
         });
         const topTools = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-        // Key recommendations
+        // Key recommendations - actionable and professional
         const recommendations = [];
 
-        if (deptAnalysis[0]?.hours > 20) {
-          recommendations.push(`מחלקת ${deptAnalysis[0].name} משקיעה ${deptAnalysis[0].hours} שעות שבועיות - מומלץ לבחון תהליכים לייעול`);
-        }
-
         const highCopyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
-        if (highCopyPaste > totalResponses * 0.3) {
-          recommendations.push(`${highCopyPaste} עובדים מעתיקים מידע ממיילים - שווה לבדוק כלי אוטומציה להזנת נתונים`);
+        if (highCopyPaste > 0) {
+          recommendations.push({
+            title: 'אוטומציה של העתקת נתונים',
+            desc: 'זוהתה העתקה ידנית של מידע ממיילים למערכות',
+            action: 'לבחון כלי OCR וחילוץ נתונים אוטומטי'
+          });
         }
 
         const highEmail = responses.filter(r => r.emails_count === 'מעל 100' || r.emails_count === '50-100').length;
         if (highEmail > 0) {
-          recommendations.push(`${highEmail} עובדים מטפלים ביותר מ-50 מיילים ביום - כדאי לבחון סינון וקטגוריזציה`);
+          recommendations.push({
+            title: 'ניהול עומס מיילים',
+            desc: 'עובדים מדווחים על כמות גבוהה של מיילים יומיים',
+            action: 'להטמיע כללי סינון אוטומטיים וכלי סיכום'
+          });
         }
 
-        const multiSystem = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה').length;
+        const multiSystem = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים').length;
         if (multiSystem > 0) {
-          recommendations.push(`${multiSystem} עובדים עובדים עם 5 מערכות ויותר - אינטגרציה תחסוך זמן`);
+          recommendations.push({
+            title: 'אינטגרציה בין מערכות',
+            desc: 'עבודה עם מערכות מרובות במקביל',
+            action: 'לבחון חיבורים אוטומטיים בין המערכות המרכזיות'
+          });
+        }
+
+        if (deptAnalysis[0]?.hours > 15) {
+          recommendations.push({
+            title: `מיקוד במחלקת ${deptAnalysis[0].name}`,
+            desc: 'המחלקה עם הנפח הגבוה ביותר של עבודה חוזרת',
+            action: 'לתעדף פרויקט ייעול ראשון במחלקה זו'
+          });
         }
 
         return {
@@ -2986,7 +3158,8 @@
             topDept: deptAnalysis[0]
           },
           deptAnalysis,
-          painPoints: painPoints.slice(0, 5),
+          painPoints: painPoints.slice(0, 8),
+          painPointsByDept,
           wishes: wishes.slice(0, 5),
           topTools,
           recommendations
@@ -3045,30 +3218,67 @@
                 </table>
               </div>
 
-              {/* Recommendations */}
+              {/* Recommendations - Professional Cards */}
               {analysis.recommendations.length > 0 && (
                 <div className="modal-section">
-                  <h4 className="modal-section-title">המלצות לייעול</h4>
-                  <div style={{background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', borderRadius: '12px', padding: '1.25rem', color: 'white'}}>
+                  <h4 className="modal-section-title">המלצות לפעולה</h4>
+                  <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem'}}>
                     {analysis.recommendations.map((rec, idx) => (
-                      <div key={idx} style={{padding: '0.5rem 0', borderBottom: idx < analysis.recommendations.length - 1 ? '1px solid rgba(255,255,255,0.2)' : 'none'}}>
-                        {idx + 1}. {rec}
+                      <div key={idx} style={{
+                        background: 'linear-gradient(135deg, #059669 0%, #0891b2 100%)',
+                        borderRadius: '12px',
+                        padding: '1.25rem',
+                        color: 'white'
+                      }}>
+                        <div style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '0.5rem'}}>
+                          {rec.title}
+                        </div>
+                        <div style={{fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.75rem'}}>
+                          {rec.desc}
+                        </div>
+                        <div style={{
+                          fontSize: '0.8125rem',
+                          background: 'rgba(255,255,255,0.2)',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '6px',
+                          display: 'inline-block'
+                        }}>
+                          {rec.action}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Pain Points */}
+              {/* Pain Points - By Department, No Names */}
               {analysis.painPoints.length > 0 && (
                 <div className="modal-section">
-                  <h4 className="modal-section-title">נקודות כאב שזוהו</h4>
-                  {analysis.painPoints.map((point, idx) => (
-                    <div key={idx} style={{background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', marginBottom: '0.5rem', borderRight: '3px solid var(--warning)'}}>
-                      <div style={{fontWeight: '500'}}>"{point.text}"</div>
-                      <div style={{fontSize: '0.8125rem', color: 'var(--gray-500)', marginTop: '0.25rem'}}>{point.name} - {point.dept}</div>
-                    </div>
-                  ))}
+                  <h4 className="modal-section-title">נושאים שעלו ({analysis.painPoints.length} תגובות)</h4>
+                  <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem'}}>
+                    {Object.entries(analysis.painPointsByDept).map(([dept, points], idx) => (
+                      <div key={idx} style={{
+                        background: 'var(--gray-50)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        borderTop: '3px solid var(--primary-teal)'
+                      }}>
+                        <div style={{fontWeight: '600', color: 'var(--primary-dark)', marginBottom: '0.75rem'}}>
+                          {dept}
+                        </div>
+                        {points.slice(0, 3).map((text, pIdx) => (
+                          <div key={pIdx} style={{
+                            fontSize: '0.875rem',
+                            color: 'var(--gray-600)',
+                            padding: '0.5rem 0',
+                            borderBottom: pIdx < Math.min(points.length, 3) - 1 ? '1px solid var(--gray-200)' : 'none'
+                          }}>
+                            "{text}"
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -3767,6 +3977,9 @@
               )}
             </div>
 
+
+            {/* System Insights Print - shown only in print */}
+            {responses.length > 0 && <SystemInsightsPrint responses={responses} />}
 
             {/* Meeting Legend - shown in print */}
             <MeetingLegend />
