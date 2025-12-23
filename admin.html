@@ -1684,7 +1684,7 @@
       return <canvas ref={canvasRef}></canvas>;
     }
 
-    // Kickoff Session Component
+    // Kickoff Session Component - תובנות לישיבה
     function KickoffSession({ responses }) {
       const candidates = useMemo(() => {
         return responses
@@ -1699,33 +1699,68 @@
           .slice(0, 3);
       }, [responses]);
 
-      const prompts = useMemo(() => {
-        if (candidates.length === 0) return [];
-        const p = [];
+      // Generate truly dynamic insights based on actual data
+      const dataInsights = useMemo(() => {
+        if (responses.length === 0) return { prompts: [], findings: [] };
 
-        // Generate prompts based on top candidates
-        if (candidates[0]) {
-          p.push(`איך ניתן לחסוך את העתקת הנתונים מ-${candidates[0].source} ל-${candidates[0].dest}?`);
-        }
+        const findings = [];
+        const prompts = [];
 
-        const topActivities = {};
+        // 1. Find most time-consuming department
+        const deptHours = {};
         responses.forEach(r => {
-          (r.activities || []).forEach(a => {
-            topActivities[a] = (topActivities[a] || 0) + 1;
-          });
+          const dept = r.department || r.department_other || 'לא צוין';
+          deptHours[dept] = (deptHours[dept] || 0) + calculateWeeklyHours(r);
         });
-        const topActivity = Object.entries(topActivities).sort((a, b) => b[1] - a[1])[0];
-        if (topActivity) {
-          p.push(`${ACTIVITY_LABELS[topActivity[0]] || topActivity[0]} הוא התהליך הנפוץ ביותר - האם ניתן לאחד או לפשט אותו?`);
+        const topDept = Object.entries(deptHours).sort((a, b) => b[1] - a[1])[0];
+        if (topDept) {
+          findings.push(`מחלקת ${topDept[0]} משקיעה הכי הרבה זמן - ${Math.round(topDept[1])} שעות בשבוע`);
+          prompts.push(`למה מחלקת ${topDept[0]} עובדת כל כך הרבה? מה אפשר לפשט?`);
         }
 
-        const copyCount = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
-        if (copyCount > 0) {
-          p.push(`${copyCount} עובדים מעתיקים מידע מהרבה מיילים - האם אפשר להפוך את זה לאוטומטי?`);
+        // 2. Find common frustrations
+        const frustrations = responses.filter(r => r.main_frustration).map(r => r.main_frustration);
+        if (frustrations.length > 0) {
+          const sample = frustrations[0].substring(0, 60);
+          findings.push(`${frustrations.length} עובדים דיווחו על תסכול בעבודה`);
+          prompts.push(`"${sample}..." - איך אפשר לפתור את זה?`);
         }
 
-        return p.slice(0, 3);
-      }, [candidates, responses]);
+        // 3. Find tool switching pain
+        const highToolSwitch = responses.filter(r =>
+          r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
+        );
+        if (highToolSwitch.length > 0) {
+          findings.push(`${highToolSwitch.length} עובדים עוברים בין הרבה מערכות`);
+          prompts.push(`האם אפשר לחבר את המערכות כדי להפחית העתקה ידנית?`);
+        }
+
+        // 4. Find email overload
+        const highEmail = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
+        if (highEmail.length > 0) {
+          findings.push(`${highEmail.length} עובדים מקבלים מעל 50 מיילים ביום`);
+          prompts.push(`איך אפשר לצמצם את כמות המיילים או לסנן אותם?`);
+        }
+
+        // 5. Check for copy-paste work
+        const copyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי');
+        if (copyPaste.length > 0) {
+          findings.push(`${copyPaste.length} עובדים מעתיקים מידע ידנית ממיילים`);
+          prompts.push(`האם אפשר להזין את המידע אוטומטית במקום להעתיק ידנית?`);
+        }
+
+        // 6. Find repetitive tasks
+        const repetitive = responses.filter(r => r.process_frequency === 'daily' && r.process_type === 'rule_based');
+        if (repetitive.length > 0) {
+          findings.push(`${repetitive.length} משימות יומיות שנעשות תמיד באותו אופן`);
+          prompts.push(`משימות קבועות שחוזרות כל יום - כדאי לבדוק אם אפשר לייעל`);
+        }
+
+        return {
+          prompts: prompts.slice(0, 4),
+          findings: findings.slice(0, 4)
+        };
+      }, [responses]);
 
       if (candidates.length === 0) return null;
 
@@ -1739,8 +1774,8 @@
         <div className="kickoff-section">
           <div className="kickoff-header">
             <h2 className="kickoff-title">
-              תובנות לישיבת התנעה
-              <span className="kickoff-badge">Top 3 Candidates</span>
+              סיכום לישיבה
+              <span className="kickoff-badge">3 תהליכים מובילים</span>
             </h2>
           </div>
 
@@ -1758,36 +1793,51 @@
 
                 <div className="candidate-flow">
                   <div className="flow-item">
-                    <div className="flow-label">מקור (Trigger)</div>
+                    <div className="flow-label">מאיפה מגיע המידע</div>
                     <div className="flow-value">{candidate.source || 'לא צוין'}</div>
                   </div>
                   <div className="flow-arrow">→</div>
                   <div className="flow-item">
-                    <div className="flow-label">יעד (Destination)</div>
+                    <div className="flow-label">לאן הוא מגיע</div>
                     <div className="flow-value">{candidate.dest || 'לא צוין'}</div>
                   </div>
                 </div>
 
                 {candidate.manual_steps && (
                   <div className="flow-item" style={{marginBottom: '0.75rem'}}>
-                    <div className="flow-label">צוואר בקבוק (Bottleneck)</div>
+                    <div className="flow-label">מה הכי לוקח זמן</div>
                     <div className="flow-value" style={{fontSize: '0.8125rem'}}>{candidate.manual_steps.substring(0, 80)}...</div>
                   </div>
                 )}
 
                 <div className="candidate-hours">
-                  חיסכון פוטנציאלי: <span className="hours-value">{candidate.weeklyHours} שעות/שבוע</span>
+                  זמן שאפשר לחסוך: <span className="hours-value">{candidate.weeklyHours} שעות/שבוע</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {prompts.length > 0 && (
+          {/* Dynamic Findings */}
+          {dataInsights.findings.length > 0 && (
+            <div className="prompts-section" style={{marginBottom: '1rem'}}>
+              <h3 className="prompts-title">
+                מה גילינו מהתשובות
+              </h3>
+              {dataInsights.findings.map((finding, idx) => (
+                <div key={idx} className="prompt-item">
+                  {finding}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Dynamic Questions */}
+          {dataInsights.prompts.length > 0 && (
             <div className="prompts-section">
               <h3 className="prompts-title">
-                שאלות לדיון בישיבה
+                שאלות לדיון (מבוססות על התשובות)
               </h3>
-              {prompts.map((prompt, idx) => (
+              {dataInsights.prompts.map((prompt, idx) => (
                 <div key={idx} className="prompt-item">
                   {idx + 1}. {prompt}
                 </div>
@@ -1841,6 +1891,189 @@
       }, [data, labels, horizontal]);
 
       return <canvas ref={canvasRef}></canvas>;
+    }
+
+    // AI Analysis Modal - ניתוח מתקדם
+    function AIAnalysisModal({ responses, onClose }) {
+      if (!responses || responses.length === 0) return null;
+
+      // Generate comprehensive analysis
+      const analysis = useMemo(() => {
+        const totalResponses = responses.length;
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const avgScore = Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / totalResponses);
+
+        // Department analysis
+        const deptData = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0, scores: [] };
+          deptData[dept].count++;
+          deptData[dept].hours += calculateWeeklyHours(r);
+          deptData[dept].scores.push(calculateAutomationScore(r));
+        });
+
+        const deptAnalysis = Object.entries(deptData)
+          .map(([name, data]) => ({
+            name,
+            count: data.count,
+            hours: Math.round(data.hours),
+            avgScore: Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length)
+          }))
+          .sort((a, b) => b.hours - a.hours);
+
+        // Pain points
+        const painPoints = responses
+          .filter(r => r.main_frustration)
+          .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other }));
+
+        // Improvement wishes
+        const wishes = responses
+          .filter(r => r.process_wish || r.automation_wish)
+          .map(r => ({ text: r.process_wish || r.automation_wish, name: r.name }));
+
+        // Tool usage
+        const toolUsage = {};
+        responses.forEach(r => {
+          (r.tools || []).forEach(tool => {
+            toolUsage[tool] = (toolUsage[tool] || 0) + 1;
+          });
+        });
+        const topTools = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        // Key recommendations
+        const recommendations = [];
+
+        if (deptAnalysis[0]?.hours > 20) {
+          recommendations.push(`מחלקת ${deptAnalysis[0].name} משקיעה ${deptAnalysis[0].hours} שעות שבועיות - מומלץ לבחון תהליכים לייעול`);
+        }
+
+        const highCopyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
+        if (highCopyPaste > totalResponses * 0.3) {
+          recommendations.push(`${highCopyPaste} עובדים מעתיקים מידע ממיילים - שווה לבדוק כלי אוטומציה להזנת נתונים`);
+        }
+
+        const highEmail = responses.filter(r => r.emails_count === 'מעל 100' || r.emails_count === '50-100').length;
+        if (highEmail > 0) {
+          recommendations.push(`${highEmail} עובדים מטפלים ביותר מ-50 מיילים ביום - כדאי לבחון סינון וקטגוריזציה`);
+        }
+
+        const multiSystem = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה').length;
+        if (multiSystem > 0) {
+          recommendations.push(`${multiSystem} עובדים עובדים עם 5 מערכות ויותר - אינטגרציה תחסוך זמן`);
+        }
+
+        return {
+          summary: {
+            totalResponses,
+            totalHours: Math.round(totalHours),
+            avgScore,
+            topDept: deptAnalysis[0]
+          },
+          deptAnalysis,
+          painPoints: painPoints.slice(0, 5),
+          wishes: wishes.slice(0, 5),
+          topTools,
+          recommendations
+        };
+      }, [responses]);
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal" style={{maxWidth: '900px'}} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">ניתוח מתקדם של הנתונים</h2>
+              <button className="modal-close" onClick={onClose}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {/* Summary */}
+              <div className="modal-section">
+                <h4 className="modal-section-title">סיכום כללי</h4>
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem'}}>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-dark)'}}>{analysis.summary.totalResponses}</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>תשובות</div>
+                  </div>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-teal)'}}>{analysis.summary.totalHours}</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>שעות/שבוע</div>
+                  </div>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--success)'}}>{analysis.summary.avgScore}</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>מדד חיכוך ממוצע</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Department Analysis */}
+              <div className="modal-section">
+                <h4 className="modal-section-title">ניתוח לפי מחלקה</h4>
+                <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem'}}>
+                  <thead>
+                    <tr style={{background: 'var(--gray-50)'}}>
+                      <th style={{padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--gray-200)'}}>מחלקה</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>עובדים</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>שעות/שבוע</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>מדד ממוצע</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysis.deptAnalysis.map((dept, idx) => (
+                      <tr key={idx}>
+                        <td style={{padding: '0.75rem', borderBottom: '1px solid var(--gray-100)'}}>{dept.name}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)'}}>{dept.count}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)', fontWeight: '600', color: 'var(--primary-teal)'}}>{dept.hours}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)'}}>{dept.avgScore}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Recommendations */}
+              {analysis.recommendations.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">המלצות לייעול</h4>
+                  <div style={{background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', borderRadius: '12px', padding: '1.25rem', color: 'white'}}>
+                    {analysis.recommendations.map((rec, idx) => (
+                      <div key={idx} style={{padding: '0.5rem 0', borderBottom: idx < analysis.recommendations.length - 1 ? '1px solid rgba(255,255,255,0.2)' : 'none'}}>
+                        {idx + 1}. {rec}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pain Points */}
+              {analysis.painPoints.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">נקודות כאב שזוהו</h4>
+                  {analysis.painPoints.map((point, idx) => (
+                    <div key={idx} style={{background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', marginBottom: '0.5rem', borderRight: '3px solid var(--warning)'}}>
+                      <div style={{fontWeight: '500'}}>"{point.text}"</div>
+                      <div style={{fontSize: '0.8125rem', color: 'var(--gray-500)', marginTop: '0.25rem'}}>{point.name} - {point.dept}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Top Tools */}
+              {analysis.topTools.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">כלים בשימוש נפוץ</h4>
+                  <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+                    {analysis.topTools.map(([tool, count], idx) => (
+                      <span key={idx} style={{background: 'var(--gray-100)', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem'}}>
+                        {tool} ({count})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
     }
 
     // Response Modal
@@ -1947,6 +2180,7 @@
       const [isDeleting, setIsDeleting] = useState(false);
       const [expandedCards, setExpandedCards] = useState({});
       const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+      const [showAIAnalysis, setShowAIAnalysis] = useState(false);
 
       const fetchResponses = async () => {
         setLoading(true);
@@ -1996,17 +2230,29 @@
         if (!deleteTarget?.resetAll) return;
         setIsDeleting(true);
         try {
-          const { error } = await supabase
-            .from('survey_responses_v2')
-            .delete()
-            .neq('id', 0); // Delete all rows
+          // Get all IDs first
+          const ids = responses.map(r => r.id);
+          if (ids.length === 0) {
+            setDeleteTarget(null);
+            return;
+          }
 
-          if (error) throw error;
+          // Delete in batches to avoid timeout
+          for (const id of ids) {
+            const { error } = await supabase
+              .from('survey_responses_v2')
+              .delete()
+              .eq('id', id);
+            if (error) {
+              console.error('Error deleting id:', id, error);
+            }
+          }
+
           setResponses([]);
           setDeleteTarget(null);
         } catch (err) {
           console.error('Error resetting data:', err);
-          alert('שגיאה באיפוס הנתונים');
+          alert('שגיאה באיפוס הנתונים: ' + (err.message || 'נסה שוב'));
         } finally {
           setIsDeleting(false);
         }
@@ -2235,6 +2481,14 @@
                 <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
                 <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
                 <button className="btn btn-secondary" onClick={() => window.print()}>הדפס דוח</button>
+                <button
+                  className="btn"
+                  style={{background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', color: 'white'}}
+                  onClick={() => setShowAIAnalysis(true)}
+                  disabled={responses.length === 0}
+                >
+                  ניתוח מתקדם
+                </button>
                 <button
                   className="btn btn-danger"
                   onClick={() => setDeleteTarget({ resetAll: true })}
@@ -2474,6 +2728,11 @@
           {/* Response Modal */}
           {selectedResponse && (
             <ResponseModal response={selectedResponse} onClose={() => setSelectedResponse(null)} />
+          )}
+
+          {/* AI Analysis Modal */}
+          {showAIAnalysis && (
+            <AIAnalysisModal responses={responses} onClose={() => setShowAIAnalysis(false)} />
           )}
 
           {/* Delete Confirmation Dialog */}

@@ -438,6 +438,14 @@
       line-height: 1.4;
     }
 
+    .checkbox-help {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+      line-height: 1.3;
+    }
+
     .checkbox-with-input {
       width: 100%;
     }
@@ -687,16 +695,16 @@
 
     // Process Mapping Constants (for automation analysis)
     const INFO_SOURCES = [
-      { id: 'email_body', label: 'מייל (גוף הטקסט)' },
-      { id: 'email_attachment', label: 'מייל (קבצים מצורפים)' },
-      { id: 'manifest_pdf', label: 'מניפסט PDF' },
-      { id: 'tos_port', label: 'אתר הנמל (TOS)' },
-      { id: 'edi_file', label: 'קובץ EDI' },
-      { id: 'excel', label: 'קובץ אקסל' },
-      { id: 'internal_system', label: 'מערכת פנימית' },
-      { id: 'whatsapp', label: 'וואטסאפ' },
-      { id: 'phone', label: 'טלפון' },
-      { id: 'other_source', label: 'אחר' }
+      { id: 'email_body', label: 'מייל (גוף הטקסט)', help: 'מידע שמגיע בתוך המייל עצמו' },
+      { id: 'email_attachment', label: 'מייל (קבצים מצורפים)', help: 'קבצים כמו PDF או אקסל שמצורפים למייל' },
+      { id: 'manifest_pdf', label: 'מניפסט PDF', help: 'רשימת המטענים באנייה - מגיע כקובץ PDF' },
+      { id: 'tos_port', label: 'אתר הנמל (TOS)', help: 'מערכת הנמל לניהול מטענים ואניות' },
+      { id: 'edi_file', label: 'קובץ EDI', help: 'קובץ דיגיטלי להעברת מידע בין מערכות - חוסך הקלדה ידנית' },
+      { id: 'excel', label: 'קובץ אקסל', help: 'טבלאות אקסל עם נתונים' },
+      { id: 'internal_system', label: 'מערכת פנימית', help: 'מערכת המחשב של החברה' },
+      { id: 'whatsapp', label: 'וואטסאפ', help: 'הודעות בוואטסאפ' },
+      { id: 'phone', label: 'טלפון', help: 'שיחות טלפון' },
+      { id: 'other_source', label: 'אחר', help: 'מקור אחר שלא ברשימה' }
     ];
 
     const PROCESS_TYPES = [
@@ -834,6 +842,7 @@
               </span>
               <div className="checkbox-with-input">
                 <span className="checkbox-label">{option.label}</span>
+                {option.help && <span className="checkbox-help">{option.help}</span>}
                 {showOtherInput && option.id === 'other' && values.includes('other') && (
                   <input
                     type="text"
