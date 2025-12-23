@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דשבורד תשובות השאלון | קוראל שירותי ים</title>
+  <title>מערכת ניתוח תהליכים | קוראל שירותי ים</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -624,6 +624,593 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Print Styles - דוח מלא להדפסה */
+    @media print {
+      body {
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .dashboard-header {
+        position: static;
+        border-bottom: 2px solid var(--gray-300);
+        padding: 0.5rem 1rem;
+      }
+
+      .header-actions {
+        display: none;
+      }
+
+      .btn, .delete-btn, .pagination, .table-filters,
+      .filter-input, .filter-select, .btn-danger {
+        display: none !important;
+      }
+
+      .dashboard-content {
+        padding: 0.5rem;
+      }
+
+      .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        page-break-inside: avoid;
+      }
+
+      .summary-card {
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+        padding: 0.75rem;
+      }
+
+      .chart-card, .kickoff-section, .bottleneck-card,
+      .table-section, .insights-section, .full-data-section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+        margin-bottom: 1rem;
+      }
+
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      /* New components print styles */
+      .strategic-questions {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
+      .vessel-story {
+        background: linear-gradient(135deg, #1a365d 0%, #3b82f6 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
+      .recovery-card {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
+      .kickoff-section {
+        background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%) !important;
+        color: white !important;
+      }
+
+      .bottleneck-card {
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%) !important;
+        color: white !important;
+      }
+
+      .volume-card {
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%) !important;
+        color: white !important;
+      }
+
+      .modal-overlay {
+        display: none;
+      }
+
+      /* Executive Print Summary - first item in print */
+      .executive-print-summary {
+        display: block !important;
+        page-break-inside: avoid;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Meeting Legend - visible only in print */
+      .meeting-legend {
+        display: block !important;
+        page-break-inside: avoid;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--gray-300);
+      }
+
+      /* Analysis Engine Print Section */
+      .ai-analysis-print {
+        display: block !important;
+        page-break-before: always;
+        page-break-inside: avoid;
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid var(--primary-teal);
+        border-radius: 12px;
+        margin-top: 2rem;
+      }
+
+      .ai-analysis-print-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-teal);
+      }
+
+      .data-table {
+        font-size: 0.8rem;
+      }
+
+      .data-table th, .data-table td {
+        padding: 0.5rem;
+      }
+
+      .score-badge {
+        border: 1px solid currentColor;
+      }
+    }
+
+    /* Analysis Engine Print Section - hidden on screen */
+    .ai-analysis-print {
+      display: none;
+    }
+
+    /* Executive Print Summary - hidden on screen, shown in print */
+    .executive-print-summary {
+      display: none;
+      background: white;
+      padding: 1.5rem;
+      border: 2px solid var(--primary-teal);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Meeting Legend - hidden on screen, shown in print */
+    .meeting-legend {
+      display: none;
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .meeting-legend-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .legend-item {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1rem;
+      border-right: 4px solid var(--primary-teal);
+    }
+
+    .legend-term {
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .legend-definition {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+
+    /* Kickoff Session Styles */
+    .kickoff-section {
+      background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+    }
+
+    .kickoff-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .kickoff-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .kickoff-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .kickoff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kickoff-candidate {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .candidate-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .candidate-rank {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .candidate-score {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .score-high { background: #dcfce7; color: #166534; }
+    .score-medium { background: #fef9c3; color: #854d0e; }
+    .score-low { background: #fee2e2; color: #991b1b; }
+
+    .candidate-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .candidate-dept {
+      font-size: 0.8125rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .candidate-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .flow-item {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .flow-label {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-bottom: 0.25rem;
+    }
+
+    .flow-value {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .flow-arrow {
+      font-size: 1.25rem;
+      opacity: 0.5;
+    }
+
+    .candidate-hours {
+      text-align: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.875rem;
+    }
+
+    .hours-value {
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .prompts-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .prompts-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prompt-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.875rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .prompt-item:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Automation Score Badge in Table */
+    .score-badge {
+      display: inline-block;
+      padding: 0.25rem 0.625rem;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    /* Delete Button */
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .delete-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+    }
+
+    .delete-btn:hover {
+      background: #fecaca;
+    }
+
+    /* Full Data View Section */
+    .full-data-section {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .response-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .response-card-header {
+      background: var(--white);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .response-card-header:hover {
+      background: var(--gray-50);
+    }
+
+    .response-card-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .response-card-name {
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .response-card-meta {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .response-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .response-card-body {
+      padding: 1.25rem;
+      border-top: 1px solid var(--gray-200);
+      display: none;
+    }
+
+    .response-card.expanded .response-card-body {
+      display: block;
+    }
+
+    .response-data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .response-data-section {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .response-data-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-teal);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .response-data-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .response-data-label {
+      color: var(--gray-500);
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .response-data-value {
+      color: var(--gray-700);
+    }
+
+    .expand-icon {
+      transition: transform 0.2s;
+    }
+
+    .response-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Bottleneck Card */
+    .bottleneck-card {
+      background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+
+    .bottleneck-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bottleneck-content {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .bottleneck-stat {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      margin: 0 0.25rem;
+    }
+
+    /* Volume Multiplier Card */
+    .volume-card {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      border-radius: 12px;
+      padding: 1.25rem;
+      color: white;
+    }
+
+    .volume-title {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+
+    .volume-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .volume-desc {
+      font-size: 0.8125rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    /* Confirm Dialog */
+    .confirm-dialog {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .confirm-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .confirm-message {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -634,7 +1221,7 @@
 
     // Configuration
     const SUPABASE_URL = 'https://sqhcapszcdojbwygwlox.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_MCJ2MrwsM_lbjFLWWYU7fg_u9OB2D9m';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxaGNhcHN6Y2RvamJ3eWd3bG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0NTcwNjksImV4cCI6MjA4MjAzMzA2OX0.9GCk7Vt2HxU5ALlNHw8jczCkmvu5hy-VTBdBet-7Mjk';
     const ADMIN_PASSWORD = 'coral2024';
     const ITEMS_PER_PAGE = 10;
 
@@ -682,6 +1269,1007 @@
       return date >= weekAgo;
     };
 
+    // Hebrew Labels Mapping
+    const ACTIVITY_LABELS = {
+      'ships': 'טיפול באניות',
+      'cargo': 'מטענים / פקודות מסירה',
+      'manifest': 'הזנת מניפסטים',
+      'bol': 'שטרי מטען (B/L)',
+      'external': 'גורמי חוץ (יבואנים/משלחים)',
+      'documents': 'הכנת מסמכים ודוחות',
+      'financial': 'נתונים כספיים',
+      'projects': 'ניהול פרויקטים',
+      'inquiries': 'מענה לפניות',
+      'other': 'אחר'
+    };
+
+    const SOURCE_LABELS = {
+      'email_body': 'מייל (גוף הטקסט)',
+      'email_attachment': 'מייל (קבצים מצורפים)',
+      'manifest_pdf': 'מניפסט PDF',
+      'tos_port': 'אתר הנמל (TOS)',
+      'edi_file': 'קובץ EDI',
+      'excel': 'קובץ אקסל',
+      'internal_system': 'מערכת פנימית',
+      'whatsapp': 'וואטסאפ',
+      'phone': 'טלפון',
+      'other_source': 'אחר'
+    };
+
+    const DESTINATION_LABELS = {
+      'internal_system': 'מערכת פנימית',
+      'tracking_table': 'טבלת מעקב',
+      'client_report': 'דוח ללקוח',
+      'email_response': 'תשובה במייל',
+      'archive': 'ארכיון',
+      'other_dest': 'אחר'
+    };
+
+    const TIME_ESTIMATES = {
+      'under_5': 3,
+      '5_15': 10,
+      '15_30': 22,
+      '30_60': 45,
+      'over_60': 75
+    };
+
+    const FREQUENCY_WEIGHTS = {
+      'daily': 1.0,
+      'weekly': 0.6,
+      'monthly': 0.3
+    };
+
+    // מדד עבודה רובוטית - Process Friction Score Calculator
+    // נוסחה: (תדירות × 0.4) + (עבודת שטאנץ × 0.4) + (טרטור בין מערכות × 0.2)
+    const calculateFrictionScore = (response) => {
+      // Frequency Weight (40%)
+      const freqWeight = FREQUENCY_WEIGHTS[response.process_frequency] || 0.5;
+      const frequencyScore = freqWeight * 40;
+
+      // Rule-Based Weight (40%)
+      let ruleBasedScore = 0;
+      if (response.process_type === 'rule_based') {
+        ruleBasedScore = 40;
+      } else if (response.process_type === 'mixed') {
+        ruleBasedScore = 25;
+      } else if (response.process_type === 'human_judgment') {
+        ruleBasedScore = 10;
+      }
+
+      // Tool Switching Weight (20%)
+      let toolSwitchingScore = 0;
+      if (response.tools_switching_count === '5 כלים ומעלה') {
+        toolSwitchingScore = 20;
+      } else if (response.tools_switching_count === '3-4 כלים') {
+        toolSwitchingScore = 15;
+      } else if (response.tools_switching_count === '1-2 כלים') {
+        toolSwitchingScore = 8;
+      } else if (response.manual_steps && response.manual_steps.length > 20) {
+        toolSwitchingScore = 15; // Fallback for old data
+      } else if (response.emails_copy === 'רוב' || response.emails_copy === 'כחצי') {
+        toolSwitchingScore = 12;
+      }
+
+      const totalScore = Math.round(frequencyScore + ruleBasedScore + toolSwitchingScore);
+
+      // Return score object with breakdown for display
+      return {
+        total: totalScore,
+        frequency: Math.round(frequencyScore),
+        ruleBased: ruleBasedScore,
+        toolSwitching: toolSwitchingScore
+      };
+    };
+
+    // Legacy wrapper for backward compatibility
+    const calculateAutomationScore = (response) => {
+      const result = calculateFrictionScore(response);
+      return typeof result === 'object' ? result.total : result;
+    };
+
+    // Weekly Hours Calculation
+    const calculateWeeklyHours = (response) => {
+      const timePerTask = TIME_ESTIMATES[response.time_per_task] || 15;
+      const tasksPerDay = parseInt(response.tasks_per_day) || 5;
+      const frequency = response.process_frequency || 'daily';
+
+      let daysPerWeek = 5;
+      if (frequency === 'weekly') daysPerWeek = 1.5;
+      if (frequency === 'monthly') daysPerWeek = 0.4;
+
+      return Math.round((timePerTask * tasksPerDay * daysPerWeek) / 60 * 10) / 10;
+    };
+
+    // Get Score Badge Color - מדד עבודה רובוטית (Green = High robotic work potential, Yellow = Medium, Red = Low)
+    const getScoreBadgeColor = (score) => {
+      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'פוטנציאל גבוה לייעול', tip: 'משימות חוזרות שניתן לשפר' };
+      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'פוטנציאל בינוני', tip: 'כדאי לבחון' };
+      return { bg: '#fee2e2', color: '#991b1b', label: 'עבודה מקצועית', tip: 'דורש חשיבה ושיקול דעת' };
+    };
+
+    // Layman terminology translations - מונחים ידידותיים
+    const LAYMAN_TERMS = {
+      frictionScore: 'מדד עבודה רובוטית',
+      frictionScoreTip: 'ציון מ-0 עד 100 המצביע על משימות שחוזרות על עצמן בדיוק באותו אופן. איך זה מחושב? שקלול של תדירות המשימה, האם יש לה חוקים קבועים, וכמות המערכות שצריך לעבור ביניהן.',
+      toolSwitching: 'סנכרון בין מערכות',
+      toolSwitchingTip: 'מצב שבו עובד משמש כ"גשר אנושי" ומעביר מידע ידנית בין אאוטלוק, PDF, יוניפרייט או אתר הנמל.',
+      ruleBased: 'משימה לפי תבנית קבועה',
+      ruleBasedTip: 'משימות שנעשות תמיד באותו אופן, לפי חוקים ברורים וללא צורך בשיקול דעת.',
+      weeklyPaperwork: 'עומס מנהלתי שבועי',
+      weeklyPaperworkTip: 'הערכת השעות המצטברת שמושקעת בביצוע טכני של משימות חוזרות (מבוסס על דיווחי המשתתפים).'
+    };
+
+    // Confirm Dialog Component
+    function ConfirmDialog({ title, message, onConfirm, onCancel, isDeleting }) {
+      return (
+        <div className="modal-overlay" onClick={onCancel}>
+          <div className="confirm-dialog" onClick={e => e.stopPropagation()}>
+            <h2 className="confirm-title">{title}</h2>
+            <p className="confirm-message">{message}</p>
+            <div className="confirm-actions">
+              <button className="btn btn-secondary" onClick={onCancel} disabled={isDeleting}>ביטול</button>
+              <button className="btn btn-danger" onClick={onConfirm} disabled={isDeleting}>
+                {isDeleting ? 'מוחק...' : 'אישור מחיקה'}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Full Response Card Component
+    function ResponseCard({ response, onDelete, onExpand, isExpanded }) {
+      const score = calculateAutomationScore(response);
+      const badgeColor = getScoreBadgeColor(score);
+      const weeklyHours = calculateWeeklyHours(response);
+
+      return (
+        <div className={`response-card ${isExpanded ? 'expanded' : ''}`}>
+          <div className="response-card-header" onClick={() => onExpand(response.id)}>
+            <div className="response-card-info">
+              <span className="response-card-name">{response.name}</span>
+              <span className="response-card-meta">
+                {response.department || response.department_other || '-'} | {response.role || '-'} | {formatShortDate(response.created_at)}
+              </span>
+              <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }} title={`ציון: ${score}/100`}>
+                {badgeColor.label}
+              </span>
+            </div>
+            <div className="response-card-actions">
+              <button
+                className="delete-btn"
+                onClick={(e) => { e.stopPropagation(); onDelete(response); }}
+              >
+                מחק
+              </button>
+              <span className="expand-icon">▼</span>
+            </div>
+          </div>
+          <div className="response-card-body">
+            <div className="response-data-grid">
+              <div className="response-data-section">
+                <h4 className="response-data-title">פרטים אישיים</h4>
+                <div className="response-data-item"><span className="response-data-label">שם:</span><span className="response-data-value">{response.name}</span></div>
+                <div className="response-data-item"><span className="response-data-label">מחלקה:</span><span className="response-data-value">{response.department || response.department_other || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">תפקיד:</span><span className="response-data-value">{response.role || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">ותק:</span><span className="response-data-value">{response.seniority || '-'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">כמה כדאי לייעל?</h4>
+                <div className="response-data-item"><span className="response-data-label">ציון:</span><span className="response-data-value">{score}/100 - {badgeColor.label}</span></div>
+                <div className="response-data-item"><span className="response-data-label">זמן בעבודה חוזרת:</span><span className="response-data-value">{weeklyHours} שעות בשבוע</span></div>
+                <div className="response-data-item"><span className="response-data-label">סוג המשימה:</span><span className="response-data-value">{response.process_type === 'rule_based' ? 'קבועה (תמיד אותו דבר)' : response.process_type === 'mixed' ? 'חלק קבוע, חלק משתנה' : 'דורש חשיבה כל פעם'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">כמה פעמים:</span><span className="response-data-value">{response.process_frequency === 'daily' ? 'כל יום' : response.process_frequency === 'weekly' ? 'פעם-פעמיים בשבוע' : 'פעם-פעמיים בחודש'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">פעילויות</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.activities || []).map(a => ACTIVITY_LABELS[a] || a).join(', ') || '-'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">מקורות מידע</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.info_source || []).map(s => SOURCE_LABELS[s] || s).join(', ') || '-'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">מיילים</h4>
+                <div className="response-data-item"><span className="response-data-label">מיילים ביום:</span><span className="response-data-value">{response.emails_count || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">דורשים העתקה:</span><span className="response-data-value">{response.emails_copy || '-'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">מיילים נופלים:</span><span className="response-data-value">{response.emails_missed || '-'}</span></div>
+              </div>
+
+              <div className="response-data-section">
+                <h4 className="response-data-title">כלים</h4>
+                <div className="response-data-item">
+                  <span className="response-data-value">
+                    {(response.tools || []).join(', ') || '-'}
+                  </span>
+                </div>
+                {response.tools_copy_between && (
+                  <div className="response-data-item" style={{marginTop: '0.5rem'}}>
+                    <span className="response-data-label">העתקות:</span>
+                    <span className="response-data-value">{response.tools_copy_between}</span>
+                  </div>
+                )}
+              </div>
+
+              {response.main_frustration && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">הכי מתסכל</h4>
+                  <div className="response-data-value">{response.main_frustration}</div>
+                </div>
+              )}
+
+              {(response.automation_wish || response.process_wish) && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">מה הייתם רוצים שישתפר?</h4>
+                  <div className="response-data-value">{response.process_wish || response.automation_wish}</div>
+                </div>
+              )}
+
+              {response.manual_steps && (
+                <div className="response-data-section">
+                  <h4 className="response-data-title">שלבים ידניים (צוואר בקבוק)</h4>
+                  <div className="response-data-value">{response.manual_steps}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Bottleneck Analysis Component - ניתוח פר-עובד לאיזון בהשוואה
+    function BottleneckCard({ responses }) {
+      const analysis = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        // Find department with highest AVERAGE hours per employee (per-capita)
+        const deptData = {};
+
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) {
+            deptData[dept] = { totalHours: 0, count: 0, units: 0, vessels: 0 };
+          }
+          deptData[dept].totalHours += calculateWeeklyHours(r);
+          deptData[dept].count++;
+
+          // Count units based on responses
+          const cargoCount = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const bolCount = r.bol_per_week ? parseInt(r.bol_per_week.match(/\d+/)?.[0] || '0') : 0;
+          deptData[dept].units += Math.max(cargoCount, bolCount);
+
+          // Count vessels
+          const vesselCount = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          deptData[dept].vessels += vesselCount;
+        });
+
+        // Calculate per-capita hours and find highest
+        const deptAnalysis = Object.entries(deptData).map(([name, data]) => ({
+          name,
+          avgHoursPerEmployee: Math.round((data.totalHours / data.count) * 10) / 10,
+          totalHours: Math.round(data.totalHours * 10) / 10,
+          employeeCount: data.count,
+          units: data.units,
+          vessels: data.vessels
+        })).sort((a, b) => b.avgHoursPerEmployee - a.avgHoursPerEmployee);
+
+        if (deptAnalysis.length === 0) return null;
+
+        return {
+          all: deptAnalysis,
+          top: deptAnalysis[0]
+        };
+      }, [responses]);
+
+      if (!analysis) return null;
+
+      return (
+        <div className="bottleneck-card">
+          <h2 className="bottleneck-title">
+            ⚡ עומס עבודה ממוצע לעובד
+          </h2>
+          <div className="bottleneck-content">
+            <div style={{marginBottom: '1rem'}}>
+              <strong>{analysis.top.name}</strong> - בממוצע
+              <span className="bottleneck-stat">{analysis.top.avgHoursPerEmployee} שעות/עובד/שבוע</span>
+              ב"ניירת"
+              {analysis.top.employeeCount > 1 && (
+                <span style={{opacity: 0.8, fontSize: '0.875rem'}}> ({analysis.top.employeeCount} עובדים ענו)</span>
+              )}
+            </div>
+            {analysis.all.length > 1 && (
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.5rem', marginTop: '1rem'}}>
+                {analysis.all.map((dept, idx) => (
+                  <div key={idx} style={{background: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center'}}>
+                    <div style={{fontSize: '0.75rem', opacity: 0.8}}>{dept.name}</div>
+                    <div style={{fontSize: '1.25rem', fontWeight: '700'}}>{dept.avgHoursPerEmployee}</div>
+                    <div style={{fontSize: '0.6875rem', opacity: 0.7}}>שעות/עובד ({dept.employeeCount})</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Volume Multiplier Component - מכפיל סיבוכיות אנייה
+    function VolumeMultiplierCard({ responses }) {
+      const vesselComplexity = useMemo(() => {
+        // Calculate from importers_per_vessel field
+        let totalImporters = 0;
+        let vesselDataCount = 0;
+        let totalDeliveryOrders = 0;
+        let totalVessels = 0;
+
+        responses.forEach(r => {
+          // Use importers_per_vessel as primary source
+          if (r.importers_per_vessel) {
+            const importers = parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0');
+            if (importers > 0) {
+              totalImporters += importers;
+              vesselDataCount++;
+            }
+          }
+
+          // Calculate delivery orders from cargo/BOL
+          const cargo = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const bol = r.bol_per_week ? parseInt(r.bol_per_week.match(/\d+/)?.[0] || '0') : 0;
+          totalDeliveryOrders += Math.max(cargo, bol);
+
+          // Count vessels
+          const vessels = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          totalVessels += vessels;
+        });
+
+        // Calculate average importers per vessel (from those who reported)
+        const avgImportersPerVessel = vesselDataCount > 0 ? Math.round(totalImporters / vesselDataCount) : 0;
+
+        // Calculate delivery orders per vessel
+        const deliveryOrdersPerVessel = totalVessels > 0 ? Math.round(totalDeliveryOrders / totalVessels) : 0;
+
+        // Use importers as proxy for complexity, fallback to delivery orders
+        const complexityMultiplier = avgImportersPerVessel || deliveryOrdersPerVessel;
+
+        if (complexityMultiplier === 0) return null;
+
+        return {
+          multiplier: complexityMultiplier,
+          importers: avgImportersPerVessel,
+          deliveryOrders: deliveryOrdersPerVessel,
+          vessels: totalVessels
+        };
+      }, [responses]);
+
+      if (!vesselComplexity) return null;
+
+      return (
+        <div className="volume-card">
+          <div className="volume-title">מכפיל סיבוכיות אנייה</div>
+          <div className="volume-value">1 אנייה = {vesselComplexity.multiplier} פקודות מסירה</div>
+          <div className="volume-desc">
+            {vesselComplexity.importers > 0 && `${vesselComplexity.importers} יבואנים לאנייה בממוצע`}
+            {vesselComplexity.vessels > 0 && <span style={{marginRight: '0.5rem'}}>• {vesselComplexity.vessels} אניות/שבוע</span>}
+          </div>
+        </div>
+      );
+    }
+
+    // Strategic Question Engine - מנוע שאלות אסטרטגיות לישיבה ("Meeting Brain")
+    function StrategicQuestions({ responses }) {
+      const questions = useMemo(() => {
+        if (responses.length === 0) return [];
+
+        const stratQuestions = [];
+
+        // === CONFLICT LOGIC: PDA responsibility overlap between departments ===
+        const pdaSenders = responses.filter(r => r.pda_sender).map(r => ({
+          sender: r.pda_sender,
+          dept: r.department || r.department_other
+        }));
+        const uniquePdaDepts = [...new Set(pdaSenders.map(p => p.sender))];
+        const hasAgency = uniquePdaDepts.some(d => d && (d.includes('סוכנות') || d.toLowerCase().includes('agency')));
+        const hasAccounts = uniquePdaDepts.some(d => d && (d.includes('חשבות') || d.includes('הנהלת חשבונות') || d.toLowerCase().includes('account')));
+
+        if (hasAgency && hasAccounts || uniquePdaDepts.length > 1) {
+          stratQuestions.push({
+            type: 'conflict',
+            icon: '⚠️',
+            question: `למה האחריות על ה-PDA מתחלקת בין ${uniquePdaDepts.join(' ו-')}? האם יש כאן כפילות עבודה?`,
+            context: `${uniquePdaDepts.length} גורמים שונים מטפלים באותו תהליך - זה גורם לבזבוז זמן ובלבול`
+          });
+        }
+
+        // === ETL BOTTLENECK: PDF manifest to Unifreight ===
+        const manifestFromPdf = responses.filter(r => {
+          const sources = r.info_source || [];
+          return sources.includes('manifest_pdf') || sources.includes('email_attachment');
+        });
+        const highManualTyping = responses.filter(r =>
+          r.bol_manual_typing === 'כן, הרבה' ||
+          r.bol_manual_typing === 'כן' ||
+          (r.manual_steps && r.manual_steps.includes('הקלדה'))
+        );
+
+        if (manifestFromPdf.length > 0 && highManualTyping.length > 0) {
+          // Find the person with most hours to personalize the question
+          const topWorker = responses.reduce((max, r) =>
+            calculateWeeklyHours(r) > calculateWeeklyHours(max) ? r : max
+          , responses[0]);
+          const topHours = Math.round(calculateWeeklyHours(topWorker));
+
+          stratQuestions.push({
+            type: 'etl',
+            icon: '📋',
+            question: `איך אנחנו מקצרים את הגשר בין ה-PDF של המניפסט ליוניפרייט כדי לחסוך ל${topWorker.name} ${topHours} שעות בשבוע?`,
+            context: `${manifestFromPdf.length} עובדים מקבלים מניפסטים ב-PDF ו-${highManualTyping.length} מקלידים ידנית - פער שאפשר לגשר`
+          });
+        }
+
+        // === Manual data flow analysis ===
+        const manualStepsResponses = responses.filter(r => r.manual_steps && r.manual_steps.length > 20);
+        if (manualStepsResponses.length > 0) {
+          const sources = [...new Set(responses.flatMap(r => r.info_source || []))].slice(0, 2);
+          const dests = [...new Set(responses.flatMap(r => r.destination || []))].slice(0, 2);
+          stratQuestions.push({
+            type: 'flow',
+            icon: '🔄',
+            question: `למה מידע עדיין זורם ידנית בין ${SOURCE_LABELS[sources[0]] || 'מקורות'} ל${DESTINATION_LABELS[dests[0]] || 'יעדים'}?`,
+            context: `${manualStepsResponses.length} עובדים דיווחו על שלבים ידניים משמעותיים`
+          });
+        }
+
+        // === Scalability warning based on volume ===
+        const totalVessels = responses.reduce((sum, r) => {
+          const v = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          return sum + v;
+        }, 0);
+        const totalUnits = responses.reduce((sum, r) => {
+          const c = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const i = r.importers_per_vessel ? parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0') : 0;
+          return sum + Math.max(c, i);
+        }, 0);
+
+        if (totalVessels > 0 && totalUnits > 0) {
+          const ratio = Math.round(totalUnits / totalVessels);
+          stratQuestions.push({
+            type: 'scale',
+            icon: '📈',
+            question: `כיום יש ${ratio} פקודות מסירה לכל אנייה. האם התהליך יעמוד בעומס כפול?`,
+            context: `אם נכפיל את כמות האניות - האם המערכת תקרוס?`
+          });
+        }
+
+        // === Tool switching pain ===
+        const highSwitchers = responses.filter(r =>
+          r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
+        );
+        if (highSwitchers.length >= 2) {
+          stratQuestions.push({
+            type: 'tools',
+            icon: '🔧',
+            question: `${highSwitchers.length} עובדים מטרטרים בין 3+ מערכות - איפה אפשר לחבר?`,
+            context: `כל העתקה ידנית = זמן אבוד + סיכון לטעויות`
+          });
+        }
+
+        // === Email overload ===
+        const emailOverload = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
+        if (emailOverload.length > 0) {
+          stratQuestions.push({
+            type: 'email',
+            icon: '📧',
+            question: `${emailOverload.length} עובדים טובעים במיילים - איך מפחיתים את הנפח?`,
+            context: `יותר מ-50 מיילים ביום = קשה למצוא מידע חשוב`
+          });
+        }
+
+        return stratQuestions.slice(0, 5);
+      }, [responses]);
+
+      if (questions.length === 0) return null;
+
+      return (
+        <div className="strategic-questions" style={{
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            💡 שאלות אסטרטגיות לישיבה
+            <span style={{fontSize: '0.75rem', background: 'rgba(255,255,255,0.2)', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
+              מנוע הניתוח
+            </span>
+          </h2>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+            {questions.map((q, idx) => (
+              <div key={idx} style={{
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                borderRight: '4px solid ' + (q.type === 'scale' ? '#f59e0b' : q.type === 'overlap' ? '#ec4899' : '#10b981')
+              }}>
+                <div style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem'}}>
+                  {q.icon} {q.question}
+                </div>
+                <div style={{fontSize: '0.8125rem', opacity: 0.8}}>
+                  {q.context}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Time Recovery Calculator - פוטנציאל שחרור זמן
+    function TimeRecoveryCard({ responses }) {
+      const recovery = useMemo(() => {
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const highFrictionHours = responses
+          .filter(r => calculateAutomationScore(r) >= 70)
+          .reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+
+        // Assume 30% of high friction work can be automated
+        const recoverableHours = Math.round(highFrictionHours * 0.3);
+        const fteFraction = (recoverableHours / 40).toFixed(1);
+
+        return {
+          total: Math.round(totalHours),
+          recoverable: recoverableHours,
+          fte: fteFraction
+        };
+      }, [responses]);
+
+      if (recovery.total === 0) return null;
+
+      return (
+        <div className="recovery-card" style={{
+          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+          borderRadius: '12px',
+          padding: '1.25rem',
+          color: 'white',
+          marginBottom: '1rem'
+        }}>
+          <div style={{fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem'}}>
+            פוטנציאל שחרור זמן מחלקתי
+          </div>
+          <div style={{fontSize: '2.5rem', fontWeight: '700'}}>
+            {recovery.recoverable} שעות
+          </div>
+          <div style={{fontSize: '0.875rem', opacity: 0.9, marginTop: '0.5rem'}}>
+            שוות ל-<strong>{recovery.fte} משרות</strong> פנויות לניהול לקוחות
+          </div>
+          <div style={{fontSize: '0.75rem', opacity: 0.7, marginTop: '0.5rem'}}>
+            מתוך {recovery.total} שעות "ניירת" שבועיות שדווחו
+          </div>
+        </div>
+      );
+    }
+
+    // Vessel Story Card - סיפור האנייה
+    function VesselStoryCard({ responses }) {
+      const vesselData = useMemo(() => {
+        // Extract vessel-related data
+        const manifestWorkers = responses.filter(r => (r.activities || []).includes('manifest'));
+        const cargoWorkers = responses.filter(r => (r.activities || []).includes('cargo'));
+        const bolWorkers = responses.filter(r => (r.activities || []).includes('bol'));
+        const docsWorkers = responses.filter(r => (r.activities || []).includes('documents'));
+
+        return {
+          manifest: {
+            count: manifestWorkers.length,
+            hours: manifestWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          cargo: {
+            count: cargoWorkers.length,
+            hours: cargoWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          bol: {
+            count: bolWorkers.length,
+            hours: bolWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          docs: {
+            count: docsWorkers.length,
+            hours: docsWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          }
+        };
+      }, [responses]);
+
+      const hasData = vesselData.manifest.count > 0 || vesselData.cargo.count > 0;
+      if (!hasData) return null;
+
+      return (
+        <div className="vessel-story" style={{
+          background: 'linear-gradient(135deg, #1a365d 0%, #3b82f6 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.25rem'}}>
+            🚢 מסע האנייה - מי עושה מה?
+          </h2>
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem'}}>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>מניפסט</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.manifest.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.manifest.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>מטען</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.cargo.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.cargo.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>שטר מטען</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.bol.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.bol.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>פקודת מסירה</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.docs.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.docs.hours)}ש</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Executive Print Summary Component - סיכום מנהלים להדפסה
+    function ExecutivePrintSummary({ responses }) {
+      const summary = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const highFrictionHours = responses
+          .filter(r => calculateAutomationScore(r) >= 70)
+          .reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+
+        // Assume 30% of high friction work can be automated
+        const recoverableHours = Math.round(highFrictionHours * 0.3);
+        const workdaysSaved = (recoverableHours / 8).toFixed(1); // 8 hours per workday
+
+        // Department analysis
+        const deptData = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0 };
+          deptData[dept].count++;
+          deptData[dept].hours += calculateWeeklyHours(r);
+        });
+        const deptSummary = Object.entries(deptData)
+          .map(([name, data]) => ({ name, ...data, avgPerPerson: Math.round(data.hours / data.count * 10) / 10 }))
+          .sort((a, b) => b.avgPerPerson - a.avgPerPerson);
+
+        return {
+          totalResponses: responses.length,
+          totalHours: Math.round(totalHours),
+          recoverableHours,
+          workdaysSaved,
+          avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
+          deptSummary
+        };
+      }, [responses]);
+
+      if (!summary) return null;
+
+      return (
+        <div className="executive-print-summary">
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', borderBottom: '2px solid #0891b2', paddingBottom: '0.5rem'}}>
+            📊 סיכום מנהלים - ניתוח תהליכים | קוראל שירותי ים
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem'}}>
+            <div style={{background: '#f0fdf4', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #22c55e'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#16a34a'}}>{summary.workdaysSaved}</div>
+              <div style={{fontSize: '0.875rem', color: '#166534'}}>ימי עבודה ניתנים לשחרור</div>
+            </div>
+            <div style={{background: '#eff6ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #3b82f6'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#2563eb'}}>{summary.totalResponses}</div>
+              <div style={{fontSize: '0.875rem', color: '#1e40af'}}>עובדים ענו על הסקר</div>
+            </div>
+            <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #f59e0b'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#d97706'}}>{summary.totalHours}</div>
+              <div style={{fontSize: '0.875rem', color: '#92400e'}}>שעות "ניירת" שבועיות</div>
+            </div>
+            <div style={{background: '#f0f9ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #0891b2'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#0891b2'}}>{summary.avgScore}/100</div>
+              <div style={{fontSize: '0.875rem', color: '#155e75'}}>{LAYMAN_TERMS.frictionScore} ממוצע</div>
+            </div>
+          </div>
+          <div style={{fontSize: '0.875rem'}}>
+            <strong>פירוט לפי מחלקה:</strong>
+            <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem'}}>
+              {summary.deptSummary.map((dept, idx) => (
+                <span key={idx} style={{background: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
+                  {dept.name}: {dept.avgPerPerson} שעות/עובד ({dept.count})
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Meeting Legend Component (for print) - מדריך למשתתף
+    function MeetingLegend() {
+      const legendItems = [
+        {
+          term: 'מדד עבודה רובוטית',
+          definition: 'ציון מ-0 עד 100 המצביע על משימות שחוזרות על עצמן בדיוק באותו אופן. איך זה מחושב? שקלול של תדירות המשימה, האם יש לה חוקים קבועים, וכמות המערכות שצריך לעבור ביניהן (כמו להעתיק ממייל לאקסל).'
+        },
+        {
+          term: 'סנכרון בין מערכות',
+          definition: 'מצב שבו עובד משמש כ"גשר אנושי" ומעביר מידע ידנית בין אאוטלוק, PDF, יוניפרייט או אתר הנמל.'
+        },
+        {
+          term: 'משימה לפי תבנית קבועה',
+          definition: 'משימה שנעשית תמיד באותו אופן, לפי חוקים ברורים וללא צורך בשיקול דעת. קל יותר לייעל משימות כאלה.'
+        },
+        {
+          term: 'עומס מנהלתי שבועי',
+          definition: 'הערכת השעות המצטברת שמושקעת בביצוע טכני של משימות חוזרות (מבוסס על דיווחי המשתתפים).'
+        }
+      ];
+
+      return (
+        <div className="meeting-legend">
+          <h2 className="meeting-legend-title">
+            📖 מילון מונחים
+          </h2>
+          <div className="legend-grid">
+            {legendItems.map((item, idx) => (
+              <div key={idx} className="legend-item">
+                <div className="legend-term">{item.term}</div>
+                <div className="legend-definition">{item.definition}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Tools Library Component - ארגז כלים מוצע לשדרוג התהליכים
+    function ToolsLibrary() {
+      const tools = [
+        {
+          icon: '📧',
+          name: 'Microsoft 365 Copilot (Outlook)',
+          description: 'סיכום אוטומטי של שרשראות מיילים ארוכות, כתיבת טיוטות למענה מהיר וסינון רעשים בתיבת הדואר.'
+        },
+        {
+          icon: '💬',
+          name: 'WhatsApp Insights',
+          description: 'שימוש במודלים לריכוז וסיכום של עשרות קבוצות הוואטסאפ לכדי דוח דגשים יומי (מידע על אניות, דרישות דחופות).'
+        },
+        {
+          icon: '📄',
+          name: 'חילוץ מידע אוטומטי (OCR/RPA)',
+          description: 'כלי חילוץ מידע אוטומטי שקורא מניפסטים ב-PDF ומזין את הנתונים ישירות ליוניפרייט ללא הקלדה ידנית.'
+        },
+        {
+          icon: '📁',
+          name: 'כללי ניתוב מיילים',
+          description: 'הגדרת "כללי ניתוב" חכמים שמתייקים מיילים לפי שם אנייה או מספר תיק באופן אוטומטי.'
+        }
+      ];
+
+      return (
+        <div className="tools-library" style={{
+          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            🧰 ארגז כלים מוצע לשדרוג התהליכים
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem'}}>
+            {tools.map((tool, idx) => (
+              <div key={idx} style={{
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>{tool.icon}</div>
+                <div style={{fontWeight: '600', marginBottom: '0.5rem'}}>{tool.name}</div>
+                <div style={{fontSize: '0.875rem', opacity: 0.9, lineHeight: '1.5'}}>{tool.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Next Steps Guide Component - צעדים הבאים
+    function NextStepsGuide() {
+      const steps = [
+        {
+          number: '1',
+          title: 'בחירת תהליך',
+          description: 'הגדרת משימה אחת שמרגישה "רובוטית" במיוחד'
+        },
+        {
+          number: '2',
+          title: 'חיבור כלי',
+          description: 'התאמת הכלי הנכון (למשל: Copilot למיילים)'
+        },
+        {
+          number: '3',
+          title: 'בדיקה (Pilot)',
+          description: 'הרצה על תיק/אנייה אחת לבחינת היעילות ושיפור'
+        }
+      ];
+
+      return (
+        <div className="next-steps-guide" style={{
+          background: 'var(--gray-50)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          border: '2px solid var(--gray-200)'
+        }}>
+          <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--primary-dark)'}}>
+            🚀 הצעדים הבאים
+          </h2>
+          <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
+            {steps.map((step, idx) => (
+              <div key={idx} style={{
+                flex: '1',
+                minWidth: '200px',
+                background: 'white',
+                borderRadius: '12px',
+                padding: '1rem',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-start'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'var(--primary-teal)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  flexShrink: 0
+                }}>
+                  {step.number}
+                </div>
+                <div>
+                  <div style={{fontWeight: '600', color: 'var(--primary-dark)', marginBottom: '0.25rem'}}>{step.title}</div>
+                  <div style={{fontSize: '0.875rem', color: 'var(--gray-600)'}}>{step.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Cross-Departmental Sync Analysis - ניתוח סנכרון בין-מחלקתי
+    function SyncAnalysisCard({ responses }) {
+      const syncData = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        // Analyze data flow between departments
+        const flows = [];
+        const deptData = {};
+
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          const pdaSender = r.pda_sender;
+          const destination = r.destination || [];
+
+          if (!deptData[dept]) {
+            deptData[dept] = { count: 0, sends: [], receives: [] };
+          }
+          deptData[dept].count++;
+
+          // Track PDA flow
+          if (pdaSender && pdaSender !== dept) {
+            flows.push({ from: pdaSender, to: dept, type: 'PDA' });
+          }
+
+          // Track destination systems
+          destination.forEach(d => {
+            if (d && d !== 'internal_system') {
+              deptData[dept].sends.push(d);
+            }
+          });
+        });
+
+        // Find sync points (where manual transfer happens)
+        const syncPoints = [];
+        const uniqueFlows = [...new Set(flows.map(f => `${f.from}->${f.to}`))];
+
+        if (uniqueFlows.length > 0) {
+          syncPoints.push({
+            type: 'manual_transfer',
+            description: 'העברת מידע ידנית בין מחלקות',
+            count: uniqueFlows.length
+          });
+        }
+
+        // Calculate complexity multiplier from importers_per_vessel
+        let avgImporters = 0;
+        let importerCount = 0;
+        responses.forEach(r => {
+          if (r.importers_per_vessel) {
+            const val = parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0');
+            if (val > 0) {
+              avgImporters += val;
+              importerCount++;
+            }
+          }
+        });
+        const complexityMultiplier = importerCount > 0 ? Math.round(avgImporters / importerCount) : 0;
+
+        return {
+          departments: Object.keys(deptData).length,
+          syncPoints,
+          uniqueFlows,
+          complexityMultiplier
+        };
+      }, [responses]);
+
+      if (!syncData || syncData.departments < 2) return null;
+
+      return (
+        <div style={{
+          background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem'}}>
+            🔗 סנכרון בין-מחלקתי
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem'}}>
+            <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700'}}>{syncData.departments}</div>
+              <div style={{fontSize: '0.875rem', opacity: 0.9}}>מחלקות בסנכרון</div>
+            </div>
+            <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700'}}>{syncData.uniqueFlows.length}</div>
+              <div style={{fontSize: '0.875rem', opacity: 0.9}}>נקודות העברה ידנית</div>
+            </div>
+            {syncData.complexityMultiplier > 0 && (
+              <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+                <div style={{fontSize: '2rem', fontWeight: '700'}}>x{syncData.complexityMultiplier}</div>
+                <div style={{fontSize: '0.875rem', opacity: 0.9}}>מכפיל סיבוכיות (יבואנים לאנייה)</div>
+              </div>
+            )}
+          </div>
+          <div style={{marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.875rem'}}>
+            💡 <strong>תובנה:</strong> כל נקודת העברה ידנית בין מחלקות מייצרת עומס מנהלתי כפול - גם אצל השולח וגם אצל המקבל. חיבור מערכות יכול לפנות זמן לעבודה מקצועית.
+          </div>
+        </div>
+      );
+    }
+
     // Login Component
     function LoginScreen({ onLogin }) {
       const [password, setPassword] = useState('');
@@ -700,7 +2288,7 @@
       return (
         <div className="login-screen">
           <form className="login-card" onSubmit={handleSubmit}>
-            <h1 className="login-title">דשבורד אדמין</h1>
+            <h1 className="login-title">מרכז ניטור וייעול תהליכים</h1>
             <p className="login-subtitle">קוראל שירותי ים</p>
             {error && <div className="login-error">{error}</div>}
             <input
@@ -776,6 +2364,176 @@
       return <canvas ref={canvasRef}></canvas>;
     }
 
+    // Kickoff Session Component - תובנות לישיבה
+    function KickoffSession({ responses }) {
+      const candidates = useMemo(() => {
+        return responses
+          .map(r => ({
+            ...r,
+            score: calculateAutomationScore(r),
+            weeklyHours: calculateWeeklyHours(r),
+            source: (r.info_source || []).map(s => SOURCE_LABELS[s] || s).join(', ') || 'מייל',
+            dest: (r.destination || []).map(d => DESTINATION_LABELS[d] || d).join(', ') || 'מערכת פנימית'
+          }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+      }, [responses]);
+
+      // Generate truly dynamic insights based on actual data
+      const dataInsights = useMemo(() => {
+        if (responses.length === 0) return { prompts: [], findings: [] };
+
+        const findings = [];
+        const prompts = [];
+
+        // 1. Find most time-consuming department
+        const deptHours = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          deptHours[dept] = (deptHours[dept] || 0) + calculateWeeklyHours(r);
+        });
+        const topDept = Object.entries(deptHours).sort((a, b) => b[1] - a[1])[0];
+        if (topDept) {
+          findings.push(`מחלקת ${topDept[0]} משקיעה הכי הרבה זמן - ${Math.round(topDept[1])} שעות בשבוע`);
+          prompts.push(`למה מחלקת ${topDept[0]} עובדת כל כך הרבה? מה אפשר לפשט?`);
+        }
+
+        // 2. Find common frustrations
+        const frustrations = responses.filter(r => r.main_frustration).map(r => r.main_frustration);
+        if (frustrations.length > 0) {
+          const sample = frustrations[0].substring(0, 60);
+          findings.push(`${frustrations.length} עובדים דיווחו על תסכול בעבודה`);
+          prompts.push(`"${sample}..." - איך אפשר לפתור את זה?`);
+        }
+
+        // 3. Find tool switching pain
+        const highToolSwitch = responses.filter(r =>
+          r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
+        );
+        if (highToolSwitch.length > 0) {
+          findings.push(`${highToolSwitch.length} עובדים עוברים בין הרבה מערכות`);
+          prompts.push(`האם אפשר לחבר את המערכות כדי להפחית העתקה ידנית?`);
+        }
+
+        // 4. Find email overload
+        const highEmail = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
+        if (highEmail.length > 0) {
+          findings.push(`${highEmail.length} עובדים מקבלים מעל 50 מיילים ביום`);
+          prompts.push(`איך אפשר לצמצם את כמות המיילים או לסנן אותם?`);
+        }
+
+        // 5. Check for copy-paste work
+        const copyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי');
+        if (copyPaste.length > 0) {
+          findings.push(`${copyPaste.length} עובדים מעתיקים מידע ידנית ממיילים`);
+          prompts.push(`האם אפשר להזין את המידע אוטומטית במקום להעתיק ידנית?`);
+        }
+
+        // 6. Find repetitive tasks
+        const repetitive = responses.filter(r => r.process_frequency === 'daily' && r.process_type === 'rule_based');
+        if (repetitive.length > 0) {
+          findings.push(`${repetitive.length} משימות יומיות שנעשות תמיד באותו אופן`);
+          prompts.push(`משימות קבועות שחוזרות כל יום - כדאי לבדוק אם אפשר לייעל`);
+        }
+
+        return {
+          prompts: prompts.slice(0, 4),
+          findings: findings.slice(0, 4)
+        };
+      }, [responses]);
+
+      if (candidates.length === 0) return null;
+
+      const getScoreClass = (score) => {
+        if (score >= 80) return 'score-high';
+        if (score >= 50) return 'score-medium';
+        return 'score-low';
+      };
+
+      const getScoreLabel = (score) => {
+        if (score >= 80) return 'מאוד כדאי לייעל';
+        if (score >= 50) return 'כדאי לבדוק';
+        return 'פחות דחוף';
+      };
+
+      return (
+        <div className="kickoff-section">
+          <div className="kickoff-header">
+            <h2 className="kickoff-title">
+              סיכום לישיבה
+              <span className="kickoff-badge">3 עובדים שכדאי לדבר איתם</span>
+            </h2>
+          </div>
+
+          <div className="kickoff-grid">
+            {candidates.map((candidate, idx) => (
+              <div key={candidate.id} className="kickoff-candidate">
+                <div className="candidate-header">
+                  <div className="candidate-rank">#{idx + 1}</div>
+                  <div className={`candidate-score ${getScoreClass(candidate.score)}`}>
+                    {getScoreLabel(candidate.score)}
+                  </div>
+                </div>
+                <div className="candidate-name">{candidate.name}</div>
+                <div className="candidate-dept">{candidate.department || candidate.department_other || 'לא צוין'} | {candidate.role || 'לא צוין'}</div>
+
+                <div className="candidate-flow">
+                  <div className="flow-item">
+                    <div className="flow-label">מאיפה מגיע המידע</div>
+                    <div className="flow-value">{candidate.source || 'לא צוין'}</div>
+                  </div>
+                  <div className="flow-arrow">→</div>
+                  <div className="flow-item">
+                    <div className="flow-label">לאן הוא הולך</div>
+                    <div className="flow-value">{candidate.dest || 'לא צוין'}</div>
+                  </div>
+                </div>
+
+                {candidate.manual_steps && (
+                  <div className="flow-item" style={{marginBottom: '0.75rem'}}>
+                    <div className="flow-label">מה גוזל הכי הרבה זמן</div>
+                    <div className="flow-value" style={{fontSize: '0.8125rem'}}>{candidate.manual_steps.substring(0, 80)}...</div>
+                  </div>
+                )}
+
+                <div className="candidate-hours">
+                  זמן שאפשר לחסוך: <span className="hours-value">{candidate.weeklyHours} שעות בשבוע</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Dynamic Findings */}
+          {dataInsights.findings.length > 0 && (
+            <div className="prompts-section" style={{marginBottom: '1rem'}}>
+              <h3 className="prompts-title">
+                מה גילינו מהתשובות
+              </h3>
+              {dataInsights.findings.map((finding, idx) => (
+                <div key={idx} className="prompt-item">
+                  {finding}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Dynamic Questions */}
+          {dataInsights.prompts.length > 0 && (
+            <div className="prompts-section">
+              <h3 className="prompts-title">
+                שאלות לדיון (מבוססות על התשובות)
+              </h3>
+              {dataInsights.prompts.map((prompt, idx) => (
+                <div key={idx} className="prompt-item">
+                  {idx + 1}. {prompt}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // Bar Chart
     function BarChart({ data, labels, horizontal = false }) {
       const canvasRef = useRef(null);
@@ -819,6 +2577,324 @@
       }, [data, labels, horizontal]);
 
       return <canvas ref={canvasRef}></canvas>;
+    }
+
+    // ניתוח מערכתי מתקדם - Analysis Engine Modal
+    function AnalysisEngineModal({ responses, onClose, onAnalysisComplete }) {
+      const [analysisResponse, setAnalysisResponse] = useState(null);
+      const [analysisLoading, setAnalysisLoading] = useState(false);
+      const [analysisError, setAnalysisError] = useState(null);
+
+      if (!responses || responses.length === 0) return null;
+
+      // מנוע הניתוח המערכתי
+      const runAnalysisEngine = async () => {
+        setAnalysisLoading(true);
+        setAnalysisError(null);
+        try {
+          // הכנת נתוני סיכום למנוע הניתוח
+          const deptDataSummary = {};
+          responses.forEach(r => {
+            const dept = r.department || r.department_other || 'לא צוין';
+            if (!deptDataSummary[dept]) deptDataSummary[dept] = { count: 0, hours: 0 };
+            deptDataSummary[dept].count++;
+            deptDataSummary[dept].hours += calculateWeeklyHours(r);
+          });
+
+          const deptBreakdown = Object.entries(deptDataSummary)
+            .map(([name, data]) => `- ${name}: ${data.count} עובדים, ${Math.round(data.hours)} שעות/שבוע`)
+            .join('\n');
+
+          const painPointsSummary = responses
+            .filter(r => r.main_frustration)
+            .slice(0, 5)
+            .map(r => `- ${r.name} (${r.department || 'לא צוין'}): "${r.main_frustration}"`)
+            .join('\n') || 'לא דווחו';
+
+          const toolsSummary = {};
+          responses.forEach(r => {
+            (r.tools || []).forEach(t => { toolsSummary[t] = (toolsSummary[t] || 0) + 1; });
+          });
+          const toolsList = Object.entries(toolsSummary)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8)
+            .map(([t, c]) => `${t} (${c})`)
+            .join(', ') || 'לא צוין';
+
+          const wishesSummary = responses
+            .filter(r => r.process_wish || r.automation_wish)
+            .slice(0, 5)
+            .map(r => `- "${r.process_wish || r.automation_wish}"`)
+            .join('\n') || 'לא צוין';
+
+          const summaryData = {
+            totalResponses: responses.length,
+            totalHours: Math.round(responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0)),
+            avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
+            deptBreakdown,
+            painPoints: painPointsSummary,
+            tools: toolsList,
+            wishes: wishesSummary
+          };
+
+          const res = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ responses, summaryData })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'שגיאה במנוע הניתוח המערכתי');
+          }
+
+          setAnalysisResponse(data.analysis);
+          if (onAnalysisComplete) {
+            onAnalysisComplete(data.analysis);
+          }
+        } catch (err) {
+          console.error('Analysis engine error:', err);
+          setAnalysisError(err.message || 'שגיאה בהתחברות למנוע הניתוח');
+        } finally {
+          setAnalysisLoading(false);
+        }
+      };
+
+      // Generate comprehensive analysis
+      const analysis = useMemo(() => {
+        const totalResponses = responses.length;
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const avgScore = Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / totalResponses);
+
+        // Department analysis
+        const deptData = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0, scores: [] };
+          deptData[dept].count++;
+          deptData[dept].hours += calculateWeeklyHours(r);
+          deptData[dept].scores.push(calculateAutomationScore(r));
+        });
+
+        const deptAnalysis = Object.entries(deptData)
+          .map(([name, data]) => ({
+            name,
+            count: data.count,
+            hours: Math.round(data.hours),
+            avgScore: Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length)
+          }))
+          .sort((a, b) => b.hours - a.hours);
+
+        // Pain points
+        const painPoints = responses
+          .filter(r => r.main_frustration)
+          .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other }));
+
+        // Improvement wishes
+        const wishes = responses
+          .filter(r => r.process_wish || r.automation_wish)
+          .map(r => ({ text: r.process_wish || r.automation_wish, name: r.name }));
+
+        // Tool usage
+        const toolUsage = {};
+        responses.forEach(r => {
+          (r.tools || []).forEach(tool => {
+            toolUsage[tool] = (toolUsage[tool] || 0) + 1;
+          });
+        });
+        const topTools = Object.entries(toolUsage).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        // Key recommendations
+        const recommendations = [];
+
+        if (deptAnalysis[0]?.hours > 20) {
+          recommendations.push(`מחלקת ${deptAnalysis[0].name} משקיעה ${deptAnalysis[0].hours} שעות שבועיות - מומלץ לבחון תהליכים לייעול`);
+        }
+
+        const highCopyPaste = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
+        if (highCopyPaste > totalResponses * 0.3) {
+          recommendations.push(`${highCopyPaste} עובדים מעתיקים מידע ממיילים - שווה לבדוק כלי אוטומציה להזנת נתונים`);
+        }
+
+        const highEmail = responses.filter(r => r.emails_count === 'מעל 100' || r.emails_count === '50-100').length;
+        if (highEmail > 0) {
+          recommendations.push(`${highEmail} עובדים מטפלים ביותר מ-50 מיילים ביום - כדאי לבחון סינון וקטגוריזציה`);
+        }
+
+        const multiSystem = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה').length;
+        if (multiSystem > 0) {
+          recommendations.push(`${multiSystem} עובדים עובדים עם 5 מערכות ויותר - אינטגרציה תחסוך זמן`);
+        }
+
+        return {
+          summary: {
+            totalResponses,
+            totalHours: Math.round(totalHours),
+            avgScore,
+            topDept: deptAnalysis[0]
+          },
+          deptAnalysis,
+          painPoints: painPoints.slice(0, 5),
+          wishes: wishes.slice(0, 5),
+          topTools,
+          recommendations
+        };
+      }, [responses]);
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal" style={{maxWidth: '900px'}} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">תובנות מערכת - קוראל שירותי ים</h2>
+              <button className="modal-close" onClick={onClose}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {/* Summary */}
+              <div className="modal-section">
+                <h4 className="modal-section-title">מה גילינו?</h4>
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem'}}>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-dark)'}}>{analysis.summary.totalResponses}</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>עובדים ענו</div>
+                  </div>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-teal)'}}>{analysis.summary.totalHours}</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>שעות עבודה חוזרת בשבוע</div>
+                  </div>
+                  <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--success)'}}>{analysis.summary.avgScore}/100</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>פוטנציאל לייעול</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Department Analysis */}
+              <div className="modal-section">
+                <h4 className="modal-section-title">פירוט לפי מחלקה</h4>
+                <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem'}}>
+                  <thead>
+                    <tr style={{background: 'var(--gray-50)'}}>
+                      <th style={{padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--gray-200)'}}>מחלקה</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>עובדים שענו</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>שעות עבודה חוזרת</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>כדאי לייעל?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysis.deptAnalysis.map((dept, idx) => (
+                      <tr key={idx}>
+                        <td style={{padding: '0.75rem', borderBottom: '1px solid var(--gray-100)'}}>{dept.name}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)'}}>{dept.count}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)', fontWeight: '600', color: 'var(--primary-teal)'}}>{dept.hours}</td>
+                        <td style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-100)'}}>{dept.avgScore}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Recommendations */}
+              {analysis.recommendations.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">המלצות לייעול</h4>
+                  <div style={{background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', borderRadius: '12px', padding: '1.25rem', color: 'white'}}>
+                    {analysis.recommendations.map((rec, idx) => (
+                      <div key={idx} style={{padding: '0.5rem 0', borderBottom: idx < analysis.recommendations.length - 1 ? '1px solid rgba(255,255,255,0.2)' : 'none'}}>
+                        {idx + 1}. {rec}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pain Points */}
+              {analysis.painPoints.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">נקודות כאב שזוהו</h4>
+                  {analysis.painPoints.map((point, idx) => (
+                    <div key={idx} style={{background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', marginBottom: '0.5rem', borderRight: '3px solid var(--warning)'}}>
+                      <div style={{fontWeight: '500'}}>"{point.text}"</div>
+                      <div style={{fontSize: '0.8125rem', color: 'var(--gray-500)', marginTop: '0.25rem'}}>{point.name} - {point.dept}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Top Tools */}
+              {analysis.topTools.length > 0 && (
+                <div className="modal-section">
+                  <h4 className="modal-section-title">כלים בשימוש נפוץ</h4>
+                  <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+                    {analysis.topTools.map(([tool, count], idx) => (
+                      <span key={idx} style={{background: 'var(--gray-100)', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.875rem'}}>
+                        {tool} ({count})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* מנוע הניתוח המערכתי */}
+              <div className="modal-section">
+                <h4 className="modal-section-title" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                  מנוע הניתוח המערכתי
+                  <span style={{fontSize: '0.75rem', background: 'linear-gradient(135deg, #0891b2, #1a365d)', color: 'white', padding: '0.125rem 0.5rem', borderRadius: '10px'}}>קוראל</span>
+                </h4>
+
+                {!analysisResponse && !analysisLoading && (
+                  <div style={{textAlign: 'center', padding: '1.5rem'}}>
+                    <p style={{color: 'var(--gray-600)', marginBottom: '1rem'}}>
+                      קבל דוח מקיף עם תובנות מערכת והמלצות מבוססות נתונים
+                    </p>
+                    <button
+                      onClick={runAnalysisEngine}
+                      style={{
+                        background: 'linear-gradient(135deg, #0891b2 0%, #1a365d 100%)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.875rem 2rem',
+                        borderRadius: '12px',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit'
+                      }}
+                    >
+                      הפעל מנוע ניתוח
+                    </button>
+                    {analysisError && (
+                      <p style={{color: 'var(--error)', marginTop: '1rem', fontSize: '0.875rem'}}>{analysisError}</p>
+                    )}
+                  </div>
+                )}
+
+                {analysisLoading && (
+                  <div style={{textAlign: 'center', padding: '2rem'}}>
+                    <div className="spinner" style={{margin: '0 auto 1rem'}}></div>
+                    <p style={{color: 'var(--gray-600)'}}>מנוע הניתוח מעבד את הנתונים...</p>
+                  </div>
+                )}
+
+                {analysisResponse && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: '1.8',
+                    fontSize: '0.9375rem',
+                    color: 'var(--gray-700)',
+                    borderRight: '4px solid #8b5cf6'
+                  }}>
+                    {analysisResponse}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
     }
 
     // Response Modal
@@ -874,7 +2950,7 @@
           fields: [
             { label: 'הכי מתסכל', value: response.main_frustration || '-', highlight: true },
             { label: 'רעיון לשיפור', value: response.improvement_idea || '-', highlight: true },
-            { label: 'אוטומציה רצויה', value: response.automation_wish || '-', highlight: true },
+            { label: 'מה הייתם רוצים שישתפר', value: response.process_wish || response.automation_wish || '-', highlight: true },
             { label: 'הערות נוספות', value: response.additional_notes || '-', highlight: true }
           ]
         }
@@ -921,6 +2997,12 @@
       const [currentPage, setCurrentPage] = useState(1);
       const [selectedResponse, setSelectedResponse] = useState(null);
       const [insightsDeptFilter, setInsightsDeptFilter] = useState('');
+      const [deleteTarget, setDeleteTarget] = useState(null);
+      const [isDeleting, setIsDeleting] = useState(false);
+      const [expandedCards, setExpandedCards] = useState({});
+      const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+      const [showAnalysisEngine, setShowAnalysisEngine] = useState(false);
+      const [savedAnalysis, setSavedAnalysis] = useState(localStorage.getItem('coral_analysis') || '');
 
       const fetchResponses = async () => {
         setLoading(true);
@@ -944,20 +3026,79 @@
         fetchResponses();
       }, []);
 
+      // Delete single response
+      const handleDeleteResponse = async () => {
+        if (!deleteTarget) return;
+        setIsDeleting(true);
+        try {
+          const { error } = await supabase
+            .from('survey_responses_v2')
+            .delete()
+            .eq('id', deleteTarget.id);
+
+          if (error) throw error;
+          setResponses(prev => prev.filter(r => r.id !== deleteTarget.id));
+          setDeleteTarget(null);
+        } catch (err) {
+          console.error('Error deleting response:', err);
+          alert('שגיאה במחיקה');
+        } finally {
+          setIsDeleting(false);
+        }
+      };
+
+      // Delete all responses
+      const handleResetAllData = async () => {
+        if (!deleteTarget?.resetAll) return;
+        setIsDeleting(true);
+        try {
+          // Get all IDs first
+          const ids = responses.map(r => r.id);
+          if (ids.length === 0) {
+            setDeleteTarget(null);
+            return;
+          }
+
+          // Delete in batches to avoid timeout
+          for (const id of ids) {
+            const { error } = await supabase
+              .from('survey_responses_v2')
+              .delete()
+              .eq('id', id);
+            if (error) {
+              console.error('Error deleting id:', id, error);
+            }
+          }
+
+          setResponses([]);
+          setDeleteTarget(null);
+        } catch (err) {
+          console.error('Error resetting data:', err);
+          alert('שגיאה באיפוס הנתונים: ' + (err.message || 'נסה שוב'));
+        } finally {
+          setIsDeleting(false);
+        }
+      };
+
+      // Toggle card expansion
+      const toggleCardExpansion = (id) => {
+        setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+      };
+
       // Stats
       const stats = useMemo(() => {
         const total = responses.length;
         const today = responses.filter(r => isToday(r.created_at)).length;
         const week = responses.filter(r => isThisWeek(r.created_at)).length;
 
-        const deptCounts = {};
-        responses.forEach(r => {
-          const dept = r.department || r.department_other || 'לא צוין';
-          deptCounts[dept] = (deptCounts[dept] || 0) + 1;
-        });
-        const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0];
+        // Calculate total weekly hours potential for automation
+        const totalWeeklyHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
 
-        return { total, today, week, topDept: topDept ? topDept[0] : '-' };
+        // Calculate average automation score
+        const scores = responses.map(r => calculateAutomationScore(r));
+        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+
+        return { total, today, week, totalWeeklyHours: Math.round(totalWeeklyHours * 10) / 10, avgScore };
       }, [responses]);
 
       // Chart data
@@ -984,7 +3125,7 @@
         });
         const emails = { labels: Object.keys(emailCounts), data: Object.values(emailCounts) };
 
-        // Activities
+        // Activities - with Hebrew labels
         const actCounts = {};
         responses.forEach(r => {
           (r.activities || []).forEach(a => {
@@ -992,7 +3133,10 @@
           });
         });
         const sortedActs = Object.entries(actCounts).sort((a, b) => b[1] - a[1]);
-        const activities = { labels: sortedActs.map(a => a[0]), data: sortedActs.map(a => a[1]) };
+        const activities = {
+          labels: sortedActs.map(a => ACTIVITY_LABELS[a[0]] || a[0]),
+          data: sortedActs.map(a => a[1])
+        };
 
         // Hours outside
         const hoursCounts = {};
@@ -1064,8 +3208,8 @@
           .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other || '-' }));
 
         const automation = filtered
-          .filter(r => r.automation_wish)
-          .map(r => ({ text: r.automation_wish, name: r.name, dept: r.department || r.department_other || '-' }));
+          .filter(r => r.automation_wish || r.process_wish)
+          .map(r => ({ text: r.process_wish || r.automation_wish, name: r.name, dept: r.department || r.department_other || '-' }));
 
         return { painPoints, automation };
       }, [responses, insightsDeptFilter]);
@@ -1078,7 +3222,8 @@
           'דורשים העתקה', 'חיפוש במייל', 'מיילים נופלים',
           'כלים', 'מערכת פנימית', 'העתקות בין כלים',
           'עבודה מחוץ לשעות', 'פעולה חוזרת', 'מבזבז זמן',
-          'הכי מתסכל', 'רעיון לשיפור', 'אוטומציה רצויה', 'הערות'
+          'הכי מתסכל', 'רעיון לשיפור', 'מה הייתם רוצים שישתפר', 'הערות',
+          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'טרטור בין מערכות', 'מדד עבודה רובוטית'
         ];
 
         const rows = responses.map(r => [
@@ -1103,8 +3248,14 @@
           r.biggest_time_waste || '',
           r.main_frustration || '',
           r.improvement_idea || '',
-          r.automation_wish || '',
-          r.additional_notes || ''
+          r.process_wish || r.automation_wish || '',
+          r.additional_notes || '',
+          r.pda_sender || '',
+          r.is_crew_related ? 'כן' : '',
+          r.data_entry_point || '',
+          r.final_destination_system || '',
+          r.tools_switching_count || '',
+          calculateAutomationScore(r)
         ]);
 
         const csvContent = '\uFEFF' + [headers, ...rows]
@@ -1142,7 +3293,7 @@
         <div className="dashboard">
           <header className="dashboard-header">
             <div className="header-content">
-              <h1 className="header-title">דשבורד תשובות השאלון | קוראל שירותי ים</h1>
+              <h1 className="header-title">מערכת ניתוח תהליכים | קוראל שירותי ים</h1>
               <div className="header-actions">
                 {lastUpdated && (
                   <span className="last-updated">
@@ -1151,19 +3302,67 @@
                 )}
                 <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
                 <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
+                <button className="btn btn-secondary" onClick={() => window.print()}>הדפס דוח מלא</button>
+                <button
+                  className="btn"
+                  style={{background: 'linear-gradient(135deg, #0891b2 0%, #1a365d 100%)', color: 'white'}}
+                  onClick={() => setShowAnalysisEngine(true)}
+                  disabled={responses.length === 0}
+                >
+                  תובנות מערכת
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => setDeleteTarget({ resetAll: true })}
+                  disabled={responses.length === 0}
+                >
+                  איפוס כל הנתונים
+                </button>
                 <button className="btn btn-logout" onClick={onLogout}>התנתק</button>
               </div>
             </div>
           </header>
 
           <main className="dashboard-content">
-            {/* Summary Cards */}
+            {/* Executive Print Summary - visible only when printing */}
+            {responses.length > 0 && <ExecutivePrintSummary responses={responses} />}
+
+            {/* Strategic Questions for Meeting */}
+            {responses.length > 0 && <StrategicQuestions responses={responses} />}
+
+            {/* Vessel Story - מסע האנייה */}
+            {responses.length > 0 && <VesselStoryCard responses={responses} />}
+
+            {/* Kickoff Session - Meeting Ready Section */}
+            {responses.length > 0 && <KickoffSession responses={responses} />}
+
+            {/* Summary Cards with Time Recovery */}
             <div className="summary-cards">
-              <SummaryCard label="סה״כ תשובות" value={stats.total} />
-              <SummaryCard label="תשובות היום" value={stats.today} />
-              <SummaryCard label="השבוע האחרון" value={stats.week} />
-              <SummaryCard label="מחלקה מובילה" value={stats.topDept} />
+              <SummaryCard label="עובדים שענו" value={stats.total} />
+              <SummaryCard label="ענו היום" value={stats.today} />
+              <SummaryCard label="ענו השבוע" value={stats.week} />
+              <SummaryCard
+                label='זמן "ניירת" שבועי'
+                value={`${stats.totalWeeklyHours} שעות`}
+                secondary={`${LAYMAN_TERMS.frictionScore}: ${stats.avgScore}/100`}
+              />
+              <VolumeMultiplierCard responses={responses} />
             </div>
+
+            {/* Time Recovery Calculator */}
+            {responses.length > 0 && <TimeRecoveryCard responses={responses} />}
+
+            {/* Bottleneck Analysis */}
+            {responses.length > 0 && <BottleneckCard responses={responses} />}
+
+            {/* Cross-Departmental Sync Analysis */}
+            {responses.length > 0 && <SyncAnalysisCard responses={responses} />}
+
+            {/* Tools Library */}
+            {responses.length > 0 && <ToolsLibrary />}
+
+            {/* Next Steps Guide */}
+            {responses.length > 0 && <NextStepsGuide />}
 
             {/* Charts */}
             {responses.length > 0 && (
@@ -1186,7 +3385,7 @@
               </div>
             )}
 
-            {/* Responses Table */}
+            {/* Responses Table / Full View */}
             <div className="table-section">
               <div className="table-header">
                 <h2 className="table-title">כל התשובות ({filteredResponses.length})</h2>
@@ -1208,12 +3407,57 @@
                       <option key={dept} value={dept}>{dept}</option>
                     ))}
                   </select>
+                  <button
+                    className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setViewMode('table')}
+                  >
+                    טבלה
+                  </button>
+                  <button
+                    className={`btn ${viewMode === 'cards' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setViewMode('cards')}
+                  >
+                    כרטיסים מפורטים
+                  </button>
                 </div>
               </div>
 
               {filteredResponses.length === 0 ? (
                 <div className="empty-state">אין תשובות להצגה</div>
+              ) : viewMode === 'cards' ? (
+                /* Cards View */
+                <div>
+                  {paginatedResponses.map(response => (
+                    <ResponseCard
+                      key={response.id}
+                      response={response}
+                      onDelete={setDeleteTarget}
+                      onExpand={toggleCardExpansion}
+                      isExpanded={expandedCards[response.id]}
+                    />
+                  ))}
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        הקודם
+                      </button>
+                      <span className="pagination-info">עמוד {currentPage} מתוך {totalPages}</span>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => p + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        הבא
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
+                /* Table View */
                 <>
                   <div className="table-wrapper">
                     <table className="data-table">
@@ -1223,19 +3467,38 @@
                           <th onClick={() => handleSort('name')}>שם {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('department')}>מחלקה {sortField === 'department' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th title="ככל שהמספר גבוה יותר, יש יותר פוטנציאל לייעול">כדאי לייעל?</th>
                           <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th>פעולות</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedResponses.map(response => (
-                          <tr key={response.id} onClick={() => setSelectedResponse(response)}>
-                            <td>{formatShortDate(response.created_at)}</td>
-                            <td>{response.name}</td>
-                            <td>{response.department || response.department_other || '-'}</td>
-                            <td>{response.role || '-'}</td>
-                            <td>{response.emails_count || '-'}</td>
-                          </tr>
-                        ))}
+                        {paginatedResponses.map(response => {
+                          const score = calculateAutomationScore(response);
+                          const badgeColor = getScoreBadgeColor(score);
+                          return (
+                            <tr key={response.id}>
+                              <td onClick={() => setSelectedResponse(response)}>{formatShortDate(response.created_at)}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.name}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.department || response.department_other || '-'}</td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.role || '-'}</td>
+                              <td onClick={() => setSelectedResponse(response)} title={`ציון: ${score}/100`}>
+                                <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
+                                  {badgeColor.label}
+                                </span>
+                              </td>
+                              <td onClick={() => setSelectedResponse(response)}>{response.emails_count || '-'}</td>
+                              <td>
+                                <button
+                                  className="delete-btn"
+                                  onClick={() => setDeleteTarget(response)}
+                                >
+                                  מחק
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -1266,7 +3529,7 @@
             {/* Pain Points */}
             {insights.painPoints.length > 0 && (
               <div className="insights-section">
-                <h2 className="insights-title">מה הכי מתסכל את העובדים? ({insights.painPoints.length} תשובות)</h2>
+                <h2 className="insights-title">מה מציק לעובדים? ({insights.painPoints.length} תגובות)</h2>
                 <div className="insights-filter">
                   <select
                     className="filter-select"
@@ -1290,10 +3553,10 @@
               </div>
             )}
 
-            {/* Automation Wishes */}
+            {/* Process Improvement Wishes */}
             {insights.automation.length > 0 && (
               <div className="insights-section">
-                <h2 className="insights-title">מה העובדים היו רוצים שיקרה אוטומטית? ({insights.automation.length} תשובות)</h2>
+                <h2 className="insights-title">מה העובדים רוצים לשפר? ({insights.automation.length} רעיונות)</h2>
                 <div className="insights-grid">
                   {insights.automation.map((item, idx) => (
                     <div key={idx} className="insight-card automation">
@@ -1304,11 +3567,52 @@
                 </div>
               </div>
             )}
+
+            {/* Meeting Legend - shown in print */}
+            <MeetingLegend />
+
+            {/* Analysis Engine Print Section - appears only when printing if analysis was run */}
+            {savedAnalysis && (
+              <div className="ai-analysis-print">
+                <h2 className="ai-analysis-print-title">
+                  דוח ניתוח מערכתי - קוראל שירותי ים
+                </h2>
+                <div style={{whiteSpace: 'pre-wrap', lineHeight: '1.8', fontSize: '0.9rem'}}>
+                  {savedAnalysis}
+                </div>
+              </div>
+            )}
           </main>
 
           {/* Response Modal */}
           {selectedResponse && (
             <ResponseModal response={selectedResponse} onClose={() => setSelectedResponse(null)} />
+          )}
+
+          {/* Analysis Engine Modal */}
+          {showAnalysisEngine && (
+            <AnalysisEngineModal
+              responses={responses}
+              onClose={() => setShowAnalysisEngine(false)}
+              onAnalysisComplete={(analysis) => {
+                setSavedAnalysis(analysis);
+                localStorage.setItem('coral_analysis', analysis);
+              }}
+            />
+          )}
+
+          {/* Delete Confirmation Dialog */}
+          {deleteTarget && (
+            <ConfirmDialog
+              title={deleteTarget.resetAll ? 'איפוס כל הנתונים' : `מחיקת תשובה של ${deleteTarget.name}`}
+              message={deleteTarget.resetAll
+                ? 'האם אתה בטוח שברצונך למחוק את כל התשובות? פעולה זו בלתי הפיכה!'
+                : 'האם אתה בטוח שברצונך למחוק תשובה זו?'
+              }
+              onConfirm={deleteTarget.resetAll ? handleResetAllData : handleDeleteResponse}
+              onCancel={() => setDeleteTarget(null)}
+              isDeleting={isDeleting}
+            />
           )}
         </div>
       );

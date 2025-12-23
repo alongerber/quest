@@ -438,6 +438,14 @@
       line-height: 1.4;
     }
 
+    .checkbox-help {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+      line-height: 1.3;
+    }
+
     .checkbox-with-input {
       width: 100%;
     }
@@ -625,17 +633,25 @@
 
     // Supabase Configuration
     const SUPABASE_URL = 'https://sqhcapszcdojbwygwlox.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_MCJ2MrwsM_lbjFLWWYU7fg_u9OB2D9m';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxaGNhcHN6Y2RvamJ3eWd3bG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0NTcwNjksImV4cCI6MjA4MjAzMzA2OX0.9GCk7Vt2HxU5ALlNHw8jczCkmvu5hy-VTBdBet-7Mjk';
     const isSupabaseConfigured = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
 
     // Constants
     const DEPARTMENTS = [
-      'תפעול / סוכנות',
-      'חכירות',
-      'כספים',
-      'הנהלת חשבונות',
-      'פרויקטים',
-      'אחר'
+      { id: 'operations', label: 'תפעול / סוכנות', unit: 'vessel_calls', unitLabel: 'כניסות אניות, פקודות מסירה, PDAs' },
+      { id: 'accounting', label: 'חשבונות', unit: 'pdas', unitLabel: 'תיאום עם סוכנות, PDAs' },
+      { id: 'chartering', label: 'חכירות', unit: 'fixtures', unitLabel: 'עסקאות חכירה (Fixtures), חוזים' },
+      { id: 'finance', label: 'כספים', unit: 'invoices', unitLabel: 'חשבוניות, כספים כלליים' },
+      { id: 'projects', label: 'פרויקטים', unit: 'projects', unitLabel: 'פרויקטים ארוכי טווח, חילופי צוות' },
+      { id: 'hr', label: 'משאבי אנוש', unit: 'hr_tasks', unitLabel: 'משימות משאבי אנוש' },
+      { id: 'other', label: 'אחר', unit: 'tasks', unitLabel: 'משימות' }
+    ];
+
+    // PDA Sender options (for Ops & Accounts)
+    const PDA_SENDERS = [
+      { id: 'agency', label: 'סוכנות' },
+      { id: 'accounting', label: 'חשבונות' },
+      { id: 'other', label: 'אחר' }
     ];
 
     const SENIORITY_OPTIONS = [
@@ -646,9 +662,11 @@
     ];
 
     const ACTIVITIES = [
-      { id: 'ships', label: 'טיפול באניות (תיאום הגעה, עזיבה, מסמכים)' },
-      { id: 'cargo', label: 'טיפול במטענים (מעקב, תיעוד, שחרור)' },
-      { id: 'external', label: 'תקשורת עם גורמי חוץ (ספקים, סוכנים, לקוחות, רשויות)' },
+      { id: 'ships', label: 'טיפול באניות (תיאום הגעה, עזיבה, מסמכים לנמל)' },
+      { id: 'cargo', label: 'טיפול במטענים (פקודות מסירה, שחרור, מעקב)' },
+      { id: 'manifest', label: 'הזנת נתוני מניפסט ותיעוד מטען' },
+      { id: 'bol', label: 'הפקת שטרי מטען (B/L) ופקודות מסירה (D/O)' },
+      { id: 'external', label: 'תקשורת עם גורמי חוץ (יבואנים, משלחים, סוכנים, רשויות)' },
       { id: 'documents', label: 'הכנת מסמכים ודוחות' },
       { id: 'financial', label: 'עבודה עם נתונים כספיים (חשבוניות, תשלומים, התאמות)' },
       { id: 'projects', label: 'ניהול פרויקטים או משימות לאורך זמן' },
@@ -675,6 +693,49 @@
     const EMAILS_MISSED = ['לא קורה', 'לפעמים', 'קורה הרבה'];
     const HOURS_OUTSIDE = ['לא עובד מעבר לשעות', '1-3 שעות', '3-6 שעות', 'מעל 6 שעות'];
 
+    // Process Mapping Constants (for automation analysis)
+    const INFO_SOURCES = [
+      { id: 'email_body', label: 'מייל (גוף הטקסט)', help: 'מידע שמגיע בתוך המייל עצמו' },
+      { id: 'email_attachment', label: 'מייל (קבצים מצורפים)', help: 'קבצים כמו PDF או אקסל שמצורפים למייל' },
+      { id: 'manifest_pdf', label: 'מניפסט PDF', help: 'רשימת המטענים באנייה - מגיע כקובץ PDF' },
+      { id: 'tos_port', label: 'אתר הנמל (TOS)', help: 'מערכת הנמל לניהול מטענים ואניות' },
+      { id: 'edi_file', label: 'קובץ EDI', help: 'קובץ דיגיטלי להעברת מידע בין מערכות - חוסך הקלדה ידנית' },
+      { id: 'excel', label: 'קובץ אקסל', help: 'טבלאות אקסל עם נתונים' },
+      { id: 'internal_system', label: 'מערכת פנימית', help: 'מערכת המחשב של החברה' },
+      { id: 'whatsapp', label: 'וואטסאפ', help: 'הודעות בוואטסאפ' },
+      { id: 'phone', label: 'טלפון', help: 'שיחות טלפון' },
+      { id: 'other_source', label: 'אחר', help: 'מקור אחר שלא ברשימה' }
+    ];
+
+    const PROCESS_TYPES = [
+      { id: 'rule_based', label: 'מבוסס על חוקים קבועים (100% רובוטי)' },
+      { id: 'human_judgment', label: 'דורש שיקול דעת אנושי בכל פעם' },
+      { id: 'mixed', label: 'שילוב - חלק קבוע וחלק דורש שיקול דעת' }
+    ];
+
+    const FREQUENCY_OPTIONS = [
+      { id: 'daily', label: 'יומי (כל יום עבודה)', weight: 1.0 },
+      { id: 'weekly', label: 'שבועי (פעם-פעמיים בשבוע)', weight: 0.6 },
+      { id: 'monthly', label: 'חודשי (פעם-פעמיים בחודש)', weight: 0.3 }
+    ];
+
+    const DESTINATIONS = [
+      { id: 'internal_system', label: 'מערכת פנימית' },
+      { id: 'tracking_table', label: 'טבלת מעקב (אקסל)' },
+      { id: 'client_report', label: 'דוח ללקוח' },
+      { id: 'email_response', label: 'תשובה במייל' },
+      { id: 'archive', label: 'ארכיון/תיוק' },
+      { id: 'other_dest', label: 'אחר' }
+    ];
+
+    const TIME_ESTIMATES = [
+      { id: 'under_5', label: 'פחות מ-5 דקות', minutes: 3 },
+      { id: '5_15', label: '5-15 דקות', minutes: 10 },
+      { id: '15_30', label: '15-30 דקות', minutes: 22 },
+      { id: '30_60', label: '30-60 דקות', minutes: 45 },
+      { id: 'over_60', label: 'מעל שעה', minutes: 75 }
+    ];
+
     // Dynamic questions per activity
     const ACTIVITY_QUESTIONS = {
       ships: [
@@ -683,12 +744,24 @@
         { id: 'ships_systems_update', type: 'radio', title: 'כמה מערכות צריך לעדכן כשאנייה מגיעה/עוזבת?', options: ['1-2', '3-4', '5 ומעלה'] }
       ],
       cargo: [
-        { id: 'cargo_per_week', type: 'radio', title: 'כמה משלוחים אתה מטפל בהם בשבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'cargo_per_week', type: 'radio', title: 'כמה פקודות מסירה / תיקי לקוח אתה מטפל בהם בשבוע?', options: ['עד 10', '10-30', '30-50', '50-100', 'מעל 100'] },
+        { id: 'importers_per_vessel', type: 'radio', title: 'בממוצע, כמה יבואנים/גורמי קצה מטופלים תחת אנייה אחת בתיק שלך?', options: ['1-5', '5-15', '15-30', '30-50', 'מעל 50'] },
         { id: 'cargo_tracking', type: 'radio', title: 'האם מעקב המטענים נעשה ידנית או דרך מערכת?', options: ['ידנית לחלוטין', 'בעיקר ידנית', 'בעיקר במערכת', 'במערכת לחלוטין'] },
-        { id: 'cargo_status_questions', type: 'radio', title: 'כמה פעמים שואלים אותך "איפה המשלוח?" ביום?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+        { id: 'cargo_status_questions', type: 'radio', title: 'כמה פעמים שואלים אותך "איפה המטען?" ביום?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
+      ],
+      manifest: [
+        { id: 'manifest_per_week', type: 'radio', title: 'כמה מניפסטים אתה מזין בשבוע ממוצע?', options: ['1-5', '5-15', '15-30', 'מעל 30'] },
+        { id: 'manifest_source', type: 'radio', title: 'מאיפה מגיע המניפסט?', options: ['PDF במייל', 'אתר הנמל (TOS)', 'קובץ EDI', 'שילוב של כולם'] },
+        { id: 'manifest_time', type: 'radio', title: 'כמה זמן לוקח להזין מניפסט אחד?', options: ['עד 15 דקות', '15-30 דקות', '30-60 דקות', 'מעל שעה'] },
+        { id: 'manifest_lines', type: 'radio', title: 'כמה שורות (פריטים) יש במניפסט ממוצע?', options: ['עד 20', '20-50', '50-100', 'מעל 100'] }
+      ],
+      bol: [
+        { id: 'bol_per_week', type: 'radio', title: 'כמה שטרי מטען / פקודות מסירה אתה מפיק בשבוע?', options: ['עד 20', '20-50', '50-100', 'מעל 100'] },
+        { id: 'bol_source', type: 'radio', title: 'מאיפה מגיע המידע לשטר המטען?', options: ['מניפסט', 'בקשת יבואן', 'מערכת פנימית', 'שילוב של כולם'] },
+        { id: 'bol_manual_typing', type: 'radio', title: 'כמה מהנתונים מוקלדים ידנית?', options: ['כמעט הכל', 'רוב', 'חצי', 'מיעוט'] }
       ],
       external: [
-        { id: 'external_contacts', type: 'radio', title: 'עם כמה גורמי חוץ אתה בקשר קבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
+        { id: 'external_contacts', type: 'radio', title: 'עם כמה גורמי חוץ (יבואנים, משלחים, סוכנים) אתה בקשר קבוע?', options: ['עד 10', '10-30', '30-50', 'מעל 50'] },
         { id: 'external_channel', type: 'radio', title: 'מה ערוץ התקשורת העיקרי?', options: ['מייל', 'טלפון', 'WhatsApp', 'שילוב של כולם'] },
         { id: 'external_relay', type: 'radio', title: 'כמה פעמים ביום אתה מעביר מידע מגורם אחד לאחר?', options: ['כמעט אף פעם', '1-5 פעמים', '5-15 פעמים', 'מעל 15 פעמים'] }
       ],
@@ -769,6 +842,7 @@
               </span>
               <div className="checkbox-with-input">
                 <span className="checkbox-label">{option.label}</span>
+                {option.help && <span className="checkbox-help">{option.help}</span>}
                 {showOtherInput && option.id === 'other' && values.includes('other') && (
                   <input
                     type="text"
@@ -838,8 +912,8 @@
               onChange={(e) => onChange('department', e.target.value)}
             >
               <option value="">בחר מחלקה</option>
-              {DEPARTMENTS.map((dept, index) => (
-                <option key={index} value={dept}>{dept}</option>
+              {DEPARTMENTS.map((dept) => (
+                <option key={dept.id} value={dept.label}>{dept.label}</option>
               ))}
             </select>
           </div>
@@ -878,6 +952,7 @@
               name="seniority"
             />
           </div>
+
         </>
       );
     }
@@ -1110,13 +1185,154 @@
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">מה היית רוצה שיקרה "אוטומטית" בלי שתצטרך לטפל?</h3>
+            <h3 className="question-title">איזה תהליך היית רוצה שיעבוד יותר חלק?</h3>
             <textarea
               className="form-textarea"
-              value={data.automation_wish || ''}
-              onChange={(e) => onChange('automation_wish', e.target.value)}
+              value={data.process_wish || ''}
+              onChange={(e) => onChange('process_wish', e.target.value)}
               placeholder="תאר..."
               rows="3"
+            />
+          </div>
+        </>
+      );
+    }
+
+    function StepProcessMapping({ data, onChange, errors, stepNum, totalSteps }) {
+      return (
+        <>
+          <div className="step-header">
+            <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
+            <h2 className="step-title">מיפוי תהליכי עבודה</h2>
+            <p className="step-description">עזור לנו להבין את תהליכי העבודה שלך לעומק</p>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">מאיפה מגיע המידע שאתה מעבד?</h3>
+            <p className="question-hint">בחר את כל המקורות הרלוונטיים</p>
+            <CheckboxGroup
+              options={INFO_SOURCES}
+              values={data.info_source}
+              onChange={(values) => onChange('info_source', values)}
+              otherValue={data.info_source_other}
+              onOtherChange={(value) => onChange('info_source_other', value)}
+              showOtherInput={true}
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">היכן מזינים את המידע? (נקודת הזנה)</h3>
+            <input
+              type="text"
+              className="form-input"
+              value={data.data_entry_point || ''}
+              onChange={(e) => onChange('data_entry_point', e.target.value)}
+              placeholder="לדוגמה: אקסל, מערכת פנימית, אתר הנמל..."
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">לאיזו מערכת מגיע המידע בסוף? (יעד סופי)</h3>
+            <input
+              type="text"
+              className="form-input"
+              value={data.final_destination_system || ''}
+              onChange={(e) => onChange('final_destination_system', e.target.value)}
+              placeholder="לדוגמה: מערכת הנהלת חשבונות, דוח ללקוח..."
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">האם התהליך מבוסס על חוקים קבועים?</h3>
+            <p className="question-hint">האם התהליך מתבצע באותה צורה בכל פעם?</p>
+            <div className="radio-group">
+              {PROCESS_TYPES.map((option) => (
+                <label key={option.id} className={`radio-option ${data.process_type === option.id ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="process_type"
+                    value={option.id}
+                    checked={data.process_type === option.id}
+                    onChange={() => onChange('process_type', option.id)}
+                  />
+                  <span className="radio-circle" />
+                  <span className="radio-label">{option.label}</span>
+                </label>
+              ))}
+            </div>
+            {errors.process_type && <div className="error-message">{errors.process_type}</div>}
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">באיזו תדירות אתה מבצע את התהליך?</h3>
+            <div className="radio-group">
+              {FREQUENCY_OPTIONS.map((option) => (
+                <label key={option.id} className={`radio-option ${data.process_frequency === option.id ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="process_frequency"
+                    value={option.id}
+                    checked={data.process_frequency === option.id}
+                    onChange={() => onChange('process_frequency', option.id)}
+                  />
+                  <span className="radio-circle" />
+                  <span className="radio-label">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה זמן לוקחת משימה בודדת?</h3>
+            <div className="radio-group">
+              {TIME_ESTIMATES.map((option) => (
+                <label key={option.id} className={`radio-option ${data.time_per_task === option.id ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="time_per_task"
+                    value={option.id}
+                    checked={data.time_per_task === option.id}
+                    onChange={() => onChange('time_per_task', option.id)}
+                  />
+                  <span className="radio-circle" />
+                  <span className="radio-label">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה פעמים ביום אתה מבצע את התהליך הזה?</h3>
+            <input
+              type="number"
+              className="form-input"
+              value={data.tasks_per_day || ''}
+              onChange={(e) => onChange('tasks_per_day', e.target.value)}
+              placeholder="מספר פעמים ביום"
+              min="0"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">אילו שלבים ידניים יש בתהליך?</h3>
+            <p className="question-hint">תאר את השלבים שאתה עושה ידנית (העתקה, הקלדה, המתנה...)</p>
+            <textarea
+              className="form-textarea"
+              value={data.manual_steps || ''}
+              onChange={(e) => onChange('manual_steps', e.target.value)}
+              placeholder="לדוגמה: מעתיק נתונים מהמייל לאקסל, מחשב סכומים, שולח תשובה..."
+              rows="4"
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה כלים/מערכות אתה עובר ביניהם בתהליך?</h3>
+            <p className="question-hint">מעבר בין כלים = העתקת מידע ממקום אחד לאחר</p>
+            <RadioGroup
+              options={['1-2 כלים', '3-4 כלים', '5 כלים ומעלה']}
+              value={data.tools_switching_count}
+              onChange={(value) => onChange('tools_switching_count', value)}
+              name="tools_switching_count"
             />
           </div>
         </>
@@ -1175,6 +1391,24 @@
         seniority: '',
         activities: [],
         activities_other: '',
+        // Department-specific fields
+        pda_sender: '',
+        pda_sender_other: '',
+        is_crew_related: false,
+        // Process mapping fields
+        info_source: [],
+        info_source_other: '',
+        data_entry_point: '',
+        final_destination_system: '',
+        process_type: '',
+        process_frequency: '',
+        destination: [],
+        destination_other: '',
+        time_per_task: '',
+        tasks_per_day: '',
+        manual_steps: '',
+        tools_switching_count: '',
+        // Email fields
         emails_count: '',
         emails_direct: '',
         emails_action: '',
@@ -1190,7 +1424,7 @@
         biggest_time_waste: '',
         main_frustration: '',
         improvement_idea: '',
-        automation_wish: '',
+        process_wish: '',
         additional_notes: ''
       });
 
@@ -1211,7 +1445,7 @@
         if (hasDynamicQuestions) {
           baseSteps.push('dynamic');
         }
-        baseSteps.push('emails', 'tools', 'time', 'painpoints', 'final');
+        baseSteps.push('processmapping', 'emails', 'tools', 'time', 'painpoints', 'final');
         return baseSteps;
       }, [hasDynamicQuestions]);
 
@@ -1285,7 +1519,9 @@
           const submitData = {
             ...formData,
             activities: formData.activities.length > 0 ? formData.activities : null,
-            tools: formData.tools.length > 0 ? formData.tools : null
+            tools: formData.tools.length > 0 ? formData.tools : null,
+            info_source: formData.info_source.length > 0 ? formData.info_source : null,
+            destination: formData.destination.length > 0 ? formData.destination : null
           };
 
           // Clean up empty strings
@@ -1305,13 +1541,15 @@
           });
 
           if (!response.ok) {
-            throw new Error('Failed to submit');
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Supabase error:', response.status, errorData);
+            throw new Error(errorData.message || errorData.error || `Error ${response.status}`);
           }
 
           setIsCompleted(true);
         } catch (error) {
           console.error('Submit error:', error);
-          alert('אירעה שגיאה בשמירת הנתונים. נסה שוב.');
+          alert(`שגיאה: ${error.message}\n\nפתח Console (F12) לפרטים נוספים`);
         } finally {
           setIsSubmitting(false);
         }
@@ -1333,6 +1571,8 @@
             return <StepActivities {...stepProps} />;
           case 'dynamic':
             return <StepDynamicQuestions {...stepProps} />;
+          case 'processmapping':
+            return <StepProcessMapping {...stepProps} />;
           case 'emails':
             return <StepEmails {...stepProps} />;
           case 'tools':
