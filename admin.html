@@ -625,7 +625,7 @@
       }
     }
 
-    /* Print Styles */
+    /* Print Styles - דוח מלא להדפסה */
     @media print {
       body {
         background: white;
@@ -677,6 +677,25 @@
         gap: 1rem;
       }
 
+      /* New components print styles */
+      .strategic-questions {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
+      .vessel-story {
+        background: linear-gradient(135deg, #1a365d 0%, #3b82f6 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
+      .recovery-card {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        color: white !important;
+        page-break-inside: avoid;
+      }
+
       .kickoff-section {
         background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%) !important;
         color: white !important;
@@ -705,6 +724,27 @@
         border-top: 2px solid var(--gray-300);
       }
 
+      /* AI Analysis Print Section */
+      .ai-analysis-print {
+        display: block !important;
+        page-break-before: always;
+        page-break-inside: avoid;
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid var(--primary-teal);
+        border-radius: 12px;
+        margin-top: 2rem;
+      }
+
+      .ai-analysis-print-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-teal);
+      }
+
       .data-table {
         font-size: 0.8rem;
       }
@@ -716,6 +756,11 @@
       .score-badge {
         border: 1px solid currentColor;
       }
+    }
+
+    /* AI Analysis Print Section - hidden on screen */
+    .ai-analysis-print {
+      display: none;
     }
 
     /* Meeting Legend - hidden on screen, shown in print */
@@ -1318,11 +1363,23 @@
       return Math.round((timePerTask * tasksPerDay * daysPerWeek) / 60 * 10) / 10;
     };
 
-    // Get Score Badge Color - Green = High potential for improvement, Red = Low potential
+    // Get Score Badge Color - מדד עבודה שחורה (Green = High robotic work, Red = Low)
     const getScoreBadgeColor = (score) => {
-      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'מאוד כדאי' }; // Green - High priority
-      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'כדאי לבדוק' }; // Yellow - Medium
-      return { bg: '#fee2e2', color: '#991b1b', label: 'פחות דחוף' }; // Red - Lower priority
+      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'עבודה שחורה גבוהה', tip: 'הרבה עבודה טכנית שאפשר לפשט' };
+      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'עבודה שחורה בינונית', tip: 'יש מה לשפר' };
+      return { bg: '#fee2e2', color: '#991b1b', label: 'עבודה שחורה נמוכה', tip: 'עבודה יצירתית יותר' };
+    };
+
+    // Layman terminology translations
+    const LAYMAN_TERMS = {
+      frictionScore: 'מדד עבודה שחורה',
+      frictionScoreTip: 'כמה זמן מבוזבז על פעולות טכניות במקום על חשיבה? 0-100, גבוה = הרבה עבודה רובוטית',
+      toolSwitching: 'טרטור בין מערכות',
+      toolSwitchingTip: 'העברת מידע ידנית בין Outlook, Excel ומערכות הנמל',
+      ruleBased: 'עבודה לפי שטאנץ קבוע',
+      ruleBasedTip: 'משימות שנעשות תמיד באותו אופן, לפי הוראות קבועות',
+      weeklyPaperwork: 'זמן "ניירת" שבועי',
+      weeklyPaperworkTip: 'שעות שמתבזבזות בשבוע על פעולות חוזרות במקום עבודה אמיתית'
     };
 
     // Confirm Dialog Component
@@ -1548,32 +1605,266 @@
       );
     }
 
-    // Meeting Legend Component (for print)
+    // Strategic Question Engine - מנוע שאלות אסטרטגיות לישיבה
+    function StrategicQuestions({ responses }) {
+      const questions = useMemo(() => {
+        if (responses.length === 0) return [];
+
+        const stratQuestions = [];
+
+        // 1. Check manual data flow
+        const manualStepsResponses = responses.filter(r => r.manual_steps && r.manual_steps.length > 20);
+        if (manualStepsResponses.length > 0) {
+          const sources = [...new Set(responses.flatMap(r => r.info_source || []))].slice(0, 2);
+          const dests = [...new Set(responses.flatMap(r => r.destination || []))].slice(0, 2);
+          stratQuestions.push({
+            type: 'flow',
+            icon: '🔄',
+            question: `למה מידע עדיין זורם ידנית בין ${SOURCE_LABELS[sources[0]] || 'מקורות'} ל${DESTINATION_LABELS[dests[0]] || 'יעדים'}?`,
+            context: `${manualStepsResponses.length} עובדים דיווחו על שלבים ידניים משמעותיים`
+          });
+        }
+
+        // 2. Scalability warning based on volume
+        const totalVessels = responses.reduce((sum, r) => {
+          const v = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          return sum + v;
+        }, 0);
+        const totalUnits = responses.reduce((sum, r) => {
+          const c = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const i = r.importers_per_vessel ? parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0') : 0;
+          return sum + Math.max(c, i);
+        }, 0);
+
+        if (totalVessels > 0 && totalUnits > 0) {
+          const ratio = Math.round(totalUnits / totalVessels);
+          stratQuestions.push({
+            type: 'scale',
+            icon: '⚠️',
+            question: `כיום יש ${ratio} יחידות עבודה לכל אנייה. האם התהליך יעמוד בעומס כפול?`,
+            context: `אם נכפיל את כמות האניות - האם המערכת תקרוס?`
+          });
+        }
+
+        // 3. PDA responsibility overlap
+        const pdaSenders = responses.filter(r => r.pda_sender).map(r => r.pda_sender);
+        const uniquePdaDepts = [...new Set(pdaSenders)];
+        if (uniquePdaDepts.length > 1) {
+          stratQuestions.push({
+            type: 'overlap',
+            icon: '👥',
+            question: `איך מחלקים מחדש את האחריות על ה-PDA כדי למנוע כפילות עבודה?`,
+            context: `נראה ש-${uniquePdaDepts.length} גורמים שונים מטפלים ב-PDA`
+          });
+        }
+
+        // 4. Tool switching pain
+        const highSwitchers = responses.filter(r =>
+          r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
+        );
+        if (highSwitchers.length >= 2) {
+          stratQuestions.push({
+            type: 'tools',
+            icon: '🔧',
+            question: `${highSwitchers.length} עובדים מדלגים בין 3+ מערכות - האם אפשר לחבר אותן?`,
+            context: `כל העתקה ידנית = זמן אבוד + סיכון לטעויות`
+          });
+        }
+
+        // 5. Email overload
+        const emailOverload = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
+        if (emailOverload.length > 0) {
+          stratQuestions.push({
+            type: 'email',
+            icon: '📧',
+            question: `${emailOverload.length} עובדים טובעים במיילים - איך מפחיתים את הנפח?`,
+            context: `יותר מ-50 מיילים ביום = קשה למצוא מידע חשוב`
+          });
+        }
+
+        return stratQuestions.slice(0, 5);
+      }, [responses]);
+
+      if (questions.length === 0) return null;
+
+      return (
+        <div className="strategic-questions" style={{
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            💡 שאלות אסטרטגיות לישיבה
+            <span style={{fontSize: '0.75rem', background: 'rgba(255,255,255,0.2)', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
+              מנוע הניתוח
+            </span>
+          </h2>
+          <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+            {questions.map((q, idx) => (
+              <div key={idx} style={{
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                borderRight: '4px solid ' + (q.type === 'scale' ? '#f59e0b' : q.type === 'overlap' ? '#ec4899' : '#10b981')
+              }}>
+                <div style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem'}}>
+                  {q.icon} {q.question}
+                </div>
+                <div style={{fontSize: '0.8125rem', opacity: 0.8}}>
+                  {q.context}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Time Recovery Calculator - פוטנציאל שחרור זמן
+    function TimeRecoveryCard({ responses }) {
+      const recovery = useMemo(() => {
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const highFrictionHours = responses
+          .filter(r => calculateAutomationScore(r) >= 70)
+          .reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+
+        // Assume 30% of high friction work can be automated
+        const recoverableHours = Math.round(highFrictionHours * 0.3);
+        const fteFraction = (recoverableHours / 40).toFixed(1);
+
+        return {
+          total: Math.round(totalHours),
+          recoverable: recoverableHours,
+          fte: fteFraction
+        };
+      }, [responses]);
+
+      if (recovery.total === 0) return null;
+
+      return (
+        <div className="recovery-card" style={{
+          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+          borderRadius: '12px',
+          padding: '1.25rem',
+          color: 'white',
+          marginBottom: '1rem'
+        }}>
+          <div style={{fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem'}}>
+            פוטנציאל שחרור זמן מחלקתי
+          </div>
+          <div style={{fontSize: '2.5rem', fontWeight: '700'}}>
+            {recovery.recoverable} שעות
+          </div>
+          <div style={{fontSize: '0.875rem', opacity: 0.9, marginTop: '0.5rem'}}>
+            שוות ל-<strong>{recovery.fte} משרות</strong> פנויות לניהול לקוחות
+          </div>
+          <div style={{fontSize: '0.75rem', opacity: 0.7, marginTop: '0.5rem'}}>
+            מתוך {recovery.total} שעות "ניירת" שבועיות שדווחו
+          </div>
+        </div>
+      );
+    }
+
+    // Vessel Story Card - סיפור האנייה
+    function VesselStoryCard({ responses }) {
+      const vesselData = useMemo(() => {
+        // Extract vessel-related data
+        const manifestWorkers = responses.filter(r => (r.activities || []).includes('manifest'));
+        const cargoWorkers = responses.filter(r => (r.activities || []).includes('cargo'));
+        const bolWorkers = responses.filter(r => (r.activities || []).includes('bol'));
+        const docsWorkers = responses.filter(r => (r.activities || []).includes('documents'));
+
+        return {
+          manifest: {
+            count: manifestWorkers.length,
+            hours: manifestWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          cargo: {
+            count: cargoWorkers.length,
+            hours: cargoWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          bol: {
+            count: bolWorkers.length,
+            hours: bolWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          },
+          docs: {
+            count: docsWorkers.length,
+            hours: docsWorkers.reduce((s, r) => s + calculateWeeklyHours(r), 0)
+          }
+        };
+      }, [responses]);
+
+      const hasData = vesselData.manifest.count > 0 || vesselData.cargo.count > 0;
+      if (!hasData) return null;
+
+      return (
+        <div className="vessel-story" style={{
+          background: 'linear-gradient(135deg, #1a365d 0%, #3b82f6 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.25rem'}}>
+            🚢 מסע האנייה - מי עושה מה?
+          </h2>
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem'}}>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>מניפסט</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.manifest.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.manifest.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>מטען</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.cargo.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.cargo.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>שטר מטען</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.bol.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.bol.hours)}ש</div>
+            </div>
+            <div style={{fontSize: '1.5rem', opacity: 0.5}}>→</div>
+            <div style={{textAlign: 'center', flex: 1, minWidth: '80px'}}>
+              <div style={{fontSize: '0.75rem', opacity: 0.8}}>פקודת מסירה</div>
+              <div style={{fontSize: '1.5rem', fontWeight: '700'}}>{vesselData.docs.count}</div>
+              <div style={{fontSize: '0.6875rem', opacity: 0.7}}>{Math.round(vesselData.docs.hours)}ש</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Meeting Legend Component (for print) - מדריך למשתתף
     function MeetingLegend() {
       const legendItems = [
         {
-          term: 'ציון "כדאי לייעל"',
-          definition: 'מספר מ-0 עד 100. ציון גבוה = יש הרבה עבודה חוזרת שאפשר לפשט. ירוק (מעל 80) = עדיפות ראשונה.'
+          term: 'מדד עבודה שחורה',
+          definition: 'מספר מ-0 עד 100. מציין כמה זמן מבוזבז על פעולות טכניות (העתקה, הקלדה) במקום על חשיבה וקבלת החלטות. גבוה = הרבה עבודה רובוטית.'
         },
         {
-          term: 'משימה קבועה',
-          definition: 'משימה שנעשית תמיד באותו אופן - למשל העתקת נתונים ממקום למקום. קל יותר לפשט אותה.'
+          term: 'טרטור בין מערכות',
+          definition: 'מצב שבו העובד צריך להעתיק מידע ידנית בין מערכות (למשל מ-Outlook ל-Excel לאתר הנמל). כל העתקה = זמן אבוד + סיכון לטעויות.'
         },
         {
-          term: 'העתקה בין מערכות',
-          definition: 'כשעובד צריך לקחת מידע ממקום אחד ולהעתיק אותו ידנית למקום אחר. זה גוזל זמן ועלול לגרום לטעויות.'
+          term: 'עבודה לפי שטאנץ קבוע',
+          definition: 'משימה שנעשית תמיד באותו אופן, לפי הוראות קבועות. קל יותר לייעל משימות כאלה כי אין צורך בשיקול דעת.'
         },
         {
-          term: 'שעות עבודה חוזרות',
-          definition: 'כמה שעות בשבוע העובד מבלה בלעשות את אותו דבר שוב ושוב. ככל שיש יותר - כדאי יותר לייעל.'
+          term: 'זמן "ניירת" שבועי',
+          definition: 'סך השעות שמתבזבזות בשבוע על פעולות מנהלתיות חוזרות - העתקות, הקלדות, חיפוש מידע, מעקב ידני.'
         },
         {
-          term: 'מאיפה לאיפה',
-          definition: 'מאיפה מגיע המידע (מייל, מערכת וכו\') ולאן הוא צריך להגיע בסוף. עוזר להבין את התהליך.'
+          term: 'פוטנציאל שחרור זמן',
+          definition: 'כמה שעות עבודה אפשר לחסוך אם נייעל את התהליכים. מחושב לפי כמות העבודה השחורה ומורכבות התהליך.'
         },
         {
           term: 'צבעי התראה',
-          definition: 'ירוק = עדיפות גבוהה לייעול. צהוב = כדאי לבדוק. אדום = פחות דחוף כרגע.'
+          definition: 'ירוק = הרבה עבודה שחורה, עדיפות לייעול. צהוב = כדאי לבדוק. אדום = עבודה יצירתית יותר, פחות דחוף.'
         }
       ];
 
@@ -1612,7 +1903,7 @@
       return (
         <div className="login-screen">
           <form className="login-card" onSubmit={handleSubmit}>
-            <h1 className="login-title">דשבורד אדמין</h1>
+            <h1 className="login-title">מערכת ניתוח תהליכים</h1>
             <p className="login-subtitle">קוראל שירותי ים</p>
             {error && <div className="login-error">{error}</div>}
             <input
@@ -1904,15 +2195,15 @@
     }
 
     // AI Analysis Modal - ניתוח מתקדם
-    function AIAnalysisModal({ responses, onClose }) {
+    function AIAnalysisModal({ responses, onClose, onAnalysisComplete }) {
       const [aiResponse, setAiResponse] = useState(null);
       const [aiLoading, setAiLoading] = useState(false);
       const [aiError, setAiError] = useState(null);
 
       if (!responses || responses.length === 0) return null;
 
-      // Call real Claude AI
-      const callClaudeAI = async () => {
+      // מנוע הניתוח המערכתי
+      const runAnalysisEngine = async () => {
         setAiLoading(true);
         setAiError(null);
         try {
@@ -1970,10 +2261,13 @@
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.error || 'שגיאה בשירות AI');
+            throw new Error(data.error || 'שגיאה בשירות מנוע הניתוח');
           }
 
           setAiResponse(data.analysis);
+          if (onAnalysisComplete) {
+            onAnalysisComplete(data.analysis);
+          }
         } catch (err) {
           console.error('AI Error:', err);
           setAiError(err.message || 'שגיאה בהתחברות ל-AI');
@@ -2067,7 +2361,7 @@
         <div className="modal-overlay" onClick={onClose}>
           <div className="modal" style={{maxWidth: '900px'}} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2 className="modal-title">ניתוח מתקדם של הנתונים</h2>
+              <h2 className="modal-title">תובנות מערכת - קוראל שירותי ים</h2>
               <button className="modal-close" onClick={onClose}>&times;</button>
             </div>
             <div className="modal-body">
@@ -2156,22 +2450,22 @@
                 </div>
               )}
 
-              {/* Claude AI Analysis */}
+              {/* מנוע הניתוח המערכתי */}
               <div className="modal-section">
                 <h4 className="modal-section-title" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                  ניתוח Claude AI
-                  <span style={{fontSize: '0.75rem', background: 'linear-gradient(135deg, #8b5cf6, #a855f7)', color: 'white', padding: '0.125rem 0.5rem', borderRadius: '10px'}}>חדש</span>
+                  מנוע הניתוח המערכתי
+                  <span style={{fontSize: '0.75rem', background: 'linear-gradient(135deg, #0891b2, #1a365d)', color: 'white', padding: '0.125rem 0.5rem', borderRadius: '10px'}}>קוראל</span>
                 </h4>
 
                 {!aiResponse && !aiLoading && (
                   <div style={{textAlign: 'center', padding: '1.5rem'}}>
                     <p style={{color: 'var(--gray-600)', marginBottom: '1rem'}}>
-                      קבל ניתוח מעמיק מבוסס AI עם המלצות מותאמות אישית
+                      קבל דוח מקיף עם תובנות מערכת והמלצות מבוססות נתונים
                     </p>
                     <button
-                      onClick={callClaudeAI}
+                      onClick={runAnalysisEngine}
                       style={{
-                        background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                        background: 'linear-gradient(135deg, #0891b2 0%, #1a365d 100%)',
                         color: 'white',
                         border: 'none',
                         padding: '0.875rem 2rem',
@@ -2182,7 +2476,7 @@
                         fontFamily: 'inherit'
                       }}
                     >
-                      הפעל ניתוח AI
+                      הפעל מנוע ניתוח
                     </button>
                     {aiError && (
                       <p style={{color: 'var(--error)', marginTop: '1rem', fontSize: '0.875rem'}}>{aiError}</p>
@@ -2193,7 +2487,7 @@
                 {aiLoading && (
                   <div style={{textAlign: 'center', padding: '2rem'}}>
                     <div className="spinner" style={{margin: '0 auto 1rem'}}></div>
-                    <p style={{color: 'var(--gray-600)'}}>Claude מנתח את הנתונים...</p>
+                    <p style={{color: 'var(--gray-600)'}}>מנוע הניתוח מעבד את הנתונים...</p>
                   </div>
                 )}
 
@@ -2323,6 +2617,7 @@
       const [expandedCards, setExpandedCards] = useState({});
       const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
       const [showAIAnalysis, setShowAIAnalysis] = useState(false);
+      const [savedAIAnalysis, setSavedAIAnalysis] = useState(localStorage.getItem('coral_ai_analysis') || '');
 
       const fetchResponses = async () => {
         setLoading(true);
@@ -2613,7 +2908,7 @@
         <div className="dashboard">
           <header className="dashboard-header">
             <div className="header-content">
-              <h1 className="header-title">דשבורד תשובות השאלון | קוראל שירותי ים</h1>
+              <h1 className="header-title">מערכת ניתוח תהליכים | קוראל שירותי ים</h1>
               <div className="header-actions">
                 {lastUpdated && (
                   <span className="last-updated">
@@ -2622,14 +2917,14 @@
                 )}
                 <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
                 <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
-                <button className="btn btn-secondary" onClick={() => window.print()}>הדפס דוח</button>
+                <button className="btn btn-secondary" onClick={() => window.print()}>הדפס דוח מלא</button>
                 <button
                   className="btn"
-                  style={{background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', color: 'white'}}
+                  style={{background: 'linear-gradient(135deg, #0891b2 0%, #1a365d 100%)', color: 'white'}}
                   onClick={() => setShowAIAnalysis(true)}
                   disabled={responses.length === 0}
                 >
-                  ניתוח מתקדם
+                  תובנות מערכת
                 </button>
                 <button
                   className="btn btn-danger"
@@ -2644,21 +2939,30 @@
           </header>
 
           <main className="dashboard-content">
+            {/* Strategic Questions for Meeting */}
+            {responses.length > 0 && <StrategicQuestions responses={responses} />}
+
+            {/* Vessel Story - מסע האנייה */}
+            {responses.length > 0 && <VesselStoryCard responses={responses} />}
+
             {/* Kickoff Session - Meeting Ready Section */}
             {responses.length > 0 && <KickoffSession responses={responses} />}
 
-            {/* Summary Cards */}
+            {/* Summary Cards with Time Recovery */}
             <div className="summary-cards">
               <SummaryCard label="עובדים שענו" value={stats.total} />
               <SummaryCard label="ענו היום" value={stats.today} />
               <SummaryCard label="ענו השבוע" value={stats.week} />
               <SummaryCard
-                label="שעות עבודה חוזרות בשבוע"
+                label='זמן "ניירת" שבועי'
                 value={`${stats.totalWeeklyHours} שעות`}
-                secondary={`פוטנציאל לייעול: ${stats.avgScore}/100 (גבוה = כדאי לייעל)`}
+                secondary={`מדד עבודה שחורה: ${stats.avgScore}/100`}
               />
               <VolumeMultiplierCard responses={responses} />
             </div>
+
+            {/* Time Recovery Calculator */}
+            {responses.length > 0 && <TimeRecoveryCard responses={responses} />}
 
             {/* Bottleneck Analysis */}
             {responses.length > 0 && <BottleneckCard responses={responses} />}
@@ -2869,6 +3173,18 @@
 
             {/* Meeting Legend - shown in print */}
             <MeetingLegend />
+
+            {/* AI Analysis Print Section - appears only when printing if analysis was run */}
+            {savedAIAnalysis && (
+              <div className="ai-analysis-print">
+                <h2 className="ai-analysis-print-title">
+                  דוח תובנות מערכת - קוראל שירותי ים
+                </h2>
+                <div style={{whiteSpace: 'pre-wrap', lineHeight: '1.8', fontSize: '0.9rem'}}>
+                  {savedAIAnalysis}
+                </div>
+              </div>
+            )}
           </main>
 
           {/* Response Modal */}
@@ -2878,7 +3194,14 @@
 
           {/* AI Analysis Modal */}
           {showAIAnalysis && (
-            <AIAnalysisModal responses={responses} onClose={() => setShowAIAnalysis(false)} />
+            <AIAnalysisModal
+              responses={responses}
+              onClose={() => setShowAIAnalysis(false)}
+              onAnalysisComplete={(analysis) => {
+                setSavedAIAnalysis(analysis);
+                localStorage.setItem('coral_ai_analysis', analysis);
+              }}
+            />
           )}
 
           {/* Delete Confirmation Dialog */}
