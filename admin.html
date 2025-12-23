@@ -624,6 +624,174 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Kickoff Session Styles */
+    .kickoff-section {
+      background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+    }
+
+    .kickoff-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .kickoff-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .kickoff-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .kickoff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kickoff-candidate {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .candidate-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .candidate-rank {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .candidate-score {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .score-high { background: #dcfce7; color: #166534; }
+    .score-medium { background: #fef9c3; color: #854d0e; }
+    .score-low { background: #fee2e2; color: #991b1b; }
+
+    .candidate-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .candidate-dept {
+      font-size: 0.8125rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .candidate-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .flow-item {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .flow-label {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-bottom: 0.25rem;
+    }
+
+    .flow-value {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .flow-arrow {
+      font-size: 1.25rem;
+      opacity: 0.5;
+    }
+
+    .candidate-hours {
+      text-align: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.875rem;
+    }
+
+    .hours-value {
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .prompts-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .prompts-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prompt-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.875rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .prompt-item:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Automation Score Badge in Table */
+    .score-badge {
+      display: inline-block;
+      padding: 0.25rem 0.625rem;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -680,6 +848,100 @@
       const today = new Date();
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       return date >= weekAgo;
+    };
+
+    // Hebrew Labels Mapping
+    const ACTIVITY_LABELS = {
+      'ships': 'טיפול באניות',
+      'cargo': 'טיפול במטענים',
+      'external': 'תקשורת עם גורמי חוץ',
+      'documents': 'הכנת מסמכים ודוחות',
+      'financial': 'עבודה עם נתונים כספיים',
+      'projects': 'ניהול פרויקטים',
+      'inquiries': 'מענה לפניות',
+      'other': 'אחר'
+    };
+
+    const SOURCE_LABELS = {
+      'email_body': 'מייל (גוף הטקסט)',
+      'pdf': 'קובץ PDF',
+      'excel': 'קובץ אקסל',
+      'port_system': 'מערכת הנמל',
+      'whatsapp': 'וואטסאפ',
+      'phone': 'טלפון',
+      'other_source': 'אחר'
+    };
+
+    const DESTINATION_LABELS = {
+      'internal_system': 'מערכת פנימית',
+      'tracking_table': 'טבלת מעקב',
+      'client_report': 'דוח ללקוח',
+      'email_response': 'תשובה במייל',
+      'archive': 'ארכיון',
+      'other_dest': 'אחר'
+    };
+
+    const TIME_ESTIMATES = {
+      'under_5': 3,
+      '5_15': 10,
+      '15_30': 22,
+      '30_60': 45,
+      'over_60': 75
+    };
+
+    const FREQUENCY_WEIGHTS = {
+      'daily': 1.0,
+      'weekly': 0.6,
+      'monthly': 0.3
+    };
+
+    // Automation Score Calculator
+    const calculateAutomationScore = (response) => {
+      let score = 0;
+
+      // Frequency Weight (40%)
+      const freqWeight = FREQUENCY_WEIGHTS[response.process_frequency] || 0.5;
+      score += freqWeight * 40;
+
+      // Rule-Based Weight (40%)
+      if (response.process_type === 'rule_based') {
+        score += 40;
+      } else if (response.process_type === 'mixed') {
+        score += 25;
+      } else if (response.process_type === 'human_judgment') {
+        score += 10;
+      }
+
+      // Manual Entry Weight (20%) - based on manual_steps presence and emails_copy
+      if (response.manual_steps && response.manual_steps.length > 20) {
+        score += 20;
+      } else if (response.emails_copy === 'רוב' || response.emails_copy === 'כחצי') {
+        score += 15;
+      } else if (response.emails_copy === 'מיעוט') {
+        score += 10;
+      }
+
+      return Math.round(score);
+    };
+
+    // Weekly Hours Calculation
+    const calculateWeeklyHours = (response) => {
+      const timePerTask = TIME_ESTIMATES[response.time_per_task] || 15;
+      const tasksPerDay = parseInt(response.tasks_per_day) || 5;
+      const frequency = response.process_frequency || 'daily';
+
+      let daysPerWeek = 5;
+      if (frequency === 'weekly') daysPerWeek = 1.5;
+      if (frequency === 'monthly') daysPerWeek = 0.4;
+
+      return Math.round((timePerTask * tasksPerDay * daysPerWeek) / 60 * 10) / 10;
+    };
+
+    // Get Automation Score Badge Color
+    const getScoreBadgeColor = (score) => {
+      if (score >= 80) return { bg: '#dcfce7', color: '#166534' }; // Green
+      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e' }; // Yellow
+      return { bg: '#fee2e2', color: '#991b1b' }; // Red
     };
 
     // Login Component
@@ -774,6 +1036,120 @@
       }, [data, labels]);
 
       return <canvas ref={canvasRef}></canvas>;
+    }
+
+    // Kickoff Session Component
+    function KickoffSession({ responses }) {
+      const candidates = useMemo(() => {
+        return responses
+          .map(r => ({
+            ...r,
+            score: calculateAutomationScore(r),
+            weeklyHours: calculateWeeklyHours(r),
+            source: (r.info_source || []).map(s => SOURCE_LABELS[s] || s).join(', ') || 'מייל',
+            dest: (r.destination || []).map(d => DESTINATION_LABELS[d] || d).join(', ') || 'מערכת פנימית'
+          }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+      }, [responses]);
+
+      const prompts = useMemo(() => {
+        if (candidates.length === 0) return [];
+        const p = [];
+
+        // Generate prompts based on top candidates
+        if (candidates[0]) {
+          p.push(`איך ניתן לחסוך את העתקת הנתונים מ-${candidates[0].source} ל-${candidates[0].dest}?`);
+        }
+
+        const topActivities = {};
+        responses.forEach(r => {
+          (r.activities || []).forEach(a => {
+            topActivities[a] = (topActivities[a] || 0) + 1;
+          });
+        });
+        const topActivity = Object.entries(topActivities).sort((a, b) => b[1] - a[1])[0];
+        if (topActivity) {
+          p.push(`${ACTIVITY_LABELS[topActivity[0]] || topActivity[0]} הוא התהליך הנפוץ ביותר - האם ניתן לאחד או לפשט אותו?`);
+        }
+
+        const copyCount = responses.filter(r => r.emails_copy === 'רוב' || r.emails_copy === 'כחצי').length;
+        if (copyCount > 0) {
+          p.push(`${copyCount} עובדים מעתיקים מידע מהרבה מיילים - האם אפשר להפוך את זה לאוטומטי?`);
+        }
+
+        return p.slice(0, 3);
+      }, [candidates, responses]);
+
+      if (candidates.length === 0) return null;
+
+      const getScoreClass = (score) => {
+        if (score >= 80) return 'score-high';
+        if (score >= 50) return 'score-medium';
+        return 'score-low';
+      };
+
+      return (
+        <div className="kickoff-section">
+          <div className="kickoff-header">
+            <h2 className="kickoff-title">
+              תובנות לישיבת התנעה
+              <span className="kickoff-badge">Top 3 Candidates</span>
+            </h2>
+          </div>
+
+          <div className="kickoff-grid">
+            {candidates.map((candidate, idx) => (
+              <div key={candidate.id} className="kickoff-candidate">
+                <div className="candidate-header">
+                  <div className="candidate-rank">#{idx + 1}</div>
+                  <div className={`candidate-score ${getScoreClass(candidate.score)}`}>
+                    ציון: {candidate.score}
+                  </div>
+                </div>
+                <div className="candidate-name">{candidate.name}</div>
+                <div className="candidate-dept">{candidate.department || candidate.department_other || 'לא צוין'} | {candidate.role || 'לא צוין'}</div>
+
+                <div className="candidate-flow">
+                  <div className="flow-item">
+                    <div className="flow-label">מקור (Trigger)</div>
+                    <div className="flow-value">{candidate.source || 'לא צוין'}</div>
+                  </div>
+                  <div className="flow-arrow">→</div>
+                  <div className="flow-item">
+                    <div className="flow-label">יעד (Destination)</div>
+                    <div className="flow-value">{candidate.dest || 'לא צוין'}</div>
+                  </div>
+                </div>
+
+                {candidate.manual_steps && (
+                  <div className="flow-item" style={{marginBottom: '0.75rem'}}>
+                    <div className="flow-label">צוואר בקבוק (Bottleneck)</div>
+                    <div className="flow-value" style={{fontSize: '0.8125rem'}}>{candidate.manual_steps.substring(0, 80)}...</div>
+                  </div>
+                )}
+
+                <div className="candidate-hours">
+                  חיסכון פוטנציאלי: <span className="hours-value">{candidate.weeklyHours} שעות/שבוע</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {prompts.length > 0 && (
+            <div className="prompts-section">
+              <h3 className="prompts-title">
+                שאלות לדיון בישיבה
+              </h3>
+              {prompts.map((prompt, idx) => (
+                <div key={idx} className="prompt-item">
+                  {idx + 1}. {prompt}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
     }
 
     // Bar Chart
@@ -950,14 +1326,14 @@
         const today = responses.filter(r => isToday(r.created_at)).length;
         const week = responses.filter(r => isThisWeek(r.created_at)).length;
 
-        const deptCounts = {};
-        responses.forEach(r => {
-          const dept = r.department || r.department_other || 'לא צוין';
-          deptCounts[dept] = (deptCounts[dept] || 0) + 1;
-        });
-        const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0];
+        // Calculate total weekly hours potential for automation
+        const totalWeeklyHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
 
-        return { total, today, week, topDept: topDept ? topDept[0] : '-' };
+        // Calculate average automation score
+        const scores = responses.map(r => calculateAutomationScore(r));
+        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+
+        return { total, today, week, totalWeeklyHours: Math.round(totalWeeklyHours * 10) / 10, avgScore };
       }, [responses]);
 
       // Chart data
@@ -984,7 +1360,7 @@
         });
         const emails = { labels: Object.keys(emailCounts), data: Object.values(emailCounts) };
 
-        // Activities
+        // Activities - with Hebrew labels
         const actCounts = {};
         responses.forEach(r => {
           (r.activities || []).forEach(a => {
@@ -992,7 +1368,10 @@
           });
         });
         const sortedActs = Object.entries(actCounts).sort((a, b) => b[1] - a[1]);
-        const activities = { labels: sortedActs.map(a => a[0]), data: sortedActs.map(a => a[1]) };
+        const activities = {
+          labels: sortedActs.map(a => ACTIVITY_LABELS[a[0]] || a[0]),
+          data: sortedActs.map(a => a[1])
+        };
 
         // Hours outside
         const hoursCounts = {};
@@ -1157,12 +1536,15 @@
           </header>
 
           <main className="dashboard-content">
+            {/* Kickoff Session - Meeting Ready Section */}
+            {responses.length > 0 && <KickoffSession responses={responses} />}
+
             {/* Summary Cards */}
             <div className="summary-cards">
               <SummaryCard label="סה״כ תשובות" value={stats.total} />
               <SummaryCard label="תשובות היום" value={stats.today} />
               <SummaryCard label="השבוע האחרון" value={stats.week} />
-              <SummaryCard label="מחלקה מובילה" value={stats.topDept} />
+              <SummaryCard label="שעות שבועיות לאוטומציה" value={`${stats.totalWeeklyHours} שעות`} secondary={`ציון ממוצע: ${stats.avgScore}`} />
             </div>
 
             {/* Charts */}
@@ -1223,19 +1605,29 @@
                           <th onClick={() => handleSort('name')}>שם {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('department')}>מחלקה {sortField === 'department' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
+                          <th>ציון אוטומציה</th>
                           <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedResponses.map(response => (
-                          <tr key={response.id} onClick={() => setSelectedResponse(response)}>
-                            <td>{formatShortDate(response.created_at)}</td>
-                            <td>{response.name}</td>
-                            <td>{response.department || response.department_other || '-'}</td>
-                            <td>{response.role || '-'}</td>
-                            <td>{response.emails_count || '-'}</td>
-                          </tr>
-                        ))}
+                        {paginatedResponses.map(response => {
+                          const score = calculateAutomationScore(response);
+                          const badgeColor = getScoreBadgeColor(score);
+                          return (
+                            <tr key={response.id} onClick={() => setSelectedResponse(response)}>
+                              <td>{formatShortDate(response.created_at)}</td>
+                              <td>{response.name}</td>
+                              <td>{response.department || response.department_other || '-'}</td>
+                              <td>{response.role || '-'}</td>
+                              <td>
+                                <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
+                                  {score}
+                                </span>
+                              </td>
+                              <td>{response.emails_count || '-'}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
