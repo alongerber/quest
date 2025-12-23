@@ -21,26 +21,48 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No data provided' });
     }
 
+    // Build detailed data from all responses
+    const detailedResponses = responses.map(r => {
+      return `
+עובד: ${r.name} | מחלקה: ${r.department || r.department_other || 'לא צוין'} | תפקיד: ${r.role || 'לא צוין'} | ותק: ${r.seniority || 'לא צוין'}
+- פעילויות: ${(r.activities || []).join(', ') || 'לא צוין'}
+- מיילים ביום: ${r.emails_count || 'לא צוין'} | דורשים העתקה: ${r.emails_copy || 'לא צוין'} | מיילים נופלים: ${r.emails_missed || 'לא צוין'}
+- כלים: ${(r.tools || []).join(', ') || 'לא צוין'}
+- העתקות בין כלים: ${r.tools_copy_between || 'לא צוין'}
+- סוג תהליך: ${r.process_type === 'rule_based' ? 'קבוע (תמיד אותו דבר)' : r.process_type === 'mixed' ? 'מעורב' : r.process_type === 'human_judgment' ? 'דורש חשיבה' : 'לא צוין'}
+- תדירות: ${r.process_frequency === 'daily' ? 'יומי' : r.process_frequency === 'weekly' ? 'שבועי' : r.process_frequency === 'monthly' ? 'חודשי' : 'לא צוין'}
+- מספר כלים שעובר ביניהם: ${r.tools_switching_count || 'לא צוין'}
+- פעולה חוזרת: ${r.most_repeated_action || 'לא צוין'}
+- מה מבזבז זמן: ${r.biggest_time_waste || 'לא צוין'}
+- מה הכי מתסכל: ${r.main_frustration || 'לא צוין'}
+- רעיון לשיפור: ${r.improvement_idea || 'לא צוין'}
+- מה רוצה שישתפר: ${r.process_wish || 'לא צוין'}
+- שלבים ידניים: ${r.manual_steps || 'לא צוין'}
+${r.ships_per_week ? `- אניות בשבוע: ${r.ships_per_week}` : ''}
+${r.cargo_per_week ? `- תיקי מטען בשבוע: ${r.cargo_per_week}` : ''}
+${r.manifest_per_week ? `- מניפסטים בשבוע: ${r.manifest_per_week}` : ''}
+${r.bol_per_week ? `- שטרי מטען בשבוע: ${r.bol_per_week}` : ''}
+${r.inquiries_per_day ? `- פניות ביום: ${r.inquiries_per_day}` : ''}
+`;
+    }).join('\n---\n');
+
     // Build a summary of the data for Claude
     const dataDescription = `
 נתוני סקר התייעלות - קוראל שירותי ים:
 
-סיכום כללי:
+=== סיכום כללי ===
 - ${summaryData.totalResponses} עובדים ענו על השאלון
 - סה"כ ${summaryData.totalHours} שעות עבודה שבועיות בתהליכים חוזרים
-- מדד חיכוך ממוצע: ${summaryData.avgScore}/100
+- ציון פוטנציאל לייעול ממוצע: ${summaryData.avgScore}/100
 
-פירוט לפי מחלקות:
+=== פירוט לפי מחלקות ===
 ${summaryData.deptBreakdown}
 
-נקודות כאב שדווחו:
-${summaryData.painPoints}
-
-כלים בשימוש:
+=== כלים בשימוש ===
 ${summaryData.tools}
 
-מה העובדים היו רוצים שישתפר:
-${summaryData.wishes}
+=== כל התשובות המפורטות ===
+${detailedResponses}
 `;
 
     // Call Claude API
@@ -53,27 +75,34 @@ ${summaryData.wishes}
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages: [
           {
             role: 'user',
-            content: `אתה יועץ התייעלות תהליכים בחברת ספנות. קיבלת את הנתונים הבאים מסקר עובדים:
+            content: `אתה יועץ התייעלות תהליכים בחברת ספנות ישראלית. קיבלת נתונים מסקר עובדים שמטרתו למצוא תהליכים שאפשר לייעל.
+
+קרא בעיון את כל הנתונים הבאים:
 
 ${dataDescription}
 
-אנא ספק ניתוח מעמיק בעברית הכולל:
+נתח את המידע וספק תשובה מקיפה בעברית:
 
-1. **תובנות מרכזיות** (3-4 תובנות חשובות מהנתונים)
+## 1. מה גילינו? (תובנות עיקריות)
+זהה 3-4 דברים בולטים מהנתונים - מה חוזר על עצמו? מה מתסכל כמה עובדים?
 
-2. **צווארי בקבוק** (איפה נראה שיש הכי הרבה בזבוז זמן)
+## 2. איפה הבעיות הגדולות?
+על סמך התשובות, איפה נראה שיש הכי הרבה עבודה מיותרת או בזבוז זמן?
 
-3. **המלצות מעשיות** (4-5 המלצות קונקרטיות לייעול, מדורגות לפי עדיפות)
+## 3. מה אפשר לעשות? (המלצות לפי עדיפות)
+4-5 המלצות קונקרטיות. התחל מהדבר הכי חשוב.
 
-4. **Quick Wins** (2-3 דברים שאפשר לשפר מהר וקל)
+## 4. דברים שקל לתקן מהר
+2-3 שיפורים פשוטים שאפשר לעשות כבר עכשיו.
 
-5. **סיכום להנהלה** (2-3 משפטים תמציתיים)
+## 5. שורה תחתונה (סיכום קצר למנהלים)
+2-3 משפטים שמסכמים את המצב ומה הכי חשוב לטפל בו.
 
-כתוב בשפה פשוטה וברורה, בלי מונחים טכניים מיותרים.`
+כתוב בשפה פשוטה וברורה, כאילו אתה מסביר לבעל החברה שלא מבין במחשבים.`
           }
         ]
       })
