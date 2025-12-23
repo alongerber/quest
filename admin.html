@@ -625,6 +625,143 @@
       }
     }
 
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .dashboard-header {
+        position: static;
+        border-bottom: 2px solid var(--gray-300);
+        padding: 0.5rem 1rem;
+      }
+
+      .header-actions {
+        display: none;
+      }
+
+      .btn, .delete-btn, .pagination, .table-filters,
+      .filter-input, .filter-select, .btn-danger {
+        display: none !important;
+      }
+
+      .dashboard-content {
+        padding: 0.5rem;
+      }
+
+      .summary-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        page-break-inside: avoid;
+      }
+
+      .summary-card {
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+        padding: 0.75rem;
+      }
+
+      .chart-card, .kickoff-section, .bottleneck-card,
+      .table-section, .insights-section, .full-data-section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+        margin-bottom: 1rem;
+      }
+
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .kickoff-section {
+        background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%) !important;
+        color: white !important;
+      }
+
+      .bottleneck-card {
+        background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%) !important;
+        color: white !important;
+      }
+
+      .volume-card {
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%) !important;
+        color: white !important;
+      }
+
+      .modal-overlay {
+        display: none;
+      }
+
+      /* Meeting Legend - visible only in print */
+      .meeting-legend {
+        display: block !important;
+        page-break-inside: avoid;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--gray-300);
+      }
+
+      .data-table {
+        font-size: 0.8rem;
+      }
+
+      .data-table th, .data-table td {
+        padding: 0.5rem;
+      }
+
+      .score-badge {
+        border: 1px solid currentColor;
+      }
+    }
+
+    /* Meeting Legend - hidden on screen, shown in print */
+    .meeting-legend {
+      display: none;
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .meeting-legend-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .legend-item {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1rem;
+      border-right: 4px solid var(--primary-teal);
+    }
+
+    .legend-term {
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .legend-definition {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+
     /* Kickoff Session Styles */
     .kickoff-section {
       background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%);
@@ -1120,33 +1257,52 @@
       'monthly': 0.3
     };
 
-    // Automation Score Calculator
-    const calculateAutomationScore = (response) => {
-      let score = 0;
-
+    // Process Friction Score Calculator (מדד חיכוך תהליכי)
+    // Formula: (Frequency_Weight × 0.4) + (Rule_Based_Weight × 0.4) + (Tool_Switching_Weight × 0.2)
+    const calculateFrictionScore = (response) => {
       // Frequency Weight (40%)
       const freqWeight = FREQUENCY_WEIGHTS[response.process_frequency] || 0.5;
-      score += freqWeight * 40;
+      const frequencyScore = freqWeight * 40;
 
       // Rule-Based Weight (40%)
+      let ruleBasedScore = 0;
       if (response.process_type === 'rule_based') {
-        score += 40;
+        ruleBasedScore = 40;
       } else if (response.process_type === 'mixed') {
-        score += 25;
+        ruleBasedScore = 25;
       } else if (response.process_type === 'human_judgment') {
-        score += 10;
+        ruleBasedScore = 10;
       }
 
-      // Manual Entry Weight (20%) - based on manual_steps presence and emails_copy
-      if (response.manual_steps && response.manual_steps.length > 20) {
-        score += 20;
+      // Tool Switching Weight (20%)
+      let toolSwitchingScore = 0;
+      if (response.tools_switching_count === '5 כלים ומעלה') {
+        toolSwitchingScore = 20;
+      } else if (response.tools_switching_count === '3-4 כלים') {
+        toolSwitchingScore = 15;
+      } else if (response.tools_switching_count === '1-2 כלים') {
+        toolSwitchingScore = 8;
+      } else if (response.manual_steps && response.manual_steps.length > 20) {
+        toolSwitchingScore = 15; // Fallback for old data
       } else if (response.emails_copy === 'רוב' || response.emails_copy === 'כחצי') {
-        score += 15;
-      } else if (response.emails_copy === 'מיעוט') {
-        score += 10;
+        toolSwitchingScore = 12;
       }
 
-      return Math.round(score);
+      const totalScore = Math.round(frequencyScore + ruleBasedScore + toolSwitchingScore);
+
+      // Return score object with breakdown for display
+      return {
+        total: totalScore,
+        frequency: Math.round(frequencyScore),
+        ruleBased: ruleBasedScore,
+        toolSwitching: toolSwitchingScore
+      };
+    };
+
+    // Legacy wrapper for backward compatibility
+    const calculateAutomationScore = (response) => {
+      const result = calculateFrictionScore(response);
+      return typeof result === 'object' ? result.total : result;
     };
 
     // Weekly Hours Calculation
@@ -1202,7 +1358,7 @@
                 {response.department || response.department_other || '-'} | {response.role || '-'} | {formatShortDate(response.created_at)}
               </span>
               <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
-                ציון: {score}
+                מדד: {score}
               </span>
             </div>
             <div className="response-card-actions">
@@ -1226,8 +1382,8 @@
               </div>
 
               <div className="response-data-section">
-                <h4 className="response-data-title">ניתוח אוטומציה</h4>
-                <div className="response-data-item"><span className="response-data-label">ציון:</span><span className="response-data-value">{score}/100</span></div>
+                <h4 className="response-data-title">ניתוח חיכוך תהליכי</h4>
+                <div className="response-data-item"><span className="response-data-label">מדד חיכוך:</span><span className="response-data-value">{score}/100</span></div>
                 <div className="response-data-item"><span className="response-data-label">שעות שבועיות:</span><span className="response-data-value">{weeklyHours} שעות</span></div>
                 <div className="response-data-item"><span className="response-data-label">סוג תהליך:</span><span className="response-data-value">{response.process_type === 'rule_based' ? 'מבוסס חוקים' : response.process_type === 'mixed' ? 'מעורב' : 'שיקול דעת'}</span></div>
                 <div className="response-data-item"><span className="response-data-label">תדירות:</span><span className="response-data-value">{response.process_frequency === 'daily' ? 'יומי' : response.process_frequency === 'weekly' ? 'שבועי' : 'חודשי'}</span></div>
@@ -1280,10 +1436,10 @@
                 </div>
               )}
 
-              {response.automation_wish && (
+              {(response.automation_wish || response.process_wish) && (
                 <div className="response-data-section">
-                  <h4 className="response-data-title">משאלת אוטומציה</h4>
-                  <div className="response-data-value">{response.automation_wish}</div>
+                  <h4 className="response-data-title">מה הייתם רוצים שישתפר?</h4>
+                  <div className="response-data-value">{response.process_wish || response.automation_wish}</div>
                 </div>
               )}
 
@@ -1384,6 +1540,52 @@
           <div className="volume-title">Volume Multiplier</div>
           <div className="volume-value">x{multiplier}</div>
           <div className="volume-desc">יחידות עבודה לכל אנייה</div>
+        </div>
+      );
+    }
+
+    // Meeting Legend Component (for print)
+    function MeetingLegend() {
+      const legendItems = [
+        {
+          term: 'מדד חיכוך תהליכי',
+          definition: 'מספר המצביע על עומס וחזרתיות בתהליך. ככל שהמספר גבוה יותר, כך התהליך כרוך במאמץ רב יותר ויש פוטנציאל לייעול.'
+        },
+        {
+          term: 'משימה מבוססת חוקים',
+          definition: 'משימה שמתבצעת תמיד באותה צורה, לפי כללים קבועים וברורים. משימות כאלה מתאימות יותר לייעול.'
+        },
+        {
+          term: 'מעבר בין כלים',
+          definition: 'מצב שבו העובד נאלץ להעתיק מידע ידנית בין מערכות שונות. זוהי נקודת חיכוך נפוצה.'
+        },
+        {
+          term: 'שעות שבועיות בתהליכים',
+          definition: 'אומדן הזמן שמושקע בתהליכים חוזרים מדי שבוע. משמש לתעדוף תהליכים לייעול.'
+        },
+        {
+          term: 'צוואר בקבוק',
+          definition: 'השלב בתהליך שגורם לעיכוב הגדול ביותר. מיפוי צווארי בקבוק מסייע למיקוד המאמץ.'
+        },
+        {
+          term: 'נקודת הזנה / יעד סופי',
+          definition: 'מאיפה מגיע המידע (נקודת הזנה) ולאן הוא צריך להגיע (יעד סופי). מסייע במיפוי זרימת המידע.'
+        }
+      ];
+
+      return (
+        <div className="meeting-legend">
+          <h2 className="meeting-legend-title">
+            איך לקרוא את הדוח הזה?
+          </h2>
+          <div className="legend-grid">
+            {legendItems.map((item, idx) => (
+              <div key={idx} className="legend-item">
+                <div className="legend-term">{item.term}</div>
+                <div className="legend-definition">{item.definition}</div>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
@@ -1548,7 +1750,7 @@
                 <div className="candidate-header">
                   <div className="candidate-rank">#{idx + 1}</div>
                   <div className={`candidate-score ${getScoreClass(candidate.score)}`}>
-                    ציון: {candidate.score}
+                    מדד: {candidate.score}
                   </div>
                 </div>
                 <div className="candidate-name">{candidate.name}</div>
@@ -1694,7 +1896,7 @@
           fields: [
             { label: 'הכי מתסכל', value: response.main_frustration || '-', highlight: true },
             { label: 'רעיון לשיפור', value: response.improvement_idea || '-', highlight: true },
-            { label: 'אוטומציה רצויה', value: response.automation_wish || '-', highlight: true },
+            { label: 'מה הייתם רוצים שישתפר', value: response.process_wish || response.automation_wish || '-', highlight: true },
             { label: 'הערות נוספות', value: response.additional_notes || '-', highlight: true }
           ]
         }
@@ -1938,8 +2140,8 @@
           .map(r => ({ text: r.main_frustration, name: r.name, dept: r.department || r.department_other || '-' }));
 
         const automation = filtered
-          .filter(r => r.automation_wish)
-          .map(r => ({ text: r.automation_wish, name: r.name, dept: r.department || r.department_other || '-' }));
+          .filter(r => r.automation_wish || r.process_wish)
+          .map(r => ({ text: r.process_wish || r.automation_wish, name: r.name, dept: r.department || r.department_other || '-' }));
 
         return { painPoints, automation };
       }, [responses, insightsDeptFilter]);
@@ -1952,7 +2154,8 @@
           'דורשים העתקה', 'חיפוש במייל', 'מיילים נופלים',
           'כלים', 'מערכת פנימית', 'העתקות בין כלים',
           'עבודה מחוץ לשעות', 'פעולה חוזרת', 'מבזבז זמן',
-          'הכי מתסכל', 'רעיון לשיפור', 'אוטומציה רצויה', 'הערות'
+          'הכי מתסכל', 'רעיון לשיפור', 'מה הייתם רוצים שישתפר', 'הערות',
+          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'מספר כלים', 'מדד חיכוך'
         ];
 
         const rows = responses.map(r => [
@@ -1977,8 +2180,14 @@
           r.biggest_time_waste || '',
           r.main_frustration || '',
           r.improvement_idea || '',
-          r.automation_wish || '',
-          r.additional_notes || ''
+          r.process_wish || r.automation_wish || '',
+          r.additional_notes || '',
+          r.pda_sender || '',
+          r.is_crew_related ? 'כן' : '',
+          r.data_entry_point || '',
+          r.final_destination_system || '',
+          r.tools_switching_count || '',
+          calculateAutomationScore(r)
         ]);
 
         const csvContent = '\uFEFF' + [headers, ...rows]
@@ -2025,6 +2234,7 @@
                 )}
                 <button className="btn btn-secondary" onClick={fetchResponses}>רענן נתונים</button>
                 <button className="btn btn-primary" onClick={exportToCSV}>ייצוא ל-Excel</button>
+                <button className="btn btn-secondary" onClick={() => window.print()}>הדפס דוח</button>
                 <button
                   className="btn btn-danger"
                   onClick={() => setDeleteTarget({ resetAll: true })}
@@ -2046,7 +2256,7 @@
               <SummaryCard label="סה״כ תשובות" value={stats.total} />
               <SummaryCard label="תשובות היום" value={stats.today} />
               <SummaryCard label="השבוע האחרון" value={stats.week} />
-              <SummaryCard label="שעות שבועיות לאוטומציה" value={`${stats.totalWeeklyHours} שעות`} secondary={`ציון ממוצע: ${stats.avgScore}`} />
+              <SummaryCard label="שעות שבועיות בתהליכים" value={`${stats.totalWeeklyHours} שעות`} secondary={`מדד חיכוך ממוצע: ${stats.avgScore}`} />
               <VolumeMultiplierCard responses={responses} />
             </div>
 
@@ -2156,7 +2366,7 @@
                           <th onClick={() => handleSort('name')}>שם {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('department')}>מחלקה {sortField === 'department' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
-                          <th>ציון אוטומציה</th>
+                          <th>מדד חיכוך</th>
                           <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th>פעולות</th>
                         </tr>
@@ -2242,10 +2452,10 @@
               </div>
             )}
 
-            {/* Automation Wishes */}
+            {/* Process Improvement Wishes */}
             {insights.automation.length > 0 && (
               <div className="insights-section">
-                <h2 className="insights-title">מה העובדים היו רוצים שיקרה אוטומטית? ({insights.automation.length} תשובות)</h2>
+                <h2 className="insights-title">מה העובדים היו רוצים שישתפר בתהליך? ({insights.automation.length} תשובות)</h2>
                 <div className="insights-grid">
                   {insights.automation.map((item, idx) => (
                     <div key={idx} className="insight-card automation">
@@ -2256,6 +2466,9 @@
                 </div>
               </div>
             )}
+
+            {/* Meeting Legend - shown in print */}
+            <MeetingLegend />
           </main>
 
           {/* Response Modal */}

@@ -630,13 +630,20 @@
 
     // Constants
     const DEPARTMENTS = [
-      { id: 'operations', label: 'תפעול / סוכנות', unit: 'vessel_calls', unitLabel: 'כניסות אניות' },
-      { id: 'chartering', label: 'חכירות', unit: 'fixtures', unitLabel: 'עסקאות חכירה (Fixtures)' },
-      { id: 'documentation', label: 'תיעוד / סוכנות', unit: 'bol', unitLabel: 'שטרי מטען / פקודות מסירה' },
-      { id: 'finance', label: 'כספים', unit: 'transactions', unitLabel: 'עסקאות' },
-      { id: 'accounting', label: 'הנהלת חשבונות', unit: 'invoices', unitLabel: 'חשבוניות' },
-      { id: 'projects', label: 'פרויקטים', unit: 'projects', unitLabel: 'פרויקטים' },
+      { id: 'operations', label: 'תפעול / סוכנות', unit: 'vessel_calls', unitLabel: 'כניסות אניות, פקודות מסירה, PDAs' },
+      { id: 'accounting', label: 'חשבונות', unit: 'pdas', unitLabel: 'תיאום עם סוכנות, PDAs' },
+      { id: 'chartering', label: 'חכירות', unit: 'fixtures', unitLabel: 'עסקאות חכירה (Fixtures), חוזים' },
+      { id: 'finance', label: 'כספים', unit: 'invoices', unitLabel: 'חשבוניות, כספים כלליים' },
+      { id: 'projects', label: 'פרויקטים', unit: 'projects', unitLabel: 'פרויקטים ארוכי טווח, חילופי צוות' },
+      { id: 'hr', label: 'משאבי אנוש', unit: 'hr_tasks', unitLabel: 'משימות משאבי אנוש' },
       { id: 'other', label: 'אחר', unit: 'tasks', unitLabel: 'משימות' }
+    ];
+
+    // PDA Sender options (for Ops & Accounts)
+    const PDA_SENDERS = [
+      { id: 'agency', label: 'סוכנות' },
+      { id: 'accounting', label: 'חשבונות' },
+      { id: 'other', label: 'אחר' }
     ];
 
     const SENIORITY_OPTIONS = [
@@ -936,6 +943,52 @@
               name="seniority"
             />
           </div>
+
+          {/* Department-specific: PDA sender for Ops & Accounts */}
+          {(data.department === 'תפעול / סוכנות' || data.department === 'חשבונות') && (
+            <div className="form-group">
+              <label className="form-label">מי ביצע את שליחת ה-PDA בתיק זה?</label>
+              <select
+                className="form-select"
+                value={data.pda_sender}
+                onChange={(e) => onChange('pda_sender', e.target.value)}
+              >
+                <option value="">בחר</option>
+                {PDA_SENDERS.map((sender) => (
+                  <option key={sender.id} value={sender.id}>{sender.label}</option>
+                ))}
+              </select>
+              {data.pda_sender === 'other' && (
+                <input
+                  type="text"
+                  className="form-input"
+                  style={{marginTop: '0.5rem'}}
+                  value={data.pda_sender_other || ''}
+                  onChange={(e) => onChange('pda_sender_other', e.target.value)}
+                  placeholder="פרט..."
+                />
+              )}
+            </div>
+          )}
+
+          {/* Department-specific: Crew-related toggle for Projects */}
+          {data.department === 'פרויקטים' && (
+            <div className="form-group">
+              <label className="checkbox-card" style={{cursor: 'pointer'}}>
+                <input
+                  type="checkbox"
+                  checked={data.is_crew_related}
+                  onChange={(e) => onChange('is_crew_related', e.target.checked)}
+                />
+                <span className="checkbox-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <span className="checkbox-label">המשימה קשורה לחילופי צוות / פרוצדורות ימאים</span>
+              </label>
+            </div>
+          )}
         </>
       );
     }
@@ -1168,11 +1221,11 @@
           </div>
 
           <div className="question-card">
-            <h3 className="question-title">מה היית רוצה שיקרה "אוטומטית" בלי שתצטרך לטפל?</h3>
+            <h3 className="question-title">איזה תהליך היית רוצה שיעבוד יותר חלק?</h3>
             <textarea
               className="form-textarea"
-              value={data.automation_wish || ''}
-              onChange={(e) => onChange('automation_wish', e.target.value)}
+              value={data.process_wish || ''}
+              onChange={(e) => onChange('process_wish', e.target.value)}
               placeholder="תאר..."
               rows="3"
             />
@@ -1186,8 +1239,8 @@
         <>
           <div className="step-header">
             <div className="step-indicator">שלב {stepNum} מתוך {totalSteps}</div>
-            <h2 className="step-title">מיפוי תהליכים לאוטומציה</h2>
-            <p className="step-description">עזור לנו להבין את התהליכים שלך לעומק</p>
+            <h2 className="step-title">מיפוי תהליכי עבודה</h2>
+            <p className="step-description">עזור לנו להבין את תהליכי העבודה שלך לעומק</p>
           </div>
 
           <div className="question-card">
@@ -1204,8 +1257,30 @@
           </div>
 
           <div className="question-card">
+            <h3 className="question-title">היכן מזינים את המידע? (נקודת הזנה)</h3>
+            <input
+              type="text"
+              className="form-input"
+              value={data.data_entry_point || ''}
+              onChange={(e) => onChange('data_entry_point', e.target.value)}
+              placeholder="לדוגמה: אקסל, מערכת פנימית, אתר הנמל..."
+            />
+          </div>
+
+          <div className="question-card">
+            <h3 className="question-title">לאיזו מערכת מגיע המידע בסוף? (יעד סופי)</h3>
+            <input
+              type="text"
+              className="form-input"
+              value={data.final_destination_system || ''}
+              onChange={(e) => onChange('final_destination_system', e.target.value)}
+              placeholder="לדוגמה: מערכת הנהלת חשבונות, דוח ללקוח..."
+            />
+          </div>
+
+          <div className="question-card">
             <h3 className="question-title">האם התהליך מבוסס על חוקים קבועים?</h3>
-            <p className="question-hint">חשוב להבין אם אפשר לבצע אוטומציה מלאה</p>
+            <p className="question-hint">האם התהליך מתבצע באותה צורה בכל פעם?</p>
             <div className="radio-group">
               {PROCESS_TYPES.map((option) => (
                 <label key={option.id} className={`radio-option ${data.process_type === option.id ? 'selected' : ''}`}>
@@ -1298,6 +1373,17 @@
               rows="4"
             />
           </div>
+
+          <div className="question-card">
+            <h3 className="question-title">כמה כלים/מערכות אתה עובר ביניהם בתהליך?</h3>
+            <p className="question-hint">מעבר בין כלים = העתקת מידע ממקום אחד לאחר</p>
+            <RadioGroup
+              options={['1-2 כלים', '3-4 כלים', '5 כלים ומעלה']}
+              value={data.tools_switching_count}
+              onChange={(value) => onChange('tools_switching_count', value)}
+              name="tools_switching_count"
+            />
+          </div>
         </>
       );
     }
@@ -1354,9 +1440,15 @@
         seniority: '',
         activities: [],
         activities_other: '',
+        // Department-specific fields
+        pda_sender: '',
+        pda_sender_other: '',
+        is_crew_related: false,
         // Process mapping fields
         info_source: [],
         info_source_other: '',
+        data_entry_point: '',
+        final_destination_system: '',
         process_type: '',
         process_frequency: '',
         destination: [],
@@ -1364,6 +1456,7 @@
         time_per_task: '',
         tasks_per_day: '',
         manual_steps: '',
+        tools_switching_count: '',
         // Email fields
         emails_count: '',
         emails_direct: '',
@@ -1380,7 +1473,7 @@
         biggest_time_waste: '',
         main_frustration: '',
         improvement_idea: '',
-        automation_wish: '',
+        process_wish: '',
         additional_notes: ''
       });
 
