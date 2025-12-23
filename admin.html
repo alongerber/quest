@@ -1689,7 +1689,7 @@
         if (manifestFromPdf.length > 0 && highManualTyping.length > 0) {
           insightsList.push({
             type: 'finding',
-            icon: '📋',
+            icon: '',
             title: 'העתקה ידנית ממסמכי PDF',
             description: `${manifestFromPdf.length} מתוך ${n} משיבים מקבלים מניפסטים ב-PDF. ${highManualTyping.length} דיווחו על הקלדה ידנית למערכת.`,
             recommendation: 'ניתן לבחון כלי OCR (זיהוי תווים אוטומטי) לחילוץ נתונים מ-PDF ישירות למערכת.'
@@ -1703,7 +1703,7 @@
         if (highSwitchers.length >= 2) {
           insightsList.push({
             type: 'finding',
-            icon: '🔄',
+            icon: '',
             title: 'מעבר תכוף בין מערכות',
             description: `${highSwitchers.length} מתוך ${n} משיבים דיווחו על עבודה עם 3+ מערכות במקביל.`,
             recommendation: 'העתקה ידנית בין מערכות היא מקור נפוץ לטעויות ובזבוז זמן. כדאי לבחון אינטגרציות או כלי RPA.'
@@ -1715,7 +1715,7 @@
         if (emailOverload.length > 0) {
           insightsList.push({
             type: 'finding',
-            icon: '📧',
+            icon: '',
             title: 'עומס מיילים גבוה',
             description: `${emailOverload.length} מתוך ${n} משיבים מטפלים ביותר מ-50 מיילים ביום.`,
             recommendation: 'ראה מדריך כלים: כללי סינון אוטומטיים, תיקיות חכמות, ו-Copilot לסיכום שרשראות.'
@@ -1727,7 +1727,7 @@
         if (ruleBased.length > 0) {
           insightsList.push({
             type: 'opportunity',
-            icon: '🎯',
+            icon: '',
             title: 'משימות לפי תבנית קבועה',
             description: `${ruleBased.length} מתוך ${n} משיבים דיווחו על משימות שנעשות תמיד באותו אופן.`,
             recommendation: 'משימות עם תבנית קבועה הן המועמדות הטובות ביותר לייעול - קל להגדיר עבורן כללים אוטומטיים.'
@@ -1748,7 +1748,7 @@
           border: '1px solid var(--gray-200)'
         }}>
           <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            📊 תובנות מהנתונים
+            תובנות מהנתונים
             <span style={{fontSize: '0.75rem', background: 'var(--gray-100)', padding: '0.25rem 0.75rem', borderRadius: '20px', color: 'var(--gray-600)'}}>
               מבוסס על {responses.length} משיבים
             </span>
@@ -1768,7 +1768,7 @@
                   {insight.description}
                 </div>
                 <div style={{fontSize: '0.8125rem', color: 'var(--primary-teal)', fontStyle: 'italic'}}>
-                  💡 {insight.recommendation}
+                  {insight.recommendation}
                 </div>
               </div>
             ))}
@@ -1985,7 +1985,7 @@
       return (
         <div className="meeting-legend">
           <h2 className="meeting-legend-title">
-            📖 מילון מונחים
+            מילון מונחים
           </h2>
           <div className="legend-grid">
             {legendItems.map((item, idx) => (
@@ -2001,6 +2001,28 @@
 
     // Practical Tools Guide - מדריך כלים מעשי (קבוע - לא תלוי בנתונים)
     function PracticalToolsGuide() {
+      // SVG Icons
+      const EmailIcon = () => (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      );
+      const DocIcon = () => (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      );
+      const AutomationIcon = () => (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      );
+
       return (
         <div style={{
           background: 'var(--white)',
@@ -2010,74 +2032,74 @@
           border: '2px solid var(--primary-teal)'
         }}>
           <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--primary-dark)'}}>
-            🧰 מדריך כלים מעשי - איך להתחיל?
+            כלי AI ואוטומציה מומלצים
           </h2>
           <p style={{fontSize: '0.875rem', color: 'var(--gray-600)', marginBottom: '1.5rem'}}>
-            הכלים הבאים זמינים כבר היום וניתנים להפעלה ללא פרויקט מורכב. מומלץ להתחיל מכלי אחד ולבחון את ההשפעה.
+            הכלים הבאים יכולים לצמצם משמעותית עבודה ידנית חוזרת. כל כלי כולל הסבר מעשי להתחלה.
           </p>
 
-          {/* Email Optimization - Fixed Section */}
+          {/* Microsoft Copilot */}
           <div style={{background: '#eff6ff', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #3b82f6'}}>
-            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#1e40af'}}>
-              📧 ייעול תיבת המייל (Outlook)
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <span style={{color: '#3b82f6'}}><EmailIcon /></span>
+              Microsoft Copilot ב-Outlook
             </h3>
-            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
-              בכל ארגון, תיבת המייל היא מקור משמעותי לעומס. גם ללא כלי AI, ניתן לשפר משמעותית:
-            </p>
             <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>1. כללי סינון אוטומטיים:</strong> הגדרת Rules ב-Outlook שמעבירים מיילים לתיקיות לפי שולח/נושא.
-                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: File → Manage Rules → New Rule → "מאת [שם]" → "העבר לתיקייה"</div>
+                <strong>סיכום שרשרת מיילים:</strong> Copilot מסכם שיחה של 20+ מיילים לפסקה אחת - במקום לקרוא הכל.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>איך: בחר שרשרת → Copilot → "Summarize this conversation"</div>
               </div>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>2. תיקיות חכמות לפי אנייה/תיק:</strong> יצירת תיקייה לכל אנייה פעילה וסינון אוטומטי.
-                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: קליק ימני על Inbox → New Folder → שם האנייה → הגדרת Rule מתאים</div>
+                <strong>כתיבת תשובה מהירה:</strong> Copilot כותב טיוטא על בסיס ההקשר, אתה רק מאשר/עורך.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>איך: "Draft a reply" → עריכה קלה → שליחה</div>
               </div>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>3. Copilot (אם זמין):</strong> סיכום שרשראות ארוכות, כתיבת טיוטות תשובה, ומציאת מידע מהיר.
-                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: בחירת שרשרת → לחיצה על Copilot → "סכם את השיחה" / "כתוב תשובה"</div>
+                <strong>מציאת מידע:</strong> שאל "מתי נשלח המניפסט של אנייה X?" ו-Copilot מחפש בכל המיילים.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>איך: Copilot → שאלה בשפה טבעית</div>
               </div>
             </div>
           </div>
 
-          {/* WhatsApp Management */}
-          <div style={{background: '#f0fdf4', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #22c55e'}}>
-            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#166534'}}>
-              💬 ניהול קבוצות וואטסאפ
-            </h3>
-            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
-              עשרות קבוצות עם מאות הודעות ביום? הנה כמה פתרונות:
-            </p>
-            <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
-              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>השתקה חכמה:</strong> השתקת קבוצות פחות קריטיות, בדיקה פעם ביום בשעה קבועה.
-              </div>
-              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>סיכום AI:</strong> העתקת הודעות לכלי כמו ChatGPT/Claude עם הפרומפט: "סכם את ההודעות הבאות ב-3 נקודות עיקריות"
-              </div>
-              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>חיפוש מתקדם:</strong> שימוש בחיפוש של וואטסאפ עם מילות מפתח (שם אנייה, מספר תיק) במקום גלילה.
-              </div>
-            </div>
-          </div>
-
-          {/* PDF/Document Processing */}
+          {/* PDF/OCR Processing */}
           <div style={{background: '#fef3c7', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #f59e0b'}}>
-            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#92400e'}}>
-              📄 עיבוד מסמכים (PDF/מניפסטים)
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <span style={{color: '#f59e0b'}}><DocIcon /></span>
+              חילוץ מידע ממסמכים (OCR + AI)
             </h3>
-            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
-              במקום להקליד ידנית מ-PDF למערכת:
-            </p>
             <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>OCR בסיסי:</strong> Adobe Acrobat או כלים חינמיים מאפשרים להפוך PDF לטקסט שניתן להעתקה.
+                <strong>Adobe Acrobat AI:</strong> הפיכת PDF לטקסט שניתן להעתקה + זיהוי טבלאות אוטומטי.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>שימוש: פתיחת PDF → Export → Excel/Word</div>
               </div>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>חילוץ נתונים מובנה:</strong> כלי AI יכולים לזהות שדות במניפסט (מספר מכולה, משקל, יבואן) ולהפוך אותם לטבלה.
+                <strong>ChatGPT/Claude לחילוץ נתונים:</strong> העלאת מניפסט PDF וקבלת טבלה מסודרת עם כל הנתונים.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>פרומפט: "חלץ מהמניפסט: מספר מכולה, משקל, יבואן, יעד - בפורמט טבלה"</div>
               </div>
               <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
-                <strong>אינטגרציה ליוניפרייט:</strong> שלב מתקדם יותר - חיבור ישיר בין חילוץ המידע להזנה למערכת.
+                <strong>Power Automate (Microsoft):</strong> תהליך אוטומטי שמקבל מייל עם PDF, מחלץ נתונים, ושולח לאקסל.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>דורש הגדרה חד-פעמית, אח"כ עובד אוטומטית</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Automation & Integration */}
+          <div style={{background: '#f0fdf4', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #22c55e'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#166534', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              <span style={{color: '#22c55e'}}><AutomationIcon /></span>
+              אוטומציות וחיבורים בין מערכות
+            </h3>
+            <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>Outlook Rules (חינם, מובנה):</strong> מיון אוטומטי של מיילים לתיקיות לפי שם אנייה/שולח/נושא.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>איך: קליק ימני על מייל → Rules → Create Rule → בחר תנאי ופעולה</div>
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>Power Automate:</strong> "כשמגיע מייל מ-X עם קובץ מצורף → שמור בתיקייה → שלח התראה לצוות"
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>בונים Flow פעם אחת, רץ לבד מאותו רגע</div>
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>Zapier/Make:</strong> חיבור בין מערכות (Gmail ↔ Sheets ↔ Slack) ללא קוד.
+                <div style={{color: 'var(--primary-teal)', marginTop: '0.25rem', fontWeight: '500'}}>לדוגמה: מייל חדש עם "מניפסט" → שורה חדשה באקסל</div>
               </div>
             </div>
           </div>
@@ -2085,23 +2107,23 @@
           {/* Getting Started */}
           <div style={{background: 'var(--gray-50)', borderRadius: '12px', padding: '1rem', borderRight: '4px solid var(--primary-teal)'}}>
             <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: 'var(--primary-dark)'}}>
-              🚀 איך להתחיל? (3 צעדים)
+              איך להתחיל? (3 צעדים)
             </h3>
             <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
               <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
-                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>1️⃣</div>
+                <div style={{fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-teal)', marginBottom: '0.25rem'}}>1</div>
                 <div style={{fontWeight: '600', fontSize: '0.875rem'}}>בחירת משימה אחת</div>
                 <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>הכי חוזרת / הכי מתסכלת</div>
               </div>
               <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
-                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>2️⃣</div>
-                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>ניסוי כלי מתאים</div>
-                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>Rules / Copilot / OCR</div>
+                <div style={{fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-teal)', marginBottom: '0.25rem'}}>2</div>
+                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>Pilot על תיק אחד</div>
+                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>ניסוי קטן לפני הרחבה</div>
               </div>
               <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
-                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>3️⃣</div>
-                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>בדיקה על תיק אחד</div>
-                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>לפני הרחבה לכולם</div>
+                <div style={{fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-teal)', marginBottom: '0.25rem'}}>3</div>
+                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>מדידה והרחבה</div>
+                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>אם עובד - ליישם לכולם</div>
               </div>
             </div>
           </div>
@@ -2138,7 +2160,7 @@
           border: '2px solid var(--gray-200)'
         }}>
           <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--primary-dark)'}}>
-            🚀 הצעדים הבאים
+            הצעדים הבאים
           </h2>
           <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
             {steps.map((step, idx) => (
@@ -2273,7 +2295,7 @@
             )}
           </div>
           <div style={{marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.875rem'}}>
-            💡 <strong>תובנה:</strong> כל נקודת העברה ידנית בין מחלקות מייצרת עומס מנהלתי כפול - גם אצל השולח וגם אצל המקבל. חיבור מערכות יכול לפנות זמן לעבודה מקצועית.
+            <strong>תובנה:</strong> כל נקודת העברה ידנית בין מחלקות מייצרת עומס מנהלתי כפול - גם אצל השולח וגם אצל המקבל. חיבור מערכות יכול לפנות זמן לעבודה מקצועית.
           </div>
         </div>
       );
@@ -2646,7 +2668,7 @@
             wishes: wishesSummary
           };
 
-          const res = await fetch('/api/analyze', {
+          const res = await fetch('/.netlify/functions/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ responses, summaryData })
