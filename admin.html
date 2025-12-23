@@ -3547,47 +3547,6 @@
               )}
             </div>
 
-            {/* Pain Points */}
-            {insights.painPoints.length > 0 && (
-              <div className="insights-section">
-                <h2 className="insights-title">מה מציק לעובדים? ({insights.painPoints.length} תגובות)</h2>
-                <div className="insights-filter">
-                  <select
-                    className="filter-select"
-                    value={insightsDeptFilter}
-                    onChange={e => setInsightsDeptFilter(e.target.value)}
-                  >
-                    <option value="">כל המחלקות</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="insights-grid">
-                  {insights.painPoints.map((item, idx) => (
-                    <div key={idx} className="insight-card">
-                      <div className="insight-content">{item.text}</div>
-                      <div className="insight-meta">{item.name} | {item.dept}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Process Improvement Wishes */}
-            {insights.automation.length > 0 && (
-              <div className="insights-section">
-                <h2 className="insights-title">מה העובדים רוצים לשפר? ({insights.automation.length} רעיונות)</h2>
-                <div className="insights-grid">
-                  {insights.automation.map((item, idx) => (
-                    <div key={idx} className="insight-card automation">
-                      <div className="insight-content">{item.text}</div>
-                      <div className="insight-meta">{item.name} | {item.dept}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Meeting Legend - shown in print */}
             <MeetingLegend />
