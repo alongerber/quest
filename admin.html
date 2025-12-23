@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מרכז ניטור וייעול תהליכים | קוראל שירותי ים</title>
+  <title>מערכת ניתוח תהליכים | קוראל שירותי ים</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1319,7 +1319,7 @@
       'monthly': 0.3
     };
 
-    // מדד עבודה שחורה - Process Friction Score Calculator
+    // מדד עבודה רובוטית - Process Friction Score Calculator
     // נוסחה: (תדירות × 0.4) + (עבודת שטאנץ × 0.4) + (טרטור בין מערכות × 0.2)
     const calculateFrictionScore = (response) => {
       // Frequency Weight (40%)
@@ -1380,23 +1380,23 @@
       return Math.round((timePerTask * tasksPerDay * daysPerWeek) / 60 * 10) / 10;
     };
 
-    // Get Score Badge Color - מדד עבודה שחורה (Green = High robotic work, Red = Low)
+    // Get Score Badge Color - מדד עבודה רובוטית (Green = High robotic work potential, Yellow = Medium, Red = Low)
     const getScoreBadgeColor = (score) => {
-      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'עבודה שחורה גבוהה', tip: 'הרבה עבודה טכנית שאפשר לפשט' };
-      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'עבודה שחורה בינונית', tip: 'יש מה לשפר' };
-      return { bg: '#fee2e2', color: '#991b1b', label: 'עבודה שחורה נמוכה', tip: 'עבודה יצירתית יותר' };
+      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'פוטנציאל גבוה לייעול', tip: 'משימות חוזרות שניתן לשפר' };
+      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'פוטנציאל בינוני', tip: 'כדאי לבחון' };
+      return { bg: '#fee2e2', color: '#991b1b', label: 'עבודה מקצועית', tip: 'דורש חשיבה ושיקול דעת' };
     };
 
-    // Layman terminology translations
+    // Layman terminology translations - מונחים ידידותיים
     const LAYMAN_TERMS = {
-      frictionScore: 'מדד עבודה שחורה',
-      frictionScoreTip: 'כמה זמן מבוזבז על פעולות טכניות במקום על חשיבה? 0-100, גבוה = הרבה עבודה רובוטית',
-      toolSwitching: 'טרטור בין מערכות',
-      toolSwitchingTip: 'העברת מידע ידנית בין Outlook, Excel ומערכות הנמל',
-      ruleBased: 'עבודה לפי שטאנץ קבוע',
-      ruleBasedTip: 'משימות שנעשות תמיד באותו אופן, לפי הוראות קבועות',
-      weeklyPaperwork: 'זמן "ניירת" שבועי',
-      weeklyPaperworkTip: 'שעות שמתבזבזות בשבוע על פעולות חוזרות במקום עבודה אמיתית'
+      frictionScore: 'מדד עבודה רובוטית',
+      frictionScoreTip: 'ציון מ-0 עד 100 המצביע על משימות שחוזרות על עצמן בדיוק באותו אופן. איך זה מחושב? שקלול של תדירות המשימה, האם יש לה חוקים קבועים, וכמות המערכות שצריך לעבור ביניהן.',
+      toolSwitching: 'סנכרון בין מערכות',
+      toolSwitchingTip: 'מצב שבו עובד משמש כ"גשר אנושי" ומעביר מידע ידנית בין אאוטלוק, PDF, יוניפרייט או אתר הנמל.',
+      ruleBased: 'משימה לפי תבנית קבועה',
+      ruleBasedTip: 'משימות שנעשות תמיד באותו אופן, לפי חוקים ברורים וללא צורך בשיקול דעת.',
+      weeklyPaperwork: 'עומס מנהלתי שבועי',
+      weeklyPaperworkTip: 'הערכת השעות המצטברת שמושקעת בביצוע טכני של משימות חוזרות (מבוסס על דיווחי המשתתפים).'
     };
 
     // Confirm Dialog Component
@@ -1991,7 +1991,7 @@
             </div>
             <div style={{background: '#f0f9ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #0891b2'}}>
               <div style={{fontSize: '2rem', fontWeight: '700', color: '#0891b2'}}>{summary.avgScore}/100</div>
-              <div style={{fontSize: '0.875rem', color: '#155e75'}}>מדד עבודה שחורה ממוצע</div>
+              <div style={{fontSize: '0.875rem', color: '#155e75'}}>{LAYMAN_TERMS.frictionScore} ממוצע</div>
             </div>
           </div>
           <div style={{fontSize: '0.875rem'}}>
@@ -2012,20 +2012,20 @@
     function MeetingLegend() {
       const legendItems = [
         {
-          term: 'מדד עבודה שחורה',
-          definition: 'מספר מ-0 עד 100. כמה זמן מבוזבז על פעולות טכניות (העתקה, הקלדה) במקום על חשיבה? גבוה = הרבה עבודה רובוטית שניתנת לייעול.'
+          term: 'מדד עבודה רובוטית',
+          definition: 'ציון מ-0 עד 100 המצביע על משימות שחוזרות על עצמן בדיוק באותו אופן. איך זה מחושב? שקלול של תדירות המשימה, האם יש לה חוקים קבועים, וכמות המערכות שצריך לעבור ביניהן (כמו להעתיק ממייל לאקסל).'
         },
         {
-          term: 'טרטור בין מערכות',
-          definition: 'העתקת מידע ידנית בין Outlook, Excel, יוניפרייט ואתר הנמל. כל העתקה = זמן אבוד + סיכון לטעויות.'
+          term: 'סנכרון בין מערכות',
+          definition: 'מצב שבו עובד משמש כ"גשר אנושי" ומעביר מידע ידנית בין אאוטלוק, PDF, יוניפרייט או אתר הנמל.'
         },
         {
-          term: 'עבודה לפי שטאנץ קבוע',
-          definition: 'משימה שנעשית תמיד באותו אופן. קל יותר לייעל משימות כאלה כי אין צורך בשיקול דעת.'
+          term: 'משימה לפי תבנית קבועה',
+          definition: 'משימה שנעשית תמיד באותו אופן, לפי חוקים ברורים וללא צורך בשיקול דעת. קל יותר לייעל משימות כאלה.'
         },
         {
-          term: 'זמן "ניירת" שבועי',
-          definition: 'שעות שמתבזבזות על פעולות חוזרות - העתקות, הקלדות, חיפוש במיילים, מעקב ידני.'
+          term: 'עומס מנהלתי שבועי',
+          definition: 'הערכת השעות המצטברת שמושקעת בביצוע טכני של משימות חוזרות (מבוסס על דיווחי המשתתפים).'
         }
       ];
 
@@ -2041,6 +2041,230 @@
                 <div className="legend-definition">{item.definition}</div>
               </div>
             ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Tools Library Component - ארגז כלים מוצע לשדרוג התהליכים
+    function ToolsLibrary() {
+      const tools = [
+        {
+          icon: '📧',
+          name: 'Microsoft 365 Copilot (Outlook)',
+          description: 'סיכום אוטומטי של שרשראות מיילים ארוכות, כתיבת טיוטות למענה מהיר וסינון רעשים בתיבת הדואר.'
+        },
+        {
+          icon: '💬',
+          name: 'WhatsApp Insights',
+          description: 'שימוש במודלים לריכוז וסיכום של עשרות קבוצות הוואטסאפ לכדי דוח דגשים יומי (מידע על אניות, דרישות דחופות).'
+        },
+        {
+          icon: '📄',
+          name: 'חילוץ מידע אוטומטי (OCR/RPA)',
+          description: 'כלי חילוץ מידע אוטומטי שקורא מניפסטים ב-PDF ומזין את הנתונים ישירות ליוניפרייט ללא הקלדה ידנית.'
+        },
+        {
+          icon: '📁',
+          name: 'כללי ניתוב מיילים',
+          description: 'הגדרת "כללי ניתוב" חכמים שמתייקים מיילים לפי שם אנייה או מספר תיק באופן אוטומטי.'
+        }
+      ];
+
+      return (
+        <div className="tools-library" style={{
+          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            🧰 ארגז כלים מוצע לשדרוג התהליכים
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem'}}>
+            {tools.map((tool, idx) => (
+              <div key={idx} style={{
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>{tool.icon}</div>
+                <div style={{fontWeight: '600', marginBottom: '0.5rem'}}>{tool.name}</div>
+                <div style={{fontSize: '0.875rem', opacity: 0.9, lineHeight: '1.5'}}>{tool.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Next Steps Guide Component - צעדים הבאים
+    function NextStepsGuide() {
+      const steps = [
+        {
+          number: '1',
+          title: 'בחירת תהליך',
+          description: 'הגדרת משימה אחת שמרגישה "רובוטית" במיוחד'
+        },
+        {
+          number: '2',
+          title: 'חיבור כלי',
+          description: 'התאמת הכלי הנכון (למשל: Copilot למיילים)'
+        },
+        {
+          number: '3',
+          title: 'בדיקה (Pilot)',
+          description: 'הרצה על תיק/אנייה אחת לבחינת היעילות ושיפור'
+        }
+      ];
+
+      return (
+        <div className="next-steps-guide" style={{
+          background: 'var(--gray-50)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          border: '2px solid var(--gray-200)'
+        }}>
+          <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--primary-dark)'}}>
+            🚀 הצעדים הבאים
+          </h2>
+          <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
+            {steps.map((step, idx) => (
+              <div key={idx} style={{
+                flex: '1',
+                minWidth: '200px',
+                background: 'white',
+                borderRadius: '12px',
+                padding: '1rem',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-start'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'var(--primary-teal)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  flexShrink: 0
+                }}>
+                  {step.number}
+                </div>
+                <div>
+                  <div style={{fontWeight: '600', color: 'var(--primary-dark)', marginBottom: '0.25rem'}}>{step.title}</div>
+                  <div style={{fontSize: '0.875rem', color: 'var(--gray-600)'}}>{step.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Cross-Departmental Sync Analysis - ניתוח סנכרון בין-מחלקתי
+    function SyncAnalysisCard({ responses }) {
+      const syncData = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        // Analyze data flow between departments
+        const flows = [];
+        const deptData = {};
+
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          const pdaSender = r.pda_sender;
+          const destination = r.destination || [];
+
+          if (!deptData[dept]) {
+            deptData[dept] = { count: 0, sends: [], receives: [] };
+          }
+          deptData[dept].count++;
+
+          // Track PDA flow
+          if (pdaSender && pdaSender !== dept) {
+            flows.push({ from: pdaSender, to: dept, type: 'PDA' });
+          }
+
+          // Track destination systems
+          destination.forEach(d => {
+            if (d && d !== 'internal_system') {
+              deptData[dept].sends.push(d);
+            }
+          });
+        });
+
+        // Find sync points (where manual transfer happens)
+        const syncPoints = [];
+        const uniqueFlows = [...new Set(flows.map(f => `${f.from}->${f.to}`))];
+
+        if (uniqueFlows.length > 0) {
+          syncPoints.push({
+            type: 'manual_transfer',
+            description: 'העברת מידע ידנית בין מחלקות',
+            count: uniqueFlows.length
+          });
+        }
+
+        // Calculate complexity multiplier from importers_per_vessel
+        let avgImporters = 0;
+        let importerCount = 0;
+        responses.forEach(r => {
+          if (r.importers_per_vessel) {
+            const val = parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0');
+            if (val > 0) {
+              avgImporters += val;
+              importerCount++;
+            }
+          }
+        });
+        const complexityMultiplier = importerCount > 0 ? Math.round(avgImporters / importerCount) : 0;
+
+        return {
+          departments: Object.keys(deptData).length,
+          syncPoints,
+          uniqueFlows,
+          complexityMultiplier
+        };
+      }, [responses]);
+
+      if (!syncData || syncData.departments < 2) return null;
+
+      return (
+        <div style={{
+          background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          color: 'white'
+        }}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem'}}>
+            🔗 סנכרון בין-מחלקתי
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem'}}>
+            <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700'}}>{syncData.departments}</div>
+              <div style={{fontSize: '0.875rem', opacity: 0.9}}>מחלקות בסנכרון</div>
+            </div>
+            <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700'}}>{syncData.uniqueFlows.length}</div>
+              <div style={{fontSize: '0.875rem', opacity: 0.9}}>נקודות העברה ידנית</div>
+            </div>
+            {syncData.complexityMultiplier > 0 && (
+              <div style={{background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '1rem', textAlign: 'center'}}>
+                <div style={{fontSize: '2rem', fontWeight: '700'}}>x{syncData.complexityMultiplier}</div>
+                <div style={{fontSize: '0.875rem', opacity: 0.9}}>מכפיל סיבוכיות (יבואנים לאנייה)</div>
+              </div>
+            )}
+          </div>
+          <div style={{marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.875rem'}}>
+            💡 <strong>תובנה:</strong> כל נקודת העברה ידנית בין מחלקות מייצרת עומס מנהלתי כפול - גם אצל השולח וגם אצל המקבל. חיבור מערכות יכול לפנות זמן לעבודה מקצועית.
           </div>
         </div>
       );
@@ -2999,7 +3223,7 @@
           'כלים', 'מערכת פנימית', 'העתקות בין כלים',
           'עבודה מחוץ לשעות', 'פעולה חוזרת', 'מבזבז זמן',
           'הכי מתסכל', 'רעיון לשיפור', 'מה הייתם רוצים שישתפר', 'הערות',
-          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'טרטור בין מערכות', 'מדד עבודה שחורה'
+          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'טרטור בין מערכות', 'מדד עבודה רובוטית'
         ];
 
         const rows = responses.map(r => [
@@ -3069,7 +3293,7 @@
         <div className="dashboard">
           <header className="dashboard-header">
             <div className="header-content">
-              <h1 className="header-title">מרכז ניטור וייעול תהליכים | קוראל שירותי ים</h1>
+              <h1 className="header-title">מערכת ניתוח תהליכים | קוראל שירותי ים</h1>
               <div className="header-actions">
                 {lastUpdated && (
                   <span className="last-updated">
@@ -3120,7 +3344,7 @@
               <SummaryCard
                 label='זמן "ניירת" שבועי'
                 value={`${stats.totalWeeklyHours} שעות`}
-                secondary={`מדד עבודה שחורה: ${stats.avgScore}/100`}
+                secondary={`${LAYMAN_TERMS.frictionScore}: ${stats.avgScore}/100`}
               />
               <VolumeMultiplierCard responses={responses} />
             </div>
@@ -3130,6 +3354,15 @@
 
             {/* Bottleneck Analysis */}
             {responses.length > 0 && <BottleneckCard responses={responses} />}
+
+            {/* Cross-Departmental Sync Analysis */}
+            {responses.length > 0 && <SyncAnalysisCard responses={responses} />}
+
+            {/* Tools Library */}
+            {responses.length > 0 && <ToolsLibrary />}
+
+            {/* Next Steps Guide */}
+            {responses.length > 0 && <NextStepsGuide />}
 
             {/* Charts */}
             {responses.length > 0 && (
