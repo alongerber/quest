@@ -953,33 +953,6 @@
             />
           </div>
 
-          {/* Department-specific: PDA sender for Ops & Accounts */}
-          {(data.department === 'תפעול / סוכנות' || data.department === 'חשבונות') && (
-            <div className="form-group">
-              <label className="form-label">מי ביצע את שליחת ה-PDA בתיק זה?</label>
-              <select
-                className="form-select"
-                value={data.pda_sender}
-                onChange={(e) => onChange('pda_sender', e.target.value)}
-              >
-                <option value="">בחר</option>
-                {PDA_SENDERS.map((sender) => (
-                  <option key={sender.id} value={sender.id}>{sender.label}</option>
-                ))}
-              </select>
-              {data.pda_sender === 'other' && (
-                <input
-                  type="text"
-                  className="form-input"
-                  style={{marginTop: '0.5rem'}}
-                  value={data.pda_sender_other || ''}
-                  onChange={(e) => onChange('pda_sender_other', e.target.value)}
-                  placeholder="פרט..."
-                />
-              )}
-            </div>
-          )}
-
           {/* Department-specific: Crew-related toggle for Projects */}
           {data.department === 'פרויקטים' && (
             <div className="form-group">
