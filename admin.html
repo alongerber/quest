@@ -1318,11 +1318,11 @@
       return Math.round((timePerTask * tasksPerDay * daysPerWeek) / 60 * 10) / 10;
     };
 
-    // Get Automation Score Badge Color
+    // Get Score Badge Color - Green = High potential for improvement, Red = Low potential
     const getScoreBadgeColor = (score) => {
-      if (score >= 80) return { bg: '#dcfce7', color: '#166534' }; // Green
-      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e' }; // Yellow
-      return { bg: '#fee2e2', color: '#991b1b' }; // Red
+      if (score >= 80) return { bg: '#dcfce7', color: '#166534', label: 'מאוד כדאי' }; // Green - High priority
+      if (score >= 50) return { bg: '#fef9c3', color: '#854d0e', label: 'כדאי לבדוק' }; // Yellow - Medium
+      return { bg: '#fee2e2', color: '#991b1b', label: 'פחות דחוף' }; // Red - Lower priority
     };
 
     // Confirm Dialog Component
@@ -1357,8 +1357,8 @@
               <span className="response-card-meta">
                 {response.department || response.department_other || '-'} | {response.role || '-'} | {formatShortDate(response.created_at)}
               </span>
-              <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
-                מדד: {score}
+              <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }} title={`ציון: ${score}/100`}>
+                {badgeColor.label}
               </span>
             </div>
             <div className="response-card-actions">
@@ -1382,11 +1382,11 @@
               </div>
 
               <div className="response-data-section">
-                <h4 className="response-data-title">ניתוח חיכוך תהליכי</h4>
-                <div className="response-data-item"><span className="response-data-label">מדד חיכוך:</span><span className="response-data-value">{score}/100</span></div>
-                <div className="response-data-item"><span className="response-data-label">שעות שבועיות:</span><span className="response-data-value">{weeklyHours} שעות</span></div>
-                <div className="response-data-item"><span className="response-data-label">סוג תהליך:</span><span className="response-data-value">{response.process_type === 'rule_based' ? 'מבוסס חוקים' : response.process_type === 'mixed' ? 'מעורב' : 'שיקול דעת'}</span></div>
-                <div className="response-data-item"><span className="response-data-label">תדירות:</span><span className="response-data-value">{response.process_frequency === 'daily' ? 'יומי' : response.process_frequency === 'weekly' ? 'שבועי' : 'חודשי'}</span></div>
+                <h4 className="response-data-title">כמה כדאי לייעל?</h4>
+                <div className="response-data-item"><span className="response-data-label">ציון:</span><span className="response-data-value">{score}/100 - {badgeColor.label}</span></div>
+                <div className="response-data-item"><span className="response-data-label">זמן בעבודה חוזרת:</span><span className="response-data-value">{weeklyHours} שעות בשבוע</span></div>
+                <div className="response-data-item"><span className="response-data-label">סוג המשימה:</span><span className="response-data-value">{response.process_type === 'rule_based' ? 'קבועה (תמיד אותו דבר)' : response.process_type === 'mixed' ? 'חלק קבוע, חלק משתנה' : 'דורש חשיבה כל פעם'}</span></div>
+                <div className="response-data-item"><span className="response-data-label">כמה פעמים:</span><span className="response-data-value">{response.process_frequency === 'daily' ? 'כל יום' : response.process_frequency === 'weekly' ? 'פעם-פעמיים בשבוע' : 'פעם-פעמיים בחודש'}</span></div>
               </div>
 
               <div className="response-data-section">
@@ -1497,17 +1497,21 @@
       return (
         <div className="bottleneck-card">
           <h2 className="bottleneck-title">
-            צוואר הבקבוק המוביל ביחס לאנייה
+            המחלקה שעובדת הכי קשה
           </h2>
           <div className="bottleneck-content">
-            מחלקת <span className="bottleneck-stat">{analysis.department}</span> משקיעה
-            <span className="bottleneck-stat">{analysis.hours} שעות/שבוע</span>
+            <strong>{analysis.department}</strong> - משקיעה
+            <span className="bottleneck-stat">{analysis.hours} שעות בשבוע</span>
+            בעבודה חוזרת
             {analysis.units > 0 && (
-              <>בטיפול ב-<span className="bottleneck-stat">{analysis.units} פקודות מסירה</span></>
+              <> (מטפלים ב-<span className="bottleneck-stat">{analysis.units} תיקים</span>)</>
             )}
             {analysis.vessels > 0 && (
               <> עבור <span className="bottleneck-stat">{analysis.vessels} אניות</span></>
             )}
+            <div style={{marginTop: '0.75rem', fontSize: '0.9rem', opacity: 0.9}}>
+              כדאי לבדוק אם אפשר לפשט להם את העבודה
+            </div>
           </div>
         </div>
       );
@@ -1537,9 +1541,9 @@
 
       return (
         <div className="volume-card">
-          <div className="volume-title">Volume Multiplier</div>
+          <div className="volume-title">עומס עבודה לאנייה</div>
           <div className="volume-value">x{multiplier}</div>
-          <div className="volume-desc">יחידות עבודה לכל אנייה</div>
+          <div className="volume-desc">כמה משימות בממוצע מטפלים בכל אנייה</div>
         </div>
       );
     }
@@ -1548,28 +1552,28 @@
     function MeetingLegend() {
       const legendItems = [
         {
-          term: 'מדד חיכוך תהליכי',
-          definition: 'מספר המצביע על עומס וחזרתיות בתהליך. ככל שהמספר גבוה יותר, כך התהליך כרוך במאמץ רב יותר ויש פוטנציאל לייעול.'
+          term: 'ציון "כדאי לייעל"',
+          definition: 'מספר מ-0 עד 100. ציון גבוה = יש הרבה עבודה חוזרת שאפשר לפשט. ירוק (מעל 80) = עדיפות ראשונה.'
         },
         {
-          term: 'משימה מבוססת חוקים',
-          definition: 'משימה שמתבצעת תמיד באותה צורה, לפי כללים קבועים וברורים. משימות כאלה מתאימות יותר לייעול.'
+          term: 'משימה קבועה',
+          definition: 'משימה שנעשית תמיד באותו אופן - למשל העתקת נתונים ממקום למקום. קל יותר לפשט אותה.'
         },
         {
-          term: 'מעבר בין כלים',
-          definition: 'מצב שבו העובד נאלץ להעתיק מידע ידנית בין מערכות שונות. זוהי נקודת חיכוך נפוצה.'
+          term: 'העתקה בין מערכות',
+          definition: 'כשעובד צריך לקחת מידע ממקום אחד ולהעתיק אותו ידנית למקום אחר. זה גוזל זמן ועלול לגרום לטעויות.'
         },
         {
-          term: 'שעות שבועיות בתהליכים',
-          definition: 'אומדן הזמן שמושקע בתהליכים חוזרים מדי שבוע. משמש לתעדוף תהליכים לייעול.'
+          term: 'שעות עבודה חוזרות',
+          definition: 'כמה שעות בשבוע העובד מבלה בלעשות את אותו דבר שוב ושוב. ככל שיש יותר - כדאי יותר לייעל.'
         },
         {
-          term: 'צוואר בקבוק',
-          definition: 'השלב בתהליך שגורם לעיכוב הגדול ביותר. מיפוי צווארי בקבוק מסייע למיקוד המאמץ.'
+          term: 'מאיפה לאיפה',
+          definition: 'מאיפה מגיע המידע (מייל, מערכת וכו\') ולאן הוא צריך להגיע בסוף. עוזר להבין את התהליך.'
         },
         {
-          term: 'נקודת הזנה / יעד סופי',
-          definition: 'מאיפה מגיע המידע (נקודת הזנה) ולאן הוא צריך להגיע (יעד סופי). מסייע במיפוי זרימת המידע.'
+          term: 'צבעי התראה',
+          definition: 'ירוק = עדיפות גבוהה לייעול. צהוב = כדאי לבדוק. אדום = פחות דחוף כרגע.'
         }
       ];
 
@@ -1770,12 +1774,18 @@
         return 'score-low';
       };
 
+      const getScoreLabel = (score) => {
+        if (score >= 80) return 'מאוד כדאי לייעל';
+        if (score >= 50) return 'כדאי לבדוק';
+        return 'פחות דחוף';
+      };
+
       return (
         <div className="kickoff-section">
           <div className="kickoff-header">
             <h2 className="kickoff-title">
               סיכום לישיבה
-              <span className="kickoff-badge">3 תהליכים מובילים</span>
+              <span className="kickoff-badge">3 עובדים שכדאי לדבר איתם</span>
             </h2>
           </div>
 
@@ -1785,7 +1795,7 @@
                 <div className="candidate-header">
                   <div className="candidate-rank">#{idx + 1}</div>
                   <div className={`candidate-score ${getScoreClass(candidate.score)}`}>
-                    מדד: {candidate.score}
+                    {getScoreLabel(candidate.score)}
                   </div>
                 </div>
                 <div className="candidate-name">{candidate.name}</div>
@@ -1798,20 +1808,20 @@
                   </div>
                   <div className="flow-arrow">→</div>
                   <div className="flow-item">
-                    <div className="flow-label">לאן הוא מגיע</div>
+                    <div className="flow-label">לאן הוא הולך</div>
                     <div className="flow-value">{candidate.dest || 'לא צוין'}</div>
                   </div>
                 </div>
 
                 {candidate.manual_steps && (
                   <div className="flow-item" style={{marginBottom: '0.75rem'}}>
-                    <div className="flow-label">מה הכי לוקח זמן</div>
+                    <div className="flow-label">מה גוזל הכי הרבה זמן</div>
                     <div className="flow-value" style={{fontSize: '0.8125rem'}}>{candidate.manual_steps.substring(0, 80)}...</div>
                   </div>
                 )}
 
                 <div className="candidate-hours">
-                  זמן שאפשר לחסוך: <span className="hours-value">{candidate.weeklyHours} שעות/שבוע</span>
+                  זמן שאפשר לחסוך: <span className="hours-value">{candidate.weeklyHours} שעות בשבוע</span>
                 </div>
               </div>
             ))}
@@ -2063,33 +2073,33 @@
             <div className="modal-body">
               {/* Summary */}
               <div className="modal-section">
-                <h4 className="modal-section-title">סיכום כללי</h4>
+                <h4 className="modal-section-title">מה גילינו?</h4>
                 <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1rem'}}>
                   <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
                     <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-dark)'}}>{analysis.summary.totalResponses}</div>
-                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>תשובות</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>עובדים ענו</div>
                   </div>
                   <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
                     <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--primary-teal)'}}>{analysis.summary.totalHours}</div>
-                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>שעות/שבוע</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>שעות עבודה חוזרת בשבוע</div>
                   </div>
                   <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
-                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--success)'}}>{analysis.summary.avgScore}</div>
-                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>מדד חיכוך ממוצע</div>
+                    <div style={{fontSize: '2rem', fontWeight: '700', color: 'var(--success)'}}>{analysis.summary.avgScore}/100</div>
+                    <div style={{fontSize: '0.875rem', color: 'var(--gray-500)'}}>פוטנציאל לייעול</div>
                   </div>
                 </div>
               </div>
 
               {/* Department Analysis */}
               <div className="modal-section">
-                <h4 className="modal-section-title">ניתוח לפי מחלקה</h4>
+                <h4 className="modal-section-title">פירוט לפי מחלקה</h4>
                 <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem'}}>
                   <thead>
                     <tr style={{background: 'var(--gray-50)'}}>
                       <th style={{padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--gray-200)'}}>מחלקה</th>
-                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>עובדים</th>
-                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>שעות/שבוע</th>
-                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>מדד ממוצע</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>עובדים שענו</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>שעות עבודה חוזרת</th>
+                      <th style={{padding: '0.75rem', textAlign: 'center', borderBottom: '1px solid var(--gray-200)'}}>כדאי לייעל?</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2639,10 +2649,14 @@
 
             {/* Summary Cards */}
             <div className="summary-cards">
-              <SummaryCard label="סה״כ תשובות" value={stats.total} />
-              <SummaryCard label="תשובות היום" value={stats.today} />
-              <SummaryCard label="השבוע האחרון" value={stats.week} />
-              <SummaryCard label="שעות שבועיות בתהליכים" value={`${stats.totalWeeklyHours} שעות`} secondary={`מדד חיכוך ממוצע: ${stats.avgScore}`} />
+              <SummaryCard label="עובדים שענו" value={stats.total} />
+              <SummaryCard label="ענו היום" value={stats.today} />
+              <SummaryCard label="ענו השבוע" value={stats.week} />
+              <SummaryCard
+                label="שעות עבודה חוזרות בשבוע"
+                value={`${stats.totalWeeklyHours} שעות`}
+                secondary={`פוטנציאל לייעול: ${stats.avgScore}/100 (גבוה = כדאי לייעל)`}
+              />
               <VolumeMultiplierCard responses={responses} />
             </div>
 
@@ -2752,7 +2766,7 @@
                           <th onClick={() => handleSort('name')}>שם {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('department')}>מחלקה {sortField === 'department' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th onClick={() => handleSort('role')}>תפקיד {sortField === 'role' && (sortDir === 'asc' ? '↑' : '↓')}</th>
-                          <th>מדד חיכוך</th>
+                          <th title="ככל שהמספר גבוה יותר, יש יותר פוטנציאל לייעול">כדאי לייעל?</th>
                           <th onClick={() => handleSort('emails_count')}>מיילים ביום {sortField === 'emails_count' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                           <th>פעולות</th>
                         </tr>
@@ -2767,9 +2781,9 @@
                               <td onClick={() => setSelectedResponse(response)}>{response.name}</td>
                               <td onClick={() => setSelectedResponse(response)}>{response.department || response.department_other || '-'}</td>
                               <td onClick={() => setSelectedResponse(response)}>{response.role || '-'}</td>
-                              <td onClick={() => setSelectedResponse(response)}>
+                              <td onClick={() => setSelectedResponse(response)} title={`ציון: ${score}/100`}>
                                 <span className="score-badge" style={{ background: badgeColor.bg, color: badgeColor.color }}>
-                                  {score}
+                                  {badgeColor.label}
                                 </span>
                               </td>
                               <td onClick={() => setSelectedResponse(response)}>{response.emails_count || '-'}</td>
@@ -2814,7 +2828,7 @@
             {/* Pain Points */}
             {insights.painPoints.length > 0 && (
               <div className="insights-section">
-                <h2 className="insights-title">מה הכי מתסכל את העובדים? ({insights.painPoints.length} תשובות)</h2>
+                <h2 className="insights-title">מה מציק לעובדים? ({insights.painPoints.length} תגובות)</h2>
                 <div className="insights-filter">
                   <select
                     className="filter-select"
@@ -2841,7 +2855,7 @@
             {/* Process Improvement Wishes */}
             {insights.automation.length > 0 && (
               <div className="insights-section">
-                <h2 className="insights-title">מה העובדים היו רוצים שישתפר בתהליך? ({insights.automation.length} תשובות)</h2>
+                <h2 className="insights-title">מה העובדים רוצים לשפר? ({insights.automation.length} רעיונות)</h2>
                 <div className="insights-grid">
                   {insights.automation.map((item, idx) => (
                     <div key={idx} className="insight-card automation">
