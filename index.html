@@ -953,24 +953,6 @@
             />
           </div>
 
-          {/* Department-specific: Crew-related toggle for Projects */}
-          {data.department === 'פרויקטים' && (
-            <div className="form-group">
-              <label className="checkbox-card" style={{cursor: 'pointer'}}>
-                <input
-                  type="checkbox"
-                  checked={data.is_crew_related}
-                  onChange={(e) => onChange('is_crew_related', e.target.checked)}
-                />
-                <span className="checkbox-box">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
-                <span className="checkbox-label">המשימה קשורה לחילופי צוות / פרוצדורות ימאים</span>
-              </label>
-            </div>
-          )}
         </>
       );
     }
@@ -1298,19 +1280,6 @@
                 </label>
               ))}
             </div>
-          </div>
-
-          <div className="question-card">
-            <h3 className="question-title">לאן מגיע המידע בסוף התהליך?</h3>
-            <p className="question-hint">בחר את כל היעדים הרלוונטיים</p>
-            <CheckboxGroup
-              options={DESTINATIONS}
-              values={data.destination}
-              onChange={(values) => onChange('destination', values)}
-              otherValue={data.destination_other}
-              onOtherChange={(value) => onChange('destination_other', value)}
-              showOtherInput={true}
-            />
           </div>
 
           <div className="question-card">
