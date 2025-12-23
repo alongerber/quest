@@ -1667,32 +1667,15 @@
       );
     }
 
-    // Strategic Question Engine - מנוע שאלות אסטרטגיות לישיבה ("Meeting Brain")
-    function StrategicQuestions({ responses }) {
-      const questions = useMemo(() => {
+    // תובנות מהנתונים - Insights from Data (Professional, no names)
+    function DataInsights({ responses }) {
+      const insights = useMemo(() => {
         if (responses.length === 0) return [];
 
-        const stratQuestions = [];
+        const insightsList = [];
+        const n = responses.length;
 
-        // === CONFLICT LOGIC: PDA responsibility overlap between departments ===
-        const pdaSenders = responses.filter(r => r.pda_sender).map(r => ({
-          sender: r.pda_sender,
-          dept: r.department || r.department_other
-        }));
-        const uniquePdaDepts = [...new Set(pdaSenders.map(p => p.sender))];
-        const hasAgency = uniquePdaDepts.some(d => d && (d.includes('סוכנות') || d.toLowerCase().includes('agency')));
-        const hasAccounts = uniquePdaDepts.some(d => d && (d.includes('חשבות') || d.includes('הנהלת חשבונות') || d.toLowerCase().includes('account')));
-
-        if (hasAgency && hasAccounts || uniquePdaDepts.length > 1) {
-          stratQuestions.push({
-            type: 'conflict',
-            icon: '⚠️',
-            question: `למה האחריות על ה-PDA מתחלקת בין ${uniquePdaDepts.join(' ו-')}? האם יש כאן כפילות עבודה?`,
-            context: `${uniquePdaDepts.length} גורמים שונים מטפלים באותו תהליך - זה גורם לבזבוז זמן ובלבול`
-          });
-        }
-
-        // === ETL BOTTLENECK: PDF manifest to Unifreight ===
+        // === הקלדה ידנית מ-PDF ===
         const manifestFromPdf = responses.filter(r => {
           const sources = r.info_source || [];
           return sources.includes('manifest_pdf') || sources.includes('email_attachment');
@@ -1704,110 +1687,88 @@
         );
 
         if (manifestFromPdf.length > 0 && highManualTyping.length > 0) {
-          // Find the person with most hours to personalize the question
-          const topWorker = responses.reduce((max, r) =>
-            calculateWeeklyHours(r) > calculateWeeklyHours(max) ? r : max
-          , responses[0]);
-          const topHours = Math.round(calculateWeeklyHours(topWorker));
-
-          stratQuestions.push({
-            type: 'etl',
+          insightsList.push({
+            type: 'finding',
             icon: '📋',
-            question: `איך אנחנו מקצרים את הגשר בין ה-PDF של המניפסט ליוניפרייט כדי לחסוך ל${topWorker.name} ${topHours} שעות בשבוע?`,
-            context: `${manifestFromPdf.length} עובדים מקבלים מניפסטים ב-PDF ו-${highManualTyping.length} מקלידים ידנית - פער שאפשר לגשר`
+            title: 'העתקה ידנית ממסמכי PDF',
+            description: `${manifestFromPdf.length} מתוך ${n} משיבים מקבלים מניפסטים ב-PDF. ${highManualTyping.length} דיווחו על הקלדה ידנית למערכת.`,
+            recommendation: 'ניתן לבחון כלי OCR (זיהוי תווים אוטומטי) לחילוץ נתונים מ-PDF ישירות למערכת.'
           });
         }
 
-        // === Manual data flow analysis ===
-        const manualStepsResponses = responses.filter(r => r.manual_steps && r.manual_steps.length > 20);
-        if (manualStepsResponses.length > 0) {
-          const sources = [...new Set(responses.flatMap(r => r.info_source || []))].slice(0, 2);
-          const dests = [...new Set(responses.flatMap(r => r.destination || []))].slice(0, 2);
-          stratQuestions.push({
-            type: 'flow',
-            icon: '🔄',
-            question: `למה מידע עדיין זורם ידנית בין ${SOURCE_LABELS[sources[0]] || 'מקורות'} ל${DESTINATION_LABELS[dests[0]] || 'יעדים'}?`,
-            context: `${manualStepsResponses.length} עובדים דיווחו על שלבים ידניים משמעותיים`
-          });
-        }
-
-        // === Scalability warning based on volume ===
-        const totalVessels = responses.reduce((sum, r) => {
-          const v = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
-          return sum + v;
-        }, 0);
-        const totalUnits = responses.reduce((sum, r) => {
-          const c = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
-          const i = r.importers_per_vessel ? parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0') : 0;
-          return sum + Math.max(c, i);
-        }, 0);
-
-        if (totalVessels > 0 && totalUnits > 0) {
-          const ratio = Math.round(totalUnits / totalVessels);
-          stratQuestions.push({
-            type: 'scale',
-            icon: '📈',
-            question: `כיום יש ${ratio} פקודות מסירה לכל אנייה. האם התהליך יעמוד בעומס כפול?`,
-            context: `אם נכפיל את כמות האניות - האם המערכת תקרוס?`
-          });
-        }
-
-        // === Tool switching pain ===
+        // === מעבר בין מערכות ===
         const highSwitchers = responses.filter(r =>
           r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
         );
         if (highSwitchers.length >= 2) {
-          stratQuestions.push({
-            type: 'tools',
-            icon: '🔧',
-            question: `${highSwitchers.length} עובדים מטרטרים בין 3+ מערכות - איפה אפשר לחבר?`,
-            context: `כל העתקה ידנית = זמן אבוד + סיכון לטעויות`
+          insightsList.push({
+            type: 'finding',
+            icon: '🔄',
+            title: 'מעבר תכוף בין מערכות',
+            description: `${highSwitchers.length} מתוך ${n} משיבים דיווחו על עבודה עם 3+ מערכות במקביל.`,
+            recommendation: 'העתקה ידנית בין מערכות היא מקור נפוץ לטעויות ובזבוז זמן. כדאי לבחון אינטגרציות או כלי RPA.'
           });
         }
 
-        // === Email overload ===
+        // === עומס מיילים ===
         const emailOverload = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
         if (emailOverload.length > 0) {
-          stratQuestions.push({
-            type: 'email',
+          insightsList.push({
+            type: 'finding',
             icon: '📧',
-            question: `${emailOverload.length} עובדים טובעים במיילים - איך מפחיתים את הנפח?`,
-            context: `יותר מ-50 מיילים ביום = קשה למצוא מידע חשוב`
+            title: 'עומס מיילים גבוה',
+            description: `${emailOverload.length} מתוך ${n} משיבים מטפלים ביותר מ-50 מיילים ביום.`,
+            recommendation: 'ראה מדריך כלים: כללי סינון אוטומטיים, תיקיות חכמות, ו-Copilot לסיכום שרשראות.'
           });
         }
 
-        return stratQuestions.slice(0, 5);
+        // === משימות חוזרות ===
+        const ruleBased = responses.filter(r => r.process_type === 'rule_based');
+        if (ruleBased.length > 0) {
+          insightsList.push({
+            type: 'opportunity',
+            icon: '🎯',
+            title: 'משימות לפי תבנית קבועה',
+            description: `${ruleBased.length} מתוך ${n} משיבים דיווחו על משימות שנעשות תמיד באותו אופן.`,
+            recommendation: 'משימות עם תבנית קבועה הן המועמדות הטובות ביותר לייעול - קל להגדיר עבורן כללים אוטומטיים.'
+          });
+        }
+
+        return insightsList.slice(0, 4);
       }, [responses]);
 
-      if (questions.length === 0) return null;
+      if (insights.length === 0) return null;
 
       return (
-        <div className="strategic-questions" style={{
-          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
+        <div style={{
+          background: 'var(--white)',
           borderRadius: '16px',
           padding: '1.5rem',
           marginBottom: '1.5rem',
-          color: 'white'
+          border: '1px solid var(--gray-200)'
         }}>
-          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            💡 שאלות אסטרטגיות לישיבה
-            <span style={{fontSize: '0.75rem', background: 'rgba(255,255,255,0.2)', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
-              מנוע הניתוח
+          <h2 style={{fontSize: '1.125rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            📊 תובנות מהנתונים
+            <span style={{fontSize: '0.75rem', background: 'var(--gray-100)', padding: '0.25rem 0.75rem', borderRadius: '20px', color: 'var(--gray-600)'}}>
+              מבוסס על {responses.length} משיבים
             </span>
           </h2>
-          <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
-            {questions.map((q, idx) => (
+          <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+            {insights.map((insight, idx) => (
               <div key={idx} style={{
-                background: 'rgba(255,255,255,0.1)',
+                background: 'var(--gray-50)',
                 borderRadius: '12px',
                 padding: '1rem',
-                borderRight: '4px solid ' + (q.type === 'scale' ? '#f59e0b' : q.type === 'overlap' ? '#ec4899' : '#10b981')
+                borderRight: '4px solid var(--primary-teal)'
               }}>
-                <div style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem'}}>
-                  {q.icon} {q.question}
+                <div style={{fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--primary-dark)'}}>
+                  {insight.icon} {insight.title}
                 </div>
-                <div style={{fontSize: '0.8125rem', opacity: 0.8}}>
-                  {q.context}
+                <div style={{fontSize: '0.875rem', color: 'var(--gray-600)', marginBottom: '0.5rem'}}>
+                  {insight.description}
+                </div>
+                <div style={{fontSize: '0.8125rem', color: 'var(--primary-teal)', fontStyle: 'italic'}}>
+                  💡 {insight.recommendation}
                 </div>
               </div>
             ))}
@@ -1939,33 +1900,20 @@
         if (responses.length === 0) return null;
 
         const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
-        const highFrictionHours = responses
-          .filter(r => calculateAutomationScore(r) >= 70)
-          .reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const avgScore = Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length);
 
-        // Assume 30% of high friction work can be automated
-        const recoverableHours = Math.round(highFrictionHours * 0.3);
-        const workdaysSaved = (recoverableHours / 8).toFixed(1); // 8 hours per workday
-
-        // Department analysis
-        const deptData = {};
-        responses.forEach(r => {
-          const dept = r.department || r.department_other || 'לא צוין';
-          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0 };
-          deptData[dept].count++;
-          deptData[dept].hours += calculateWeeklyHours(r);
-        });
-        const deptSummary = Object.entries(deptData)
-          .map(([name, data]) => ({ name, ...data, avgPerPerson: Math.round(data.hours / data.count * 10) / 10 }))
-          .sort((a, b) => b.avgPerPerson - a.avgPerPerson);
+        // Count key findings
+        const highEmail = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100').length;
+        const highSwitching = responses.filter(r => r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים').length;
+        const ruleBased = responses.filter(r => r.process_type === 'rule_based').length;
 
         return {
           totalResponses: responses.length,
           totalHours: Math.round(totalHours),
-          recoverableHours,
-          workdaysSaved,
-          avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
-          deptSummary
+          avgScore,
+          highEmail,
+          highSwitching,
+          ruleBased
         };
       }, [responses]);
 
@@ -1973,36 +1921,41 @@
 
       return (
         <div className="executive-print-summary">
-          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', borderBottom: '2px solid #0891b2', paddingBottom: '0.5rem'}}>
-            📊 סיכום מנהלים - ניתוח תהליכים | קוראל שירותי ים
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', borderBottom: '2px solid #0891b2', paddingBottom: '0.5rem'}}>
+            סיכום סקר תהליכים | קוראל שירותי ים
           </h2>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem'}}>
-            <div style={{background: '#f0fdf4', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #22c55e'}}>
-              <div style={{fontSize: '2rem', fontWeight: '700', color: '#16a34a'}}>{summary.workdaysSaved}</div>
-              <div style={{fontSize: '0.875rem', color: '#166534'}}>ימי עבודה ניתנים לשחרור</div>
+
+          <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '1rem', fontStyle: 'italic'}}>
+            הנתונים מבוססים על הערכות עצמיות של {summary.totalResponses} עובדים. המספרים מייצגים אינדיקציה כללית ולא מדידה מדויקת.
+          </p>
+
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1rem'}}>
+            <div style={{background: '#eff6ff', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+              <div style={{fontSize: '1.75rem', fontWeight: '700', color: '#2563eb'}}>{summary.totalResponses}</div>
+              <div style={{fontSize: '0.8125rem', color: '#1e40af'}}>עובדים ענו לסקר</div>
             </div>
-            <div style={{background: '#eff6ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #3b82f6'}}>
-              <div style={{fontSize: '2rem', fontWeight: '700', color: '#2563eb'}}>{summary.totalResponses}</div>
-              <div style={{fontSize: '0.875rem', color: '#1e40af'}}>עובדים ענו על הסקר</div>
+            <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+              <div style={{fontSize: '1.75rem', fontWeight: '700', color: '#d97706'}}>~{summary.totalHours}</div>
+              <div style={{fontSize: '0.8125rem', color: '#92400e'}}>שע׳ "ניירת"/שבוע (הערכה מצטברת)</div>
             </div>
-            <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #f59e0b'}}>
-              <div style={{fontSize: '2rem', fontWeight: '700', color: '#d97706'}}>{summary.totalHours}</div>
-              <div style={{fontSize: '0.875rem', color: '#92400e'}}>שעות "ניירת" שבועיות</div>
-            </div>
-            <div style={{background: '#f0f9ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #0891b2'}}>
-              <div style={{fontSize: '2rem', fontWeight: '700', color: '#0891b2'}}>{summary.avgScore}/100</div>
-              <div style={{fontSize: '0.875rem', color: '#155e75'}}>{LAYMAN_TERMS.frictionScore} ממוצע</div>
+            <div style={{background: '#f0f9ff', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+              <div style={{fontSize: '1.75rem', fontWeight: '700', color: '#0891b2'}}>{summary.avgScore}/100</div>
+              <div style={{fontSize: '0.8125rem', color: '#155e75'}}>מדד עבודה רובוטית (ממוצע)</div>
             </div>
           </div>
-          <div style={{fontSize: '0.875rem'}}>
-            <strong>פירוט לפי מחלקה:</strong>
-            <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem'}}>
-              {summary.deptSummary.map((dept, idx) => (
-                <span key={idx} style={{background: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
-                  {dept.name}: {dept.avgPerPerson} שעות/עובד ({dept.count})
-                </span>
-              ))}
-            </div>
+
+          <div style={{fontSize: '0.8125rem', marginBottom: '1rem'}}>
+            <strong>ממצאים עיקריים:</strong>
+            <ul style={{margin: '0.5rem 0', paddingRight: '1.25rem'}}>
+              {summary.highEmail > 0 && <li>{summary.highEmail} מתוך {summary.totalResponses} מטפלים ביותר מ-50 מיילים/יום</li>}
+              {summary.highSwitching > 0 && <li>{summary.highSwitching} מתוך {summary.totalResponses} עובדים עם 3+ מערכות במקביל</li>}
+              {summary.ruleBased > 0 && <li>{summary.ruleBased} מתוך {summary.totalResponses} מבצעים משימות לפי תבנית קבועה (מועמדות לייעול)</li>}
+            </ul>
+          </div>
+
+          <div style={{background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem'}}>
+            <strong>הסבר מדד עבודה רובוטית:</strong> ציון 0-100 המשקלל: תדירות המשימה (יומי/שבועי) + האם יש תבנית קבועה + כמות מערכות.
+            ציון גבוה = משימה שחוזרת הרבה, תמיד באותו אופן, ודורשת מעבר בין מערכות. אלו המועמדות הטובות לייעול.
           </div>
         </div>
       );
@@ -2046,55 +1999,111 @@
       );
     }
 
-    // Tools Library Component - ארגז כלים מוצע לשדרוג התהליכים
-    function ToolsLibrary() {
-      const tools = [
-        {
-          icon: '📧',
-          name: 'Microsoft 365 Copilot (Outlook)',
-          description: 'סיכום אוטומטי של שרשראות מיילים ארוכות, כתיבת טיוטות למענה מהיר וסינון רעשים בתיבת הדואר.'
-        },
-        {
-          icon: '💬',
-          name: 'WhatsApp Insights',
-          description: 'שימוש במודלים לריכוז וסיכום של עשרות קבוצות הוואטסאפ לכדי דוח דגשים יומי (מידע על אניות, דרישות דחופות).'
-        },
-        {
-          icon: '📄',
-          name: 'חילוץ מידע אוטומטי (OCR/RPA)',
-          description: 'כלי חילוץ מידע אוטומטי שקורא מניפסטים ב-PDF ומזין את הנתונים ישירות ליוניפרייט ללא הקלדה ידנית.'
-        },
-        {
-          icon: '📁',
-          name: 'כללי ניתוב מיילים',
-          description: 'הגדרת "כללי ניתוב" חכמים שמתייקים מיילים לפי שם אנייה או מספר תיק באופן אוטומטי.'
-        }
-      ];
-
+    // Practical Tools Guide - מדריך כלים מעשי (קבוע - לא תלוי בנתונים)
+    function PracticalToolsGuide() {
       return (
-        <div className="tools-library" style={{
-          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+        <div style={{
+          background: 'var(--white)',
           borderRadius: '16px',
           padding: '1.5rem',
           marginBottom: '1.5rem',
-          color: 'white'
+          border: '2px solid var(--primary-teal)'
         }}>
-          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            🧰 ארגז כלים מוצע לשדרוג התהליכים
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--primary-dark)'}}>
+            🧰 מדריך כלים מעשי - איך להתחיל?
           </h2>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem'}}>
-            {tools.map((tool, idx) => (
-              <div key={idx} style={{
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                padding: '1rem',
-                backdropFilter: 'blur(10px)'
-              }}>
-                <div style={{fontSize: '1.5rem', marginBottom: '0.5rem'}}>{tool.icon}</div>
-                <div style={{fontWeight: '600', marginBottom: '0.5rem'}}>{tool.name}</div>
-                <div style={{fontSize: '0.875rem', opacity: 0.9, lineHeight: '1.5'}}>{tool.description}</div>
+          <p style={{fontSize: '0.875rem', color: 'var(--gray-600)', marginBottom: '1.5rem'}}>
+            הכלים הבאים זמינים כבר היום וניתנים להפעלה ללא פרויקט מורכב. מומלץ להתחיל מכלי אחד ולבחון את ההשפעה.
+          </p>
+
+          {/* Email Optimization - Fixed Section */}
+          <div style={{background: '#eff6ff', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #3b82f6'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#1e40af'}}>
+              📧 ייעול תיבת המייל (Outlook)
+            </h3>
+            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
+              בכל ארגון, תיבת המייל היא מקור משמעותי לעומס. גם ללא כלי AI, ניתן לשפר משמעותית:
+            </p>
+            <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>1. כללי סינון אוטומטיים:</strong> הגדרת Rules ב-Outlook שמעבירים מיילים לתיקיות לפי שולח/נושא.
+                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: File → Manage Rules → New Rule → "מאת [שם]" → "העבר לתיקייה"</div>
               </div>
-            ))}
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>2. תיקיות חכמות לפי אנייה/תיק:</strong> יצירת תיקייה לכל אנייה פעילה וסינון אוטומטי.
+                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: קליק ימני על Inbox → New Folder → שם האנייה → הגדרת Rule מתאים</div>
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>3. Copilot (אם זמין):</strong> סיכום שרשראות ארוכות, כתיבת טיוטות תשובה, ומציאת מידע מהיר.
+                <div style={{color: 'var(--gray-500)', marginTop: '0.25rem'}}>איך: בחירת שרשרת → לחיצה על Copilot → "סכם את השיחה" / "כתוב תשובה"</div>
+              </div>
+            </div>
+          </div>
+
+          {/* WhatsApp Management */}
+          <div style={{background: '#f0fdf4', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #22c55e'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#166534'}}>
+              💬 ניהול קבוצות וואטסאפ
+            </h3>
+            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
+              עשרות קבוצות עם מאות הודעות ביום? הנה כמה פתרונות:
+            </p>
+            <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>השתקה חכמה:</strong> השתקת קבוצות פחות קריטיות, בדיקה פעם ביום בשעה קבועה.
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>סיכום AI:</strong> העתקת הודעות לכלי כמו ChatGPT/Claude עם הפרומפט: "סכם את ההודעות הבאות ב-3 נקודות עיקריות"
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>חיפוש מתקדם:</strong> שימוש בחיפוש של וואטסאפ עם מילות מפתח (שם אנייה, מספר תיק) במקום גלילה.
+              </div>
+            </div>
+          </div>
+
+          {/* PDF/Document Processing */}
+          <div style={{background: '#fef3c7', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', borderRight: '4px solid #f59e0b'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: '#92400e'}}>
+              📄 עיבוד מסמכים (PDF/מניפסטים)
+            </h3>
+            <p style={{fontSize: '0.8125rem', color: 'var(--gray-600)', marginBottom: '0.75rem'}}>
+              במקום להקליד ידנית מ-PDF למערכת:
+            </p>
+            <div style={{display: 'grid', gap: '0.5rem', fontSize: '0.8125rem'}}>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>OCR בסיסי:</strong> Adobe Acrobat או כלים חינמיים מאפשרים להפוך PDF לטקסט שניתן להעתקה.
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>חילוץ נתונים מובנה:</strong> כלי AI יכולים לזהות שדות במניפסט (מספר מכולה, משקל, יבואן) ולהפוך אותם לטבלה.
+              </div>
+              <div style={{background: 'white', padding: '0.75rem', borderRadius: '8px'}}>
+                <strong>אינטגרציה ליוניפרייט:</strong> שלב מתקדם יותר - חיבור ישיר בין חילוץ המידע להזנה למערכת.
+              </div>
+            </div>
+          </div>
+
+          {/* Getting Started */}
+          <div style={{background: 'var(--gray-50)', borderRadius: '12px', padding: '1rem', borderRight: '4px solid var(--primary-teal)'}}>
+            <h3 style={{fontSize: '1rem', fontWeight: '700', marginBottom: '0.75rem', color: 'var(--primary-dark)'}}>
+              🚀 איך להתחיל? (3 צעדים)
+            </h3>
+            <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
+              <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
+                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>1️⃣</div>
+                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>בחירת משימה אחת</div>
+                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>הכי חוזרת / הכי מתסכלת</div>
+              </div>
+              <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
+                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>2️⃣</div>
+                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>ניסוי כלי מתאים</div>
+                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>Rules / Copilot / OCR</div>
+              </div>
+              <div style={{flex: '1', minWidth: '150px', background: 'white', padding: '0.75rem', borderRadius: '8px', textAlign: 'center'}}>
+                <div style={{fontSize: '1.5rem', marginBottom: '0.25rem'}}>3️⃣</div>
+                <div style={{fontWeight: '600', fontSize: '0.875rem'}}>בדיקה על תיק אחד</div>
+                <div style={{fontSize: '0.75rem', color: 'var(--gray-500)'}}>לפני הרחבה לכולם</div>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -3327,42 +3336,32 @@
             {/* Executive Print Summary - visible only when printing */}
             {responses.length > 0 && <ExecutivePrintSummary responses={responses} />}
 
-            {/* Strategic Questions for Meeting */}
-            {responses.length > 0 && <StrategicQuestions responses={responses} />}
+            {/* Data Insights - Professional findings */}
+            {responses.length > 0 && <DataInsights responses={responses} />}
 
-            {/* Vessel Story - מסע האנייה */}
-            {responses.length > 0 && <VesselStoryCard responses={responses} />}
-
-            {/* Kickoff Session - Meeting Ready Section */}
-            {responses.length > 0 && <KickoffSession responses={responses} />}
-
-            {/* Summary Cards with Time Recovery */}
+            {/* Summary Cards - with context */}
             <div className="summary-cards">
-              <SummaryCard label="עובדים שענו" value={stats.total} />
-              <SummaryCard label="ענו היום" value={stats.today} />
-              <SummaryCard label="ענו השבוע" value={stats.week} />
+              <SummaryCard label="משיבים לסקר" value={stats.total} />
               <SummaryCard
-                label='זמן "ניירת" שבועי'
-                value={`${stats.totalWeeklyHours} שעות`}
-                secondary={`${LAYMAN_TERMS.frictionScore}: ${stats.avgScore}/100`}
+                label='הערכת זמן "ניירת"'
+                value={`כ-${Math.round(stats.totalWeeklyHours)} שע׳/שבוע`}
+                secondary={`סה״כ מצטבר (${stats.total} משיבים)`}
               />
-              <VolumeMultiplierCard responses={responses} />
+              <SummaryCard
+                label={LAYMAN_TERMS.frictionScore}
+                value={`${stats.avgScore}/100`}
+                secondary="ממוצע משוקלל"
+              />
             </div>
 
-            {/* Time Recovery Calculator */}
-            {responses.length > 0 && <TimeRecoveryCard responses={responses} />}
+            {/* Score Explanation */}
+            <div style={{background: 'var(--gray-50)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--gray-600)'}}>
+              <strong>איך לקרוא את המספרים:</strong> הנתונים מבוססים על הערכות עצמיות של {stats.total} עובדים שענו על שאלון עם טווחים (למשל: "50-100 מיילים ביום").
+              המספרים הם אינדיקציה כללית ולא מדידה מדויקת. <strong>{LAYMAN_TERMS.frictionScore}</strong>: ציון 0-100 המשקלל תדירות משימה + האם יש תבנית קבועה + כמות מערכות. ככל שגבוה יותר = יותר פוטנציאל לייעול.
+            </div>
 
-            {/* Bottleneck Analysis */}
-            {responses.length > 0 && <BottleneckCard responses={responses} />}
-
-            {/* Cross-Departmental Sync Analysis */}
-            {responses.length > 0 && <SyncAnalysisCard responses={responses} />}
-
-            {/* Tools Library */}
-            {responses.length > 0 && <ToolsLibrary />}
-
-            {/* Next Steps Guide */}
-            {responses.length > 0 && <NextStepsGuide />}
+            {/* Practical Tools Guide - Fixed content, always shown */}
+            <PracticalToolsGuide />
 
             {/* Charts */}
             {responses.length > 0 && (
