@@ -1305,13 +1305,15 @@
           });
 
           if (!response.ok) {
-            throw new Error('Failed to submit');
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Supabase error:', response.status, errorData);
+            throw new Error(errorData.message || errorData.error || `Error ${response.status}`);
           }
 
           setIsCompleted(true);
         } catch (error) {
           console.error('Submit error:', error);
-          alert('אירעה שגיאה בשמירת הנתונים. נסה שוב.');
+          alert(`שגיאה: ${error.message}\n\nפתח Console (F12) לפרטים נוספים`);
         } finally {
           setIsSubmitting(false);
         }
