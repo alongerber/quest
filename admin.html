@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דשבורד תשובות השאלון | קוראל שירותי ים</title>
+  <title>מרכז ניטור וייעול תהליכים | קוראל שירותי ים</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -715,6 +715,13 @@
         display: none;
       }
 
+      /* Executive Print Summary - first item in print */
+      .executive-print-summary {
+        display: block !important;
+        page-break-inside: avoid;
+        margin-bottom: 1.5rem;
+      }
+
       /* Meeting Legend - visible only in print */
       .meeting-legend {
         display: block !important;
@@ -724,7 +731,7 @@
         border-top: 2px solid var(--gray-300);
       }
 
-      /* AI Analysis Print Section */
+      /* Analysis Engine Print Section */
       .ai-analysis-print {
         display: block !important;
         page-break-before: always;
@@ -758,9 +765,19 @@
       }
     }
 
-    /* AI Analysis Print Section - hidden on screen */
+    /* Analysis Engine Print Section - hidden on screen */
     .ai-analysis-print {
       display: none;
+    }
+
+    /* Executive Print Summary - hidden on screen, shown in print */
+    .executive-print-summary {
+      display: none;
+      background: white;
+      padding: 1.5rem;
+      border: 2px solid var(--primary-teal);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
     }
 
     /* Meeting Legend - hidden on screen, shown in print */
@@ -1302,8 +1319,8 @@
       'monthly': 0.3
     };
 
-    // Process Friction Score Calculator (מדד חיכוך תהליכי)
-    // Formula: (Frequency_Weight × 0.4) + (Rule_Based_Weight × 0.4) + (Tool_Switching_Weight × 0.2)
+    // מדד עבודה שחורה - Process Friction Score Calculator
+    // נוסחה: (תדירות × 0.4) + (עבודת שטאנץ × 0.4) + (טרטור בין מערכות × 0.2)
     const calculateFrictionScore = (response) => {
       // Frequency Weight (40%)
       const freqWeight = FREQUENCY_WEIGHTS[response.process_frequency] || 0.5;
@@ -1512,40 +1529,47 @@
       );
     }
 
-    // Bottleneck Analysis Component
+    // Bottleneck Analysis Component - ניתוח פר-עובד לאיזון בהשוואה
     function BottleneckCard({ responses }) {
       const analysis = useMemo(() => {
         if (responses.length === 0) return null;
 
-        // Find department with most manual work
-        const deptHours = {};
-        const deptUnits = {};
-        const deptVessels = {};
+        // Find department with highest AVERAGE hours per employee (per-capita)
+        const deptData = {};
 
         responses.forEach(r => {
           const dept = r.department || r.department_other || 'לא צוין';
-          const hours = calculateWeeklyHours(r);
-          deptHours[dept] = (deptHours[dept] || 0) + hours;
+          if (!deptData[dept]) {
+            deptData[dept] = { totalHours: 0, count: 0, units: 0, vessels: 0 };
+          }
+          deptData[dept].totalHours += calculateWeeklyHours(r);
+          deptData[dept].count++;
 
           // Count units based on responses
           const cargoCount = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
           const bolCount = r.bol_per_week ? parseInt(r.bol_per_week.match(/\d+/)?.[0] || '0') : 0;
-          deptUnits[dept] = (deptUnits[dept] || 0) + Math.max(cargoCount, bolCount);
+          deptData[dept].units += Math.max(cargoCount, bolCount);
 
           // Count vessels
           const vesselCount = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
-          deptVessels[dept] = (deptVessels[dept] || 0) + vesselCount;
+          deptData[dept].vessels += vesselCount;
         });
 
-        // Find highest hours department
-        const topDept = Object.entries(deptHours).sort((a, b) => b[1] - a[1])[0];
-        if (!topDept) return null;
+        // Calculate per-capita hours and find highest
+        const deptAnalysis = Object.entries(deptData).map(([name, data]) => ({
+          name,
+          avgHoursPerEmployee: Math.round((data.totalHours / data.count) * 10) / 10,
+          totalHours: Math.round(data.totalHours * 10) / 10,
+          employeeCount: data.count,
+          units: data.units,
+          vessels: data.vessels
+        })).sort((a, b) => b.avgHoursPerEmployee - a.avgHoursPerEmployee);
+
+        if (deptAnalysis.length === 0) return null;
 
         return {
-          department: topDept[0],
-          hours: Math.round(topDept[1] * 10) / 10,
-          units: deptUnits[topDept[0]] || 0,
-          vessels: deptVessels[topDept[0]] || 0
+          all: deptAnalysis,
+          top: deptAnalysis[0]
         };
       }, [responses]);
 
@@ -1554,65 +1578,147 @@
       return (
         <div className="bottleneck-card">
           <h2 className="bottleneck-title">
-            המחלקה שעובדת הכי קשה
+            ⚡ עומס עבודה ממוצע לעובד
           </h2>
           <div className="bottleneck-content">
-            <strong>{analysis.department}</strong> - משקיעה
-            <span className="bottleneck-stat">{analysis.hours} שעות בשבוע</span>
-            בעבודה חוזרת
-            {analysis.units > 0 && (
-              <> (מטפלים ב-<span className="bottleneck-stat">{analysis.units} תיקים</span>)</>
-            )}
-            {analysis.vessels > 0 && (
-              <> עבור <span className="bottleneck-stat">{analysis.vessels} אניות</span></>
-            )}
-            <div style={{marginTop: '0.75rem', fontSize: '0.9rem', opacity: 0.9}}>
-              כדאי לבדוק אם אפשר לפשט להם את העבודה
+            <div style={{marginBottom: '1rem'}}>
+              <strong>{analysis.top.name}</strong> - בממוצע
+              <span className="bottleneck-stat">{analysis.top.avgHoursPerEmployee} שעות/עובד/שבוע</span>
+              ב"ניירת"
+              {analysis.top.employeeCount > 1 && (
+                <span style={{opacity: 0.8, fontSize: '0.875rem'}}> ({analysis.top.employeeCount} עובדים ענו)</span>
+              )}
             </div>
+            {analysis.all.length > 1 && (
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.5rem', marginTop: '1rem'}}>
+                {analysis.all.map((dept, idx) => (
+                  <div key={idx} style={{background: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center'}}>
+                    <div style={{fontSize: '0.75rem', opacity: 0.8}}>{dept.name}</div>
+                    <div style={{fontSize: '1.25rem', fontWeight: '700'}}>{dept.avgHoursPerEmployee}</div>
+                    <div style={{fontSize: '0.6875rem', opacity: 0.7}}>שעות/עובד ({dept.employeeCount})</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       );
     }
 
-    // Volume Multiplier Component
+    // Volume Multiplier Component - מכפיל סיבוכיות אנייה
     function VolumeMultiplierCard({ responses }) {
-      const multiplier = useMemo(() => {
-        let totalUnits = 0;
+      const vesselComplexity = useMemo(() => {
+        // Calculate from importers_per_vessel field
+        let totalImporters = 0;
+        let vesselDataCount = 0;
+        let totalDeliveryOrders = 0;
         let totalVessels = 0;
 
         responses.forEach(r => {
-          // Extract numeric values from responses
-          const importers = r.importers_per_vessel ? parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0') : 0;
-          const cargo = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
-          const vessels = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
+          // Use importers_per_vessel as primary source
+          if (r.importers_per_vessel) {
+            const importers = parseInt(r.importers_per_vessel.match(/\d+/)?.[0] || '0');
+            if (importers > 0) {
+              totalImporters += importers;
+              vesselDataCount++;
+            }
+          }
 
-          totalUnits += Math.max(importers, cargo);
+          // Calculate delivery orders from cargo/BOL
+          const cargo = r.cargo_per_week ? parseInt(r.cargo_per_week.match(/\d+/)?.[0] || '0') : 0;
+          const bol = r.bol_per_week ? parseInt(r.bol_per_week.match(/\d+/)?.[0] || '0') : 0;
+          totalDeliveryOrders += Math.max(cargo, bol);
+
+          // Count vessels
+          const vessels = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
           totalVessels += vessels;
         });
 
-        if (totalVessels === 0) return null;
-        return Math.round((totalUnits / totalVessels) * 10) / 10;
+        // Calculate average importers per vessel (from those who reported)
+        const avgImportersPerVessel = vesselDataCount > 0 ? Math.round(totalImporters / vesselDataCount) : 0;
+
+        // Calculate delivery orders per vessel
+        const deliveryOrdersPerVessel = totalVessels > 0 ? Math.round(totalDeliveryOrders / totalVessels) : 0;
+
+        // Use importers as proxy for complexity, fallback to delivery orders
+        const complexityMultiplier = avgImportersPerVessel || deliveryOrdersPerVessel;
+
+        if (complexityMultiplier === 0) return null;
+
+        return {
+          multiplier: complexityMultiplier,
+          importers: avgImportersPerVessel,
+          deliveryOrders: deliveryOrdersPerVessel,
+          vessels: totalVessels
+        };
       }, [responses]);
 
-      if (!multiplier) return null;
+      if (!vesselComplexity) return null;
 
       return (
         <div className="volume-card">
-          <div className="volume-title">עומס עבודה לאנייה</div>
-          <div className="volume-value">x{multiplier}</div>
-          <div className="volume-desc">כמה משימות בממוצע מטפלים בכל אנייה</div>
+          <div className="volume-title">מכפיל סיבוכיות אנייה</div>
+          <div className="volume-value">1 אנייה = {vesselComplexity.multiplier} פקודות מסירה</div>
+          <div className="volume-desc">
+            {vesselComplexity.importers > 0 && `${vesselComplexity.importers} יבואנים לאנייה בממוצע`}
+            {vesselComplexity.vessels > 0 && <span style={{marginRight: '0.5rem'}}>• {vesselComplexity.vessels} אניות/שבוע</span>}
+          </div>
         </div>
       );
     }
 
-    // Strategic Question Engine - מנוע שאלות אסטרטגיות לישיבה
+    // Strategic Question Engine - מנוע שאלות אסטרטגיות לישיבה ("Meeting Brain")
     function StrategicQuestions({ responses }) {
       const questions = useMemo(() => {
         if (responses.length === 0) return [];
 
         const stratQuestions = [];
 
-        // 1. Check manual data flow
+        // === CONFLICT LOGIC: PDA responsibility overlap between departments ===
+        const pdaSenders = responses.filter(r => r.pda_sender).map(r => ({
+          sender: r.pda_sender,
+          dept: r.department || r.department_other
+        }));
+        const uniquePdaDepts = [...new Set(pdaSenders.map(p => p.sender))];
+        const hasAgency = uniquePdaDepts.some(d => d && (d.includes('סוכנות') || d.toLowerCase().includes('agency')));
+        const hasAccounts = uniquePdaDepts.some(d => d && (d.includes('חשבות') || d.includes('הנהלת חשבונות') || d.toLowerCase().includes('account')));
+
+        if (hasAgency && hasAccounts || uniquePdaDepts.length > 1) {
+          stratQuestions.push({
+            type: 'conflict',
+            icon: '⚠️',
+            question: `למה האחריות על ה-PDA מתחלקת בין ${uniquePdaDepts.join(' ו-')}? האם יש כאן כפילות עבודה?`,
+            context: `${uniquePdaDepts.length} גורמים שונים מטפלים באותו תהליך - זה גורם לבזבוז זמן ובלבול`
+          });
+        }
+
+        // === ETL BOTTLENECK: PDF manifest to Unifreight ===
+        const manifestFromPdf = responses.filter(r => {
+          const sources = r.info_source || [];
+          return sources.includes('manifest_pdf') || sources.includes('email_attachment');
+        });
+        const highManualTyping = responses.filter(r =>
+          r.bol_manual_typing === 'כן, הרבה' ||
+          r.bol_manual_typing === 'כן' ||
+          (r.manual_steps && r.manual_steps.includes('הקלדה'))
+        );
+
+        if (manifestFromPdf.length > 0 && highManualTyping.length > 0) {
+          // Find the person with most hours to personalize the question
+          const topWorker = responses.reduce((max, r) =>
+            calculateWeeklyHours(r) > calculateWeeklyHours(max) ? r : max
+          , responses[0]);
+          const topHours = Math.round(calculateWeeklyHours(topWorker));
+
+          stratQuestions.push({
+            type: 'etl',
+            icon: '📋',
+            question: `איך אנחנו מקצרים את הגשר בין ה-PDF של המניפסט ליוניפרייט כדי לחסוך ל${topWorker.name} ${topHours} שעות בשבוע?`,
+            context: `${manifestFromPdf.length} עובדים מקבלים מניפסטים ב-PDF ו-${highManualTyping.length} מקלידים ידנית - פער שאפשר לגשר`
+          });
+        }
+
+        // === Manual data flow analysis ===
         const manualStepsResponses = responses.filter(r => r.manual_steps && r.manual_steps.length > 20);
         if (manualStepsResponses.length > 0) {
           const sources = [...new Set(responses.flatMap(r => r.info_source || []))].slice(0, 2);
@@ -1625,7 +1731,7 @@
           });
         }
 
-        // 2. Scalability warning based on volume
+        // === Scalability warning based on volume ===
         const totalVessels = responses.reduce((sum, r) => {
           const v = r.ships_per_week ? parseInt(r.ships_per_week.match(/\d+/)?.[0] || '0') : 0;
           return sum + v;
@@ -1640,25 +1746,13 @@
           const ratio = Math.round(totalUnits / totalVessels);
           stratQuestions.push({
             type: 'scale',
-            icon: '⚠️',
-            question: `כיום יש ${ratio} יחידות עבודה לכל אנייה. האם התהליך יעמוד בעומס כפול?`,
+            icon: '📈',
+            question: `כיום יש ${ratio} פקודות מסירה לכל אנייה. האם התהליך יעמוד בעומס כפול?`,
             context: `אם נכפיל את כמות האניות - האם המערכת תקרוס?`
           });
         }
 
-        // 3. PDA responsibility overlap
-        const pdaSenders = responses.filter(r => r.pda_sender).map(r => r.pda_sender);
-        const uniquePdaDepts = [...new Set(pdaSenders)];
-        if (uniquePdaDepts.length > 1) {
-          stratQuestions.push({
-            type: 'overlap',
-            icon: '👥',
-            question: `איך מחלקים מחדש את האחריות על ה-PDA כדי למנוע כפילות עבודה?`,
-            context: `נראה ש-${uniquePdaDepts.length} גורמים שונים מטפלים ב-PDA`
-          });
-        }
-
-        // 4. Tool switching pain
+        // === Tool switching pain ===
         const highSwitchers = responses.filter(r =>
           r.tools_switching_count === '5 כלים ומעלה' || r.tools_switching_count === '3-4 כלים'
         );
@@ -1666,12 +1760,12 @@
           stratQuestions.push({
             type: 'tools',
             icon: '🔧',
-            question: `${highSwitchers.length} עובדים מדלגים בין 3+ מערכות - האם אפשר לחבר אותן?`,
+            question: `${highSwitchers.length} עובדים מטרטרים בין 3+ מערכות - איפה אפשר לחבר?`,
             context: `כל העתקה ידנית = זמן אבוד + סיכון לטעויות`
           });
         }
 
-        // 5. Email overload
+        // === Email overload ===
         const emailOverload = responses.filter(r => r.emails_count === '50-100' || r.emails_count === 'מעל 100');
         if (emailOverload.length > 0) {
           stratQuestions.push({
@@ -1839,39 +1933,106 @@
       );
     }
 
+    // Executive Print Summary Component - סיכום מנהלים להדפסה
+    function ExecutivePrintSummary({ responses }) {
+      const summary = useMemo(() => {
+        if (responses.length === 0) return null;
+
+        const totalHours = responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+        const highFrictionHours = responses
+          .filter(r => calculateAutomationScore(r) >= 70)
+          .reduce((sum, r) => sum + calculateWeeklyHours(r), 0);
+
+        // Assume 30% of high friction work can be automated
+        const recoverableHours = Math.round(highFrictionHours * 0.3);
+        const workdaysSaved = (recoverableHours / 8).toFixed(1); // 8 hours per workday
+
+        // Department analysis
+        const deptData = {};
+        responses.forEach(r => {
+          const dept = r.department || r.department_other || 'לא צוין';
+          if (!deptData[dept]) deptData[dept] = { count: 0, hours: 0 };
+          deptData[dept].count++;
+          deptData[dept].hours += calculateWeeklyHours(r);
+        });
+        const deptSummary = Object.entries(deptData)
+          .map(([name, data]) => ({ name, ...data, avgPerPerson: Math.round(data.hours / data.count * 10) / 10 }))
+          .sort((a, b) => b.avgPerPerson - a.avgPerPerson);
+
+        return {
+          totalResponses: responses.length,
+          totalHours: Math.round(totalHours),
+          recoverableHours,
+          workdaysSaved,
+          avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
+          deptSummary
+        };
+      }, [responses]);
+
+      if (!summary) return null;
+
+      return (
+        <div className="executive-print-summary">
+          <h2 style={{fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', borderBottom: '2px solid #0891b2', paddingBottom: '0.5rem'}}>
+            📊 סיכום מנהלים - ניתוח תהליכים | קוראל שירותי ים
+          </h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem'}}>
+            <div style={{background: '#f0fdf4', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #22c55e'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#16a34a'}}>{summary.workdaysSaved}</div>
+              <div style={{fontSize: '0.875rem', color: '#166534'}}>ימי עבודה ניתנים לשחרור</div>
+            </div>
+            <div style={{background: '#eff6ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #3b82f6'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#2563eb'}}>{summary.totalResponses}</div>
+              <div style={{fontSize: '0.875rem', color: '#1e40af'}}>עובדים ענו על הסקר</div>
+            </div>
+            <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #f59e0b'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#d97706'}}>{summary.totalHours}</div>
+              <div style={{fontSize: '0.875rem', color: '#92400e'}}>שעות "ניירת" שבועיות</div>
+            </div>
+            <div style={{background: '#f0f9ff', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '2px solid #0891b2'}}>
+              <div style={{fontSize: '2rem', fontWeight: '700', color: '#0891b2'}}>{summary.avgScore}/100</div>
+              <div style={{fontSize: '0.875rem', color: '#155e75'}}>מדד עבודה שחורה ממוצע</div>
+            </div>
+          </div>
+          <div style={{fontSize: '0.875rem'}}>
+            <strong>פירוט לפי מחלקה:</strong>
+            <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem'}}>
+              {summary.deptSummary.map((dept, idx) => (
+                <span key={idx} style={{background: '#f1f5f9', padding: '0.25rem 0.75rem', borderRadius: '20px'}}>
+                  {dept.name}: {dept.avgPerPerson} שעות/עובד ({dept.count})
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // Meeting Legend Component (for print) - מדריך למשתתף
     function MeetingLegend() {
       const legendItems = [
         {
           term: 'מדד עבודה שחורה',
-          definition: 'מספר מ-0 עד 100. מציין כמה זמן מבוזבז על פעולות טכניות (העתקה, הקלדה) במקום על חשיבה וקבלת החלטות. גבוה = הרבה עבודה רובוטית.'
+          definition: 'מספר מ-0 עד 100. כמה זמן מבוזבז על פעולות טכניות (העתקה, הקלדה) במקום על חשיבה? גבוה = הרבה עבודה רובוטית שניתנת לייעול.'
         },
         {
           term: 'טרטור בין מערכות',
-          definition: 'מצב שבו העובד צריך להעתיק מידע ידנית בין מערכות (למשל מ-Outlook ל-Excel לאתר הנמל). כל העתקה = זמן אבוד + סיכון לטעויות.'
+          definition: 'העתקת מידע ידנית בין Outlook, Excel, יוניפרייט ואתר הנמל. כל העתקה = זמן אבוד + סיכון לטעויות.'
         },
         {
           term: 'עבודה לפי שטאנץ קבוע',
-          definition: 'משימה שנעשית תמיד באותו אופן, לפי הוראות קבועות. קל יותר לייעל משימות כאלה כי אין צורך בשיקול דעת.'
+          definition: 'משימה שנעשית תמיד באותו אופן. קל יותר לייעל משימות כאלה כי אין צורך בשיקול דעת.'
         },
         {
           term: 'זמן "ניירת" שבועי',
-          definition: 'סך השעות שמתבזבזות בשבוע על פעולות מנהלתיות חוזרות - העתקות, הקלדות, חיפוש מידע, מעקב ידני.'
-        },
-        {
-          term: 'פוטנציאל שחרור זמן',
-          definition: 'כמה שעות עבודה אפשר לחסוך אם נייעל את התהליכים. מחושב לפי כמות העבודה השחורה ומורכבות התהליך.'
-        },
-        {
-          term: 'צבעי התראה',
-          definition: 'ירוק = הרבה עבודה שחורה, עדיפות לייעול. צהוב = כדאי לבדוק. אדום = עבודה יצירתית יותר, פחות דחוף.'
+          definition: 'שעות שמתבזבזות על פעולות חוזרות - העתקות, הקלדות, חיפוש במיילים, מעקב ידני.'
         }
       ];
 
       return (
         <div className="meeting-legend">
           <h2 className="meeting-legend-title">
-            איך לקרוא את הדוח הזה?
+            📖 מילון מונחים
           </h2>
           <div className="legend-grid">
             {legendItems.map((item, idx) => (
@@ -1903,7 +2064,7 @@
       return (
         <div className="login-screen">
           <form className="login-card" onSubmit={handleSubmit}>
-            <h1 className="login-title">מערכת ניתוח תהליכים</h1>
+            <h1 className="login-title">מרכז ניטור וייעול תהליכים</h1>
             <p className="login-subtitle">קוראל שירותי ים</p>
             {error && <div className="login-error">{error}</div>}
             <input
@@ -2194,49 +2355,49 @@
       return <canvas ref={canvasRef}></canvas>;
     }
 
-    // AI Analysis Modal - ניתוח מתקדם
-    function AIAnalysisModal({ responses, onClose, onAnalysisComplete }) {
-      const [aiResponse, setAiResponse] = useState(null);
-      const [aiLoading, setAiLoading] = useState(false);
-      const [aiError, setAiError] = useState(null);
+    // ניתוח מערכתי מתקדם - Analysis Engine Modal
+    function AnalysisEngineModal({ responses, onClose, onAnalysisComplete }) {
+      const [analysisResponse, setAnalysisResponse] = useState(null);
+      const [analysisLoading, setAnalysisLoading] = useState(false);
+      const [analysisError, setAnalysisError] = useState(null);
 
       if (!responses || responses.length === 0) return null;
 
       // מנוע הניתוח המערכתי
       const runAnalysisEngine = async () => {
-        setAiLoading(true);
-        setAiError(null);
+        setAnalysisLoading(true);
+        setAnalysisError(null);
         try {
-          // Prepare summary data for Claude
-          const deptDataForAI = {};
+          // הכנת נתוני סיכום למנוע הניתוח
+          const deptDataSummary = {};
           responses.forEach(r => {
             const dept = r.department || r.department_other || 'לא צוין';
-            if (!deptDataForAI[dept]) deptDataForAI[dept] = { count: 0, hours: 0 };
-            deptDataForAI[dept].count++;
-            deptDataForAI[dept].hours += calculateWeeklyHours(r);
+            if (!deptDataSummary[dept]) deptDataSummary[dept] = { count: 0, hours: 0 };
+            deptDataSummary[dept].count++;
+            deptDataSummary[dept].hours += calculateWeeklyHours(r);
           });
 
-          const deptBreakdown = Object.entries(deptDataForAI)
+          const deptBreakdown = Object.entries(deptDataSummary)
             .map(([name, data]) => `- ${name}: ${data.count} עובדים, ${Math.round(data.hours)} שעות/שבוע`)
             .join('\n');
 
-          const painPointsForAI = responses
+          const painPointsSummary = responses
             .filter(r => r.main_frustration)
             .slice(0, 5)
             .map(r => `- ${r.name} (${r.department || 'לא צוין'}): "${r.main_frustration}"`)
             .join('\n') || 'לא דווחו';
 
-          const toolsForAI = {};
+          const toolsSummary = {};
           responses.forEach(r => {
-            (r.tools || []).forEach(t => { toolsForAI[t] = (toolsForAI[t] || 0) + 1; });
+            (r.tools || []).forEach(t => { toolsSummary[t] = (toolsSummary[t] || 0) + 1; });
           });
-          const toolsList = Object.entries(toolsForAI)
+          const toolsList = Object.entries(toolsSummary)
             .sort((a, b) => b[1] - a[1])
             .slice(0, 8)
             .map(([t, c]) => `${t} (${c})`)
             .join(', ') || 'לא צוין';
 
-          const wishesForAI = responses
+          const wishesSummary = responses
             .filter(r => r.process_wish || r.automation_wish)
             .slice(0, 5)
             .map(r => `- "${r.process_wish || r.automation_wish}"`)
@@ -2247,9 +2408,9 @@
             totalHours: Math.round(responses.reduce((sum, r) => sum + calculateWeeklyHours(r), 0)),
             avgScore: Math.round(responses.reduce((sum, r) => sum + calculateAutomationScore(r), 0) / responses.length),
             deptBreakdown,
-            painPoints: painPointsForAI,
+            painPoints: painPointsSummary,
             tools: toolsList,
-            wishes: wishesForAI
+            wishes: wishesSummary
           };
 
           const res = await fetch('/api/analyze', {
@@ -2261,18 +2422,18 @@
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.error || 'שגיאה בשירות מנוע הניתוח');
+            throw new Error(data.error || 'שגיאה במנוע הניתוח המערכתי');
           }
 
-          setAiResponse(data.analysis);
+          setAnalysisResponse(data.analysis);
           if (onAnalysisComplete) {
             onAnalysisComplete(data.analysis);
           }
         } catch (err) {
-          console.error('AI Error:', err);
-          setAiError(err.message || 'שגיאה בהתחברות ל-AI');
+          console.error('Analysis engine error:', err);
+          setAnalysisError(err.message || 'שגיאה בהתחברות למנוע הניתוח');
         } finally {
-          setAiLoading(false);
+          setAnalysisLoading(false);
         }
       };
 
@@ -2457,7 +2618,7 @@
                   <span style={{fontSize: '0.75rem', background: 'linear-gradient(135deg, #0891b2, #1a365d)', color: 'white', padding: '0.125rem 0.5rem', borderRadius: '10px'}}>קוראל</span>
                 </h4>
 
-                {!aiResponse && !aiLoading && (
+                {!analysisResponse && !analysisLoading && (
                   <div style={{textAlign: 'center', padding: '1.5rem'}}>
                     <p style={{color: 'var(--gray-600)', marginBottom: '1rem'}}>
                       קבל דוח מקיף עם תובנות מערכת והמלצות מבוססות נתונים
@@ -2478,20 +2639,20 @@
                     >
                       הפעל מנוע ניתוח
                     </button>
-                    {aiError && (
-                      <p style={{color: 'var(--error)', marginTop: '1rem', fontSize: '0.875rem'}}>{aiError}</p>
+                    {analysisError && (
+                      <p style={{color: 'var(--error)', marginTop: '1rem', fontSize: '0.875rem'}}>{analysisError}</p>
                     )}
                   </div>
                 )}
 
-                {aiLoading && (
+                {analysisLoading && (
                   <div style={{textAlign: 'center', padding: '2rem'}}>
                     <div className="spinner" style={{margin: '0 auto 1rem'}}></div>
                     <p style={{color: 'var(--gray-600)'}}>מנוע הניתוח מעבד את הנתונים...</p>
                   </div>
                 )}
 
-                {aiResponse && (
+                {analysisResponse && (
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
                     borderRadius: '12px',
@@ -2502,7 +2663,7 @@
                     color: 'var(--gray-700)',
                     borderRight: '4px solid #8b5cf6'
                   }}>
-                    {aiResponse}
+                    {analysisResponse}
                   </div>
                 )}
               </div>
@@ -2616,8 +2777,8 @@
       const [isDeleting, setIsDeleting] = useState(false);
       const [expandedCards, setExpandedCards] = useState({});
       const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
-      const [showAIAnalysis, setShowAIAnalysis] = useState(false);
-      const [savedAIAnalysis, setSavedAIAnalysis] = useState(localStorage.getItem('coral_ai_analysis') || '');
+      const [showAnalysisEngine, setShowAnalysisEngine] = useState(false);
+      const [savedAnalysis, setSavedAnalysis] = useState(localStorage.getItem('coral_analysis') || '');
 
       const fetchResponses = async () => {
         setLoading(true);
@@ -2838,7 +2999,7 @@
           'כלים', 'מערכת פנימית', 'העתקות בין כלים',
           'עבודה מחוץ לשעות', 'פעולה חוזרת', 'מבזבז זמן',
           'הכי מתסכל', 'רעיון לשיפור', 'מה הייתם רוצים שישתפר', 'הערות',
-          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'מספר כלים', 'מדד חיכוך'
+          'שולח PDA', 'קשור לצוות', 'נקודת הזנה', 'יעד סופי', 'טרטור בין מערכות', 'מדד עבודה שחורה'
         ];
 
         const rows = responses.map(r => [
@@ -2908,7 +3069,7 @@
         <div className="dashboard">
           <header className="dashboard-header">
             <div className="header-content">
-              <h1 className="header-title">מערכת ניתוח תהליכים | קוראל שירותי ים</h1>
+              <h1 className="header-title">מרכז ניטור וייעול תהליכים | קוראל שירותי ים</h1>
               <div className="header-actions">
                 {lastUpdated && (
                   <span className="last-updated">
@@ -2921,7 +3082,7 @@
                 <button
                   className="btn"
                   style={{background: 'linear-gradient(135deg, #0891b2 0%, #1a365d 100%)', color: 'white'}}
-                  onClick={() => setShowAIAnalysis(true)}
+                  onClick={() => setShowAnalysisEngine(true)}
                   disabled={responses.length === 0}
                 >
                   תובנות מערכת
@@ -2939,6 +3100,9 @@
           </header>
 
           <main className="dashboard-content">
+            {/* Executive Print Summary - visible only when printing */}
+            {responses.length > 0 && <ExecutivePrintSummary responses={responses} />}
+
             {/* Strategic Questions for Meeting */}
             {responses.length > 0 && <StrategicQuestions responses={responses} />}
 
@@ -3174,14 +3338,14 @@
             {/* Meeting Legend - shown in print */}
             <MeetingLegend />
 
-            {/* AI Analysis Print Section - appears only when printing if analysis was run */}
-            {savedAIAnalysis && (
+            {/* Analysis Engine Print Section - appears only when printing if analysis was run */}
+            {savedAnalysis && (
               <div className="ai-analysis-print">
                 <h2 className="ai-analysis-print-title">
-                  דוח תובנות מערכת - קוראל שירותי ים
+                  דוח ניתוח מערכתי - קוראל שירותי ים
                 </h2>
                 <div style={{whiteSpace: 'pre-wrap', lineHeight: '1.8', fontSize: '0.9rem'}}>
-                  {savedAIAnalysis}
+                  {savedAnalysis}
                 </div>
               </div>
             )}
@@ -3192,14 +3356,14 @@
             <ResponseModal response={selectedResponse} onClose={() => setSelectedResponse(null)} />
           )}
 
-          {/* AI Analysis Modal */}
-          {showAIAnalysis && (
-            <AIAnalysisModal
+          {/* Analysis Engine Modal */}
+          {showAnalysisEngine && (
+            <AnalysisEngineModal
               responses={responses}
-              onClose={() => setShowAIAnalysis(false)}
+              onClose={() => setShowAnalysisEngine(false)}
               onAnalysisComplete={(analysis) => {
-                setSavedAIAnalysis(analysis);
-                localStorage.setItem('coral_ai_analysis', analysis);
+                setSavedAnalysis(analysis);
+                localStorage.setItem('coral_analysis', analysis);
               }}
             />
           )}

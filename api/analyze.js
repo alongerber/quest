@@ -1,5 +1,5 @@
-// Vercel Serverless Function - Claude AI Analysis
-// This function receives survey data and returns AI-generated insights
+// Vercel Serverless Function - מנוע ניתוח מערכתי קוראל
+// פונקציה זו מקבלת נתוני סקר ומחזירה תובנות מערכת
 
 export default async function handler(req, res) {
   // Only allow POST
@@ -46,7 +46,7 @@ ${r.inquiries_per_day ? `- פניות ביום: ${r.inquiries_per_day}` : ''}
 `;
     }).join('\n---\n');
 
-    // Build a summary of the data for Claude
+    // הכנת סיכום הנתונים למנוע הניתוח
     const dataDescription = `
 נתוני סקר התייעלות - קוראל שירותי ים:
 
@@ -65,7 +65,7 @@ ${summaryData.tools}
 ${detailedResponses}
 `;
 
-    // Call Claude API
+    // מנוע הניתוח
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -193,8 +193,8 @@ ${dataDescription}
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Claude API error:', errorData);
-      return res.status(500).json({ error: 'AI service error', details: errorData });
+      console.error('Analysis engine error:', errorData);
+      return res.status(500).json({ error: 'שגיאה במנוע הניתוח', details: errorData });
     }
 
     const data = await response.json();
